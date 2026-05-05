@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MetroStats",
+  "description": "城市地铁客流统计数据集合",
+  "type": "object",
+  "required": [
+    "generated_at",
+    "source",
+    "city_count",
+    "items"
+  ],
+  "properties": {
+    "generated_at": {
+      "type": "string",
+      "description": "生成时间（ISO 8601）"
+    },
+    "source": {
+      "type": "string",
+      "description": "数据来源"
+    },
+    "city_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "包含数据的城市总数"
+    },
+    "no_daily_data_cities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "日客流为 0 或缺失的城市列表"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "city",
+          "city_cn",
+          "scrape_date"
+        ],
+        "properties": {
+          "city": {
+            "type": "string",
+            "description": "城市拼音代码"
+          },
+          "city_cn": {
+            "type": "string",
+            "description": "城市中文名"
+          },
+          "scrape_date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "description": "数据采集日期"
+          },
+          "operating_lines": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "运营线路数"
+          },
+          "lines_under_construction": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "在建线路数"
+          },
+          "operating_stations": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "运营站点数"
+          },
+          "operating_mileage_km": {
+            "type": "number",
+            "minimum": 0,
+            "description": "运营里程（公里）"
+          },
+          "daily_ridership_wan": {
+            "type": "number",
+            "minimum": 0,
+            "description": "日客流量（万人次），0 表示暂无数据"
+          },
+          "ridership_intensity": {
+            "type": "number",
+            "minimum": 0,
+            "description": "客流强度"
+          },
+          "peak_ridership_wan": {
+            "type": "number",
+            "minimum": 0,
+            "description": "历史最高日客流量（万人次）"
+          },
+          "peak_ridership_date": {
+            "type": "string",
+            "description": "历史最高日客流日期"
+          },
+          "yearly_avg_ridership": {
+            "type": "object",
+            "required": [
+              "years",
+              "values"
+            ],
+            "properties": {
+              "years": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "description": "年份列表"
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "description": "对应年份日客流量（万人次）"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -122,3 +122,83 @@ if daily_ridership_wan is null OR daily_ridership_wan <= 0:
 - 历史最高日客运量 **112.14 万人次**，出现在 **2025-12-31**
 - 年度数据从 **2018 年**（地铁首条线路开通年份）起，至 **2026 年**共 9 个年份
 - 2020 年数据受疫情影响有明显跃升（统计口径变化或新线开通），后续年份持续增长
+
+---
+
+## 5. data/latest/metro_stats.json
+
+汇总所有城市客流统计数据的集合文件，由 `scripts/build_data_index.py` 自动生成。
+
+### 顶层字段
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| `generated_at` | string | ISO 8601 生成时间 |
+| `source` | string | 数据来源（`metrodb.org`） |
+| `city_count` | number | 包含数据的城市数量 |
+| `no_daily_data_cities` | string[] | 日客流为 0 或缺失的城市列表 |
+| `items` | object[] | 城市数据数组，每项结构同第 1 节的 `{city}_stats.json` |
+
+### 说明
+
+- `items` 中每项的字段结构与第 1 节完全一致
+- 不改变原始 `{city}_stats.json` 的任何值
+- 可通过 `scripts/validate_data.py` 校验完整性
+
+---
+
+## 6. data/latest/city_assets_index.json
+
+索引所有城市目录中的资源文件（PNG、JSON），由 `scripts/build_data_index.py` 自动生成。
+
+### 顶层字段
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| `generated_at` | string | ISO 8601 生成时间 |
+| `city_count` | number | 索引城市总数 |
+| `items` | object[] | 城市资源数组 |
+
+### items 中每项字段
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| `city` | string | 城市拼音代码 |
+| `city_cn` | string | 城市中文名 |
+| `dir` | string | 城市目录名 |
+| `has_network_map` | boolean | 是否有线路图 |
+| `network_map_path` | string\|null | 线路图相对路径 |
+| `has_plan_map` | boolean | 是否有规划图 |
+| `plan_map_path` | string\|null | 规划图相对路径 |
+| `has_stats` | boolean | 是否有客流数据 |
+| `stats_path` | string\|null | 客流数据相对路径 |
+| `has_yearly_trend` | boolean | 是否有年度趋势图 |
+| `yearly_trend_path` | string\|null | 年度趋势图相对路径 |
+
+---
+
+## 7. data/latest/manifest.json
+
+记录当前数据层整体统计信息，由 `scripts/build_data_index.py` 自动生成。
+
+### 字段
+
+| 字段名 | 类型 | 说明 |
+|--------|------|------|
+| `generated_at` | string | ISO 8601 生成时间 |
+| `version` | string | 数据版本号 |
+| `stats_city_count` | number | 有客流数据的城市数量 |
+| `asset_city_count` | number | 有资源索引的城市数量 |
+| `network_map_count` | number | 线路图总数 |
+| `plan_map_count` | number | 规划图总数 |
+| `yearly_trend_count` | number | 年度趋势图总数 |
+| `no_daily_data_count` | number | 缺失日客流城市数量 |
+| `no_daily_data_cities` | string[] | 缺失日客流城市列表 |
+| `dashboard_file` | string | 大屏文件名 |
+| `data_files` | string[] | 数据文件相对路径列表 |
+
+---
+
+## 8. data/schema/metro_stats.schema.json
+
+`metro_stats.json` 的 JSON Schema（draft-07），定义了完整的字段类型、约束和描述。可用于自动化校验。

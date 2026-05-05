@@ -10,13 +10,13 @@
 ## 当前状态
 
 - 版本：v1.0.0
-- 当前阶段：Phase 1 - 文档基线建设
+- 当前阶段：Phase 2 - 数据结构标准化（已完成）
 - 浏览器验收：16/16 PASS
 - 数据覆盖：全国主要城市地铁客流数据
 
 ---
 
-## Phase 1：文档基线建设（当前）
+## Phase 1：文档基线建设（已完成）
 
 **目标**：建立完整的项目文档体系，为后续迭代提供基线。
 
@@ -34,20 +34,23 @@
 
 ---
 
-## Phase 2：数据结构标准化
+## Phase 2：数据结构标准化（已完成）
 
 **目标**：统一数据格式，建立数据校验机制。
 
 **产物**：
-- [ ] 定义统一的 JSON Schema（城市数据结构规范）
-- [ ] 编写数据校验脚本 `validate_data.py`
-- [ ] 为所有城市数据添加字段说明文档
-- [ ] 生成数据质量报告
+- [x] `data/latest/metro_stats.json` — 汇总 34 城市客流数据
+- [x] `data/latest/city_assets_index.json` — 索引 48 城市资源文件
+- [x] `data/latest/manifest.json` — 数据层整体统计
+- [x] `data/schema/metro_stats.schema.json` — JSON Schema 定义
+- [x] `scripts/build_data_index.py` — 数据索引构建脚本
+- [x] `scripts/validate_data.py` — 数据校验脚本
 
 **验收标准**：
-- JSON Schema 可验证现有所有城市数据
-- 校验脚本可检测缺失字段、类型错误、数值异常
-- 数据质量报告覆盖所有已知问题
+- `build_data_index.py` 可重复生成数据层文件
+- `validate_data.py` 输出 PASS（0 errors）
+- dashboard.html 未被修改
+- 文档已同步更新（DATA_SCHEMA、ARCHITECTURE_DATA_FLOW、TESTING_ACCEPTANCE）
 
 ---
 

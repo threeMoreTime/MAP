@@ -99,3 +99,47 @@ flowchart LR
 - `generate_charts.py` 和 `embed_data.py` 均依赖 `scrape_metrodb.py` 的输出，必须先完成客流数据采集
 - `embed_data.py` 还依赖 `scrape_all_cities.py` 的输出（线路图 PNG）
 - `dashboard.html` 是最终产物，不依赖任何外部服务即可运行
+
+---
+
+## Phase 2：统一数据层
+
+在原始城市目录基础上，建立统一的 `data/latest` 数据层，为后续 Dashboard 数据外置（Phase 4）提供标准化接口。
+
+```mermaid
+flowchart TD
+  A[城市原始目录] -->|scripts/build_data_index.py| B[data/latest/metro_stats.json]
+  A --> B2[data/latest/city_assets_index.json]
+  A --> B3[data/latest/manifest.json]
+  A --> B4[data/schema/metro_stats.schema.json]
+  B --> C[scripts/validate_data.py]
+  B2 --> C
+  B3 --> C
+  C -->|PASS/FAIL| D[验收结果]
+  B -->|Phase 4| E[Dashboard 数据外置]
+```
+
+### 数据层文件
+
+| 文件 | 说明 |
+|------|------|
+| `data/latest/metro_stats.json` | 汇总 34 个城市的客流统计数据 |
+| `data/latest/city_assets_index.json` | 索引 48 个城市的资源文件（PNG/JSON） |
+| `data/latest/manifest.json` | 数据层整体统计与元信息 |
+| `data/schema/metro_stats.schema.json` | JSON Schema 定义 |
+
+### 执行命令
+
+```bash
+# 构建数据索引
+python scripts/build_data_index.py
+
+# 校验数据完整性
+python scripts/validate_data.py
+```
+
+### 设计原则
+
+- **不修改原始数据**：`build_data_index.py` 只读取和汇总，不改变各城市目录下的原始文件
+- **可重复执行**：每次运行覆盖 `data/latest/` 下的文件，结果确定
+- **校验先行**：`validate_data.py` 独立于构建脚本，可单独运行

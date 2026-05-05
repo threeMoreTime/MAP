@@ -134,3 +134,39 @@ python -m http.server 8000
 3. **回归验证**：若变更涉及数据，额外检查数据完整性（城市数量、数值合理性）
 4. **文档更新**：若变更涉及功能或数据，同步更新相关文档
 5. **提交前确认**：`git status` 确认无遗漏文件，`git diff` 确认无意外修改
+
+---
+
+## 11. Phase 2 数据层验收
+
+### 11.1 构建数据索引
+
+```bash
+python scripts/build_data_index.py
+```
+
+预期输出：
+- `data/latest/metro_stats.json` — 34 个城市客流数据
+- `data/latest/city_assets_index.json` — 48 个城市资源索引
+- `data/latest/manifest.json` — 整体统计
+- `data/schema/metro_stats.schema.json` — JSON Schema
+
+### 11.2 校验数据完整性
+
+```bash
+python scripts/validate_data.py
+```
+
+预期输出：`PASS`（0 errors，warnings 仅限日客流缺失城市）
+
+### 11.3 验收检查项
+
+| 编号 | 检查项 | 结果 |
+| ---- | ------ | ---- |
+| D01 | `metro_stats.json` 存在且 city_count = 34 | PASS |
+| D02 | `city_assets_index.json` 存在且 city_count = 48 | PASS |
+| D03 | `manifest.json` 存在且统计数值与实际一致 | PASS |
+| D04 | `metro_stats.schema.json` 存在且为合法 JSON | PASS |
+| D05 | `validate_data.py` 输出 PASS | PASS |
+| D06 | dashboard.html 未被修改 | PASS |
+| D07 | 原始城市目录文件未修改 | PASS |
