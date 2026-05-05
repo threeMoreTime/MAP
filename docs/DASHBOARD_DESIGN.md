@@ -13,6 +13,49 @@
 
 ---
 
+## 视觉风格（Phase 3.5）
+
+Dashboard 采用现代科幻（Sci-fi）视觉风格：
+
+| 元素 | 设计 |
+|------|------|
+| 背景色 | #060e1a（深邃深蓝） |
+| 主色调 | #00d4ff（青色系），用于标题渐变、数值高亮、边框发光 |
+| 标题效果 | CSS gradient text（#00d4ff → #448aff → #00e5ff） |
+| 导航栏 | 半透明毛玻璃 + sticky 定位 + hover 渐变下划线 |
+| 指标卡片 | 半透明玻璃拟态 + 顶部发光线 + hover 浮起效果 |
+| 图表容器 | 微透明背景 + 顶部渐变发光线 + 圆角边框 |
+| 分隔线 | header 底部 + chart-box 顶部的渐变发光线（透明 → 青色 → 透明） |
+| 文字层级 | 主文字 #c8d6e5，次要文字 #4a6a8a，弱化文字 #2a3a4a |
+| 响应式 | 900px 双列转单列，600px 进一步缩减间距和字号 |
+
+## 页面结构（Phase 3.5 全面重构）
+
+Dashboard 包含以下区域：
+
+| 区域 | 元素 | 说明 |
+|------|------|------|
+| 导航栏 | `.nav-bar` | Sticky 定位，包含品牌名和锚点导航（总览、客流城市、数据说明） |
+| Hero 区 | `.hero-section` | 平台标题、描述、数据来源标注，`#updateDate` |
+| 数据总览 | `#overviewSection` | 核心指标卡片、筛选控件、地图+详情、四图表 |
+| 城市资源 | `#cityResourceSection` | 客流城市卡片网格 `#cityResourceGrid`，显示 34 个客流数据城市基础指标 |
+| 数据说明 | `#aboutSection` | 数据来源、字段说明、校验状态、已知限制 |
+| 页脚 | `.footer-enhanced` | 品牌信息、导航链接、版权声明 |
+
+### 新增 DOM ID
+
+| ID | 位置 | 用途 |
+|----|------|------|
+| `overviewSection` | 总览 section | 导航锚点 |
+| `cityResourceSection` | 城市资源 section | 导航锚点 |
+| `cityResourceGrid` | 城市资源网格容器 | `updateCityResourceGrid()` 渲染目标 |
+| `aboutSection` | 数据说明 section | 导航锚点 |
+| `cityCountFooter` | 页脚 | 页脚城市计数 |
+
+### 新增 JS 函数
+
+- **`updateCityResourceGrid()`**：根据 `getFilteredData()` 渲染 34 个客流城市卡片网格，日客流缺失城市标注"暂无客流数据"，搜索联动
+
 ## ECharts 图表模块
 
 仪表盘包含 5 个核心图表：
