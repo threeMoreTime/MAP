@@ -1,0 +1,33 @@
+{
+  "city": "wuxi",
+  "city_cn": "无锡",
+  "scrape_date": "2026-05-05",
+  "operating_lines": 4,
+  "lines_under_construction": 1,
+  "operating_stations": 87,
+  "operating_mileage_km": 113.95,
+  "daily_ridership_wan": 0.0,
+  "ridership_intensity": 0.0,
+  "peak_ridership_wan": 141.12,
+  "peak_ridership_date": "2024-02-16",
+  "yearly_avg_ridership": {
+    "years": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      35.68,
+      40.16,
+      58.3,
+      71.13,
+      117.25,
+      101.49,
+      110.26
+    ]
+  }
+}

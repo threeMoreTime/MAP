@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全国城市地铁客流数据大屏</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a1a3a; color: #fff; font-family: 'Microsoft YaHei', sans-serif; overflow-x: hidden; }
+.header { text-align: center; padding: 18px 0 8px; background: linear-gradient(180deg, #0d2550 0%, transparent 100%); }
+.header h1 { font-size: 28px; letter-spacing: 6px; text-shadow: 0 0 20px rgba(33,150,243,0.5); }
+.header .sub { font-size: 13px; color: #64b5f6; margin-top: 4px; }
+.cards { display: flex; justify-content: center; gap: 24px; padding: 16px 32px; flex-wrap: wrap; }
+.card { background: linear-gradient(135deg, #0d2550, #1a3a6a); border: 1px solid #1e5a8a; border-radius: 10px;
+        padding: 16px 28px; text-align: center; min-width: 150px; }
+.card .value { font-size: 32px; font-weight: bold; color: #64b5f6; }
+.card .label { font-size: 12px; color: #90caf9; margin-top: 4px; }
+.disclaimer { text-align: center; color: #546e7a; font-size: 11px; padding: 0 32px 8px; }
+/* Filters */
+.filters { display: flex; justify-content: center; gap: 12px; padding: 8px 24px 12px; flex-wrap: wrap; align-items: center; }
+.filters label { color: #90caf9; font-size: 13px; }
+.filters input, .filters select {
+  background: #0d2550; border: 1px solid #1e5a8a; color: #fff; border-radius: 6px;
+  padding: 6px 12px; font-size: 13px; outline: none; font-family: inherit;
+}
+.filters input:focus, .filters select:focus { border-color: #42A5F5; }
+.filters input { width: 160px; }
+.filters select { min-width: 120px; }
+.filters .filter-group { display: flex; align-items: center; gap: 6px; }
+.map-section { padding: 0 24px 16px; }
+.map-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+.chart-box { background: linear-gradient(135deg, #0d2550, #0f2040); border: 1px solid #1e3a5a;
+             border-radius: 10px; padding: 16px; }
+.chart-box h3 { font-size: 14px; color: #90caf9; margin-bottom: 8px; border-left: 3px solid #2196F3;
+                padding-left: 10px; }
+.chart { width: 100%; height: 420px; }
+.map-chart { width: 100%; height: 520px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 24px 24px; }
+.footer { text-align: center; padding: 12px; color: #546e7a; font-size: 12px; }
+.detail-panel { padding: 0; overflow-y: auto; max-height: 520px; }
+.detail-panel .metric { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a3a5a; font-size: 13px; }
+.detail-panel .metric .k { color: #90caf9; }
+.detail-panel .metric .v { color: #fff; font-weight: bold; }
+.detail-panel .city-title { font-size: 18px; font-weight: bold; color: #64b5f6; margin-bottom: 12px; text-align: center; }
+.detail-panel .hint { color: #546e7a; text-align: center; padding: 80px 0; font-size: 14px; }
+/* Fallback city list */
+.fallback-list { max-height: 480px; overflow-y: auto; }
+.fallback-list table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.fallback-list th { color: #90caf9; text-align: left; padding: 6px 8px; border-bottom: 1px solid #1e5a8a; position: sticky; top: 0; background: #0d2550; }
+.fallback-list td { padding: 5px 8px; border-bottom: 1px solid #0f2040; }
+/* Mobile */
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+  .map-row { grid-template-columns: 1fr; }
+  .cards { gap: 12px; padding: 12px 16px; }
+  .card { padding: 12px 16px; min-width: 100px; }
+  .card .value { font-size: 22px; }
+}
+@media (max-width: 600px) {
+  .header h1 { font-size: 20px; letter-spacing: 3px; }
+  .header .sub { font-size: 11px; }
+  .cards { gap: 8px; padding: 8px 12px; }
+  .card { padding: 10px 12px; min-width: 80px; }
+  .card .value { font-size: 18px; }
+  .card .label { font-size: 10px; }
+  .filters { gap: 8px; padding: 6px 12px; }
+  .filters input { width: 120px; }
+  .chart { height: 320px; }
+  .map-chart { height: 360px; }
+  .detail-panel { max-height: 360px; }
+  .map-section, .grid { padding-left: 12px; padding-right: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>全国城市地铁客流数据大屏</h1>
+  <div class="sub">数据来源：MetroDB.org | 更新日期：<span id="updateDate"></span></div>
+</div>
+<div class="cards" id="cards"></div>
+<div class="disclaimer" id="disclaimer"></div>
+
+<!-- Filters -->
+<div class="filters">
+  <div class="filter-group">
+    <label>搜索城市</label>
+    <input type="text" id="citySearch" placeholder="输入城市名...">
+  </div>
+  <div class="filter-group">
+    <label>主指标</label>
+    <select id="metricSelect">
+      <option value="daily_ridership_wan">日客流量</option>
+      <option value="operating_mileage_km">运营里程</option>
+      <option value="operating_stations">运营站点</option>
+      <option value="ridership_intensity">客流强度</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>排行</label>
+    <select id="topNSelect">
+      <option value="10">Top 10</option>
+      <option value="20">Top 20</option>
+      <option value="0">全部</option>
+    </select>
+  </div>
+</div>
+
+<!-- 地图模块 -->
+<div class="map-section">
+  <div class="map-row">
+    <div class="chart-box">
+      <h3 id="mapTitle">全国城市地铁散点地图</h3>
+      <div class="map-chart" id="chartMap"></div>
+    </div>
+    <div class="chart-box detail-panel" id="detailPanel">
+      <h3>城市详情</h3>
+      <div id="detailContent"><div class="hint">点击地图上的城市查看详细指标</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="chart-box"><h3 id="rankTitle">日客流量排行榜（万人次）</h3><div class="chart" id="chartRank"></div></div>
+  <div class="chart-box"><h3>运营里程排行榜（km）</h3><div class="chart" id="chartMileage"></div></div>
+  <div class="chart-box"><h3 id="trendTitle">Top 8 城市年度客流趋势</h3><div class="chart" id="chartTrend"></div></div>
+  <div class="chart-box"><h3>客流强度对比</h3><div class="chart" id="chartIntensity"></div></div>
+</div>
+<div class="footer">MetroDB 数据可视化 | 共 <span id="cityCount">0</span> 个城市</div>
+
+<script>
+// === 嵌入数据 ===
+const DATA = [
+  {
+    "city": "beijing",
+    "city_cn": "北京",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 27,
+    "lines_under_construction": 12,
+    "operating_stations": 522,
+    "operating_mileage_km": 861.0,
+    "daily_ridership_wan": 772.05,
+    "ridership_intensity": 0.89668989547038,
+    "peak_ridership_wan": 1380.78,
+    "peak_ridership_date": "2018-08-17",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        1068.8,
+        1082.15,
+        625.22,
+        838.35,
+        618.24,
+        943.43,
+        986.64,
+        977.1,
+        944.48
+      ]
+    }
+  },
+  {
+    "city": "changchun",
+    "city_cn": "长春",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 6,
+    "lines_under_construction": 5,
+    "operating_stations": 100,
+    "operating_mileage_km": 140.8,
+    "daily_ridership_wan": 83.36,
+    "ridership_intensity": 0.59204545454545,
+    "peak_ridership_wan": 107.21,
+    "peak_ridership_date": "2025-09-20",
+    "yearly_avg_ridership": {
+      "years": [
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        65.34,
+        42.03,
+        53.46,
+        36.53,
+        59.93,
+        60.75,
+        81.89,
+        71.99
+      ]
+    }
+  },
+  {
+    "city": "changsha",
+    "city_cn": "长沙",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 6,
+    "lines_under_construction": 4,
+    "operating_stations": 140,
+    "operating_mileage_km": 218.28,
+    "daily_ridership_wan": 394.79,
+    "ridership_intensity": 1.8086402785413,
+    "peak_ridership_wan": 467.5,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        67.28,
+        90.49,
+        103.33,
+        158.56,
+        157.09,
+        256.62,
+        278.04,
+        277.55,
+        280.13
+      ]
+    }
+  },
+  {
+    "city": "changzhou",
+    "city_cn": "常州",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 2,
+    "lines_under_construction": 0,
+    "operating_stations": 43,
+    "operating_mileage_km": 53.99,
+    "daily_ridership_wan": 29.31,
+    "ridership_intensity": 0.5428783107983,
+    "peak_ridership_wan": 42.88,
+    "peak_ridership_date": "2026-04-11",
+    "yearly_avg_ridership": {
+      "years": [
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        16.75,
+        6.53,
+        13.16,
+        12.29,
+        20.03,
+        19.7,
+        20.3,
+        20.96
+      ]
+    }
+  },
+  {
+    "city": "chengdu",
+    "city_cn": "成都",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 15,
+    "lines_under_construction": 7,
+    "operating_stations": 388,
+    "operating_mileage_km": 632.84,
+    "daily_ridership_wan": 624.91,
+    "ridership_intensity": 0.98746918652424,
+    "peak_ridership_wan": 997.13,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        316.89,
+        382.98,
+        331.05,
+        489.3,
+        427.53,
+        577.44,
+        600.25,
+        613.97,
+        642.77
+      ]
+    }
+  },
+  {
+    "city": "chongqing",
+    "city_cn": "重庆",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 13,
+    "lines_under_construction": 11,
+    "operating_stations": 305,
+    "operating_mileage_km": 522.54,
+    "daily_ridership_wan": 507.1,
+    "ridership_intensity": 0.97045202281165,
+    "peak_ridership_wan": 615.0,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        236.85,
+        284.56,
+        229.0,
+        299.55,
+        249.91,
+        365.71,
+        398.07,
+        415.88,
+        411.36
+      ]
+    }
+  },
+  {
+    "city": "dalian",
+    "city_cn": "大连",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 5,
+    "lines_under_construction": 2,
+    "operating_stations": 79,
+    "operating_mileage_km": 236.95,
+    "daily_ridership_wan": 0.0,
+    "ridership_intensity": 0.0,
+    "peak_ridership_wan": 157.9,
+    "peak_ridership_date": "2019-03-15",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        48.44,
+        56.86,
+        34.29,
+        42.66,
+        39.46,
+        66.29,
+        73.41,
+        71.84,
+        65.86
+      ]
+    }
+  },
+  {
+    "city": "dongguan",
+    "city_cn": "东莞",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 1,
+    "lines_under_construction": 2,
+    "operating_stations": 15,
+    "operating_mileage_km": 37.79,
+    "daily_ridership_wan": 41.67,
+    "ridership_intensity": 1.1026726647261,
+    "peak_ridership_wan": 65.0,
+    "peak_ridership_date": "2026-01-01",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        13.0,
+        14.75,
+        9.75,
+        11.15,
+        8.98,
+        12.42,
+        13.51,
+        14.15,
+        56.48
+      ]
+    }
+  },
+  {
+    "city": "guangzhou",
+    "city_cn": "广州",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 15,
+    "lines_under_construction": 11,
+    "operating_stations": 290,
+    "operating_mileage_km": 662.58,
+    "daily_ridership_wan": 832.5,
+    "ridership_intensity": 1.2564520510731,
+    "peak_ridership_wan": 1409.32,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        829.06,
+        905.72,
+        659.16,
+        776.43,
+        646.01,
+        857.24,
+        887.93,
+        931.23,
+        933.84
+      ]
+    }
+  },
+  {
+    "city": "guiyang",
+    "city_cn": "贵阳",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 2,
+    "lines_under_construction": 3,
+    "operating_stations": 57,
+    "operating_mileage_km": 118.73,
+    "daily_ridership_wan": 93.23,
+    "ridership_intensity": 0.78522698559757,
+    "peak_ridership_wan": 143.01,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        15.18,
+        14.92,
+        12.21,
+        29.52,
+        25.49,
+        36.67,
+        69.46,
+        78.3,
+        73.39
+      ]
+    }
+  },
+  {
+    "city": "hangzhou",
+    "city_cn": "杭州",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 11,
+    "lines_under_construction": 4,
+    "operating_stations": 241,
+    "operating_mileage_km": 516.0,
+    "daily_ridership_wan": 0.0,
+    "ridership_intensity": 0.0,
+    "peak_ridership_wan": 581.58,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        145.17,
+        173.71,
+        97.09,
+        243.27,
+        347.45,
+        297.93,
+        330.05,
+        423.52,
+        501.07
+      ]
+    }
+  },
+  {
+    "city": "harbin",
+    "city_cn": "哈尔滨",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 3,
+    "lines_under_construction": 1,
+    "operating_stations": 78,
+    "operating_mileage_km": 91.57,
+    "daily_ridership_wan": 142.6,
+    "ridership_intensity": 1.5572785846893,
+    "peak_ridership_wan": 173.0,
+    "peak_ridership_date": "2024-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        22.38,
+        28.4,
+        14.09,
+        19.75,
+        38.85,
+        77.07,
+        98.74,
+        114.04,
+        109.6
+      ]
+    }
+  },
+  {
+    "city": "hefei",
+    "city_cn": "合肥",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 6,
+    "lines_under_construction": 3,
+    "operating_stations": 161,
+    "operating_mileage_km": 232.1,
+    "daily_ridership_wan": 197.15,
+    "ridership_intensity": 0.84941835415769,
+    "peak_ridership_wan": 361.28,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        41.96,
+        49.27,
+        53.29,
+        74.17,
+        72.61,
+        112.57,
+        143.27,
+        155.96,
+        198.26
+      ]
+    }
+  },
+  {
+    "city": "hohhot",
+    "city_cn": "呼和浩特",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 2,
+    "lines_under_construction": 0,
+    "operating_stations": 43,
+    "operating_mileage_km": 49.03,
+    "daily_ridership_wan": 0.0,
+    "ridership_intensity": 0.0,
+    "peak_ridership_wan": 72.44,
+    "peak_ridership_date": "2023-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "values": [
+        14.34,
+        14.79,
+        19.61,
+        26.0,
+        40.6,
+        38.19
+      ]
+    }
+  },
+  {
+    "city": "kunming",
+    "city_cn": "昆明",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 5,
+    "lines_under_construction": 5,
+    "operating_stations": 92,
+    "operating_mileage_km": 165.85,
+    "daily_ridership_wan": 68.18,
+    "ridership_intensity": 0.41109436237564,
+    "peak_ridership_wan": 146.16,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        54.65,
+        58.61,
+        43.51,
+        60.62,
+        50.88,
+        80.02,
+        83.88,
+        81.8,
+        80.1
+      ]
+    }
+  },
+  {
+    "city": "lanzhou",
+    "city_cn": "兰州",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 1,
+    "lines_under_construction": 1,
+    "operating_stations": 20,
+    "operating_mileage_km": 35.03,
+    "daily_ridership_wan": 50.39,
+    "ridership_intensity": 1.4384813017414,
+    "peak_ridership_wan": 77.16,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        18.11,
+        19.75,
+        18.47,
+        12.09,
+        23.43,
+        44.01,
+        39.83,
+        37.29
+      ]
+    }
+  },
+  {
+    "city": "nanchang",
+    "city_cn": "南昌",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 4,
+    "lines_under_construction": 0,
+    "operating_stations": 121,
+    "operating_mileage_km": 128.5,
+    "daily_ridership_wan": 183.49,
+    "ridership_intensity": 1.4279377431907,
+    "peak_ridership_wan": 269.96,
+    "peak_ridership_date": "2025-10-01",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        68.15,
+        48.81,
+        37.39,
+        71.14,
+        65.48,
+        104.4,
+        119.93,
+        118.17,
+        117.97
+      ]
+    }
+  },
+  {
+    "city": "nanjing",
+    "city_cn": "南京",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 13,
+    "lines_under_construction": 11,
+    "operating_stations": 227,
+    "operating_mileage_km": 505.86,
+    "daily_ridership_wan": 451.84,
+    "ridership_intensity": 0.89321156051081,
+    "peak_ridership_wan": 533.1,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        304.81,
+        315.38,
+        217.99,
+        240.92,
+        210.13,
+        276.61,
+        299.4,
+        310.63,
+        334.35
+      ]
+    }
+  },
+  {
+    "city": "nanning",
+    "city_cn": "南宁",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 5,
+    "lines_under_construction": 1,
+    "operating_stations": 93,
+    "operating_mileage_km": 128.2,
+    "daily_ridership_wan": 139.5,
+    "ridership_intensity": 1.088143525741,
+    "peak_ridership_wan": 182.36,
+    "peak_ridership_date": "2024-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        58.55,
+        74.84,
+        56.96,
+        78.85,
+        74.94,
+        95.9,
+        99.05,
+        104.15,
+        139.46
+      ]
+    }
+  },
+  {
+    "city": "nantong",
+    "city_cn": "南通",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 1,
+    "lines_under_construction": 1,
+    "operating_stations": 28,
+    "operating_mileage_km": 39.18,
+    "daily_ridership_wan": 0.0,
+    "ridership_intensity": 0.0,
+    "peak_ridership_wan": 34.2,
+    "peak_ridership_date": "2025-02-02",
+    "yearly_avg_ridership": {
+      "years": [
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        6.8,
+        14.31,
+        28.03,
+        32.15,
+        32.4
+      ]
+    }
+  },
+  {
+    "city": "qingdao",
+    "city_cn": "青岛",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 7,
+    "lines_under_construction": 5,
+    "operating_stations": 156,
+    "operating_mileage_km": 318.08,
+    "daily_ridership_wan": 0.0,
+    "ridership_intensity": 0.0,
+    "peak_ridership_wan": 235.01,
+    "peak_ridership_date": "2024-05-02",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "values": [
+        41.86,
+        51.52,
+        31.6,
+        68.98,
+        96.83,
+        135.62,
+        139.8,
+        143.72
+      ]
+    }
+  },
+  {
+    "city": "shanghai",
+    "city_cn": "上海",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 20,
+    "lines_under_construction": 5,
+    "operating_stations": 510,
+    "operating_mileage_km": 896.0,
+    "daily_ridership_wan": 792.0,
+    "ridership_intensity": 0.88392857142857,
+    "peak_ridership_wan": 1339.7,
+    "peak_ridership_date": "2024-03-08",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        1015.51,
+        1062.73,
+        774.48,
+        977.96,
+        643.62,
+        1002.34,
+        1028.11,
+        1015.83,
+        982.27
+      ]
+    }
+  },
+  {
+    "city": "shenyang",
+    "city_cn": "沈阳",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 4,
+    "lines_under_construction": 5,
+    "operating_stations": 85,
+    "operating_mileage_km": 163.7,
+    "daily_ridership_wan": 206.09,
+    "ridership_intensity": 1.2589492974954,
+    "peak_ridership_wan": 288.93,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        85.04,
+        98.2,
+        84.69,
+        105.15,
+        84.22,
+        137.21,
+        178.32,
+        193.61,
+        189.38
+      ]
+    }
+  },
+  {
+    "city": "shenzhen",
+    "city_cn": "深圳",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 12,
+    "lines_under_construction": 8,
+    "operating_stations": 284,
+    "operating_mileage_km": 555.39,
+    "daily_ridership_wan": 718.77,
+    "ridership_intensity": 1.2941716631556,
+    "peak_ridership_wan": 1302.63,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        511.25,
+        549.37,
+        441.3,
+        596.25,
+        483.83,
+        739.96,
+        845.25,
+        897.16,
+        903.88
+      ]
+    }
+  },
+  {
+    "city": "shijiazhuang",
+    "city_cn": "石家庄",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 3,
+    "lines_under_construction": 1,
+    "operating_stations": 63,
+    "operating_mileage_km": 76.53,
+    "daily_ridership_wan": 52.25,
+    "ridership_intensity": 0.6827387952437,
+    "peak_ridership_wan": 295.78,
+    "peak_ridership_date": "2023-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        24.0,
+        26.21,
+        19.57,
+        28.31,
+        24.18,
+        47.41,
+        54.16,
+        51.88,
+        51.11
+      ]
+    }
+  },
+  {
+    "city": "suzhou",
+    "city_cn": "苏州",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 9,
+    "lines_under_construction": 5,
+    "operating_stations": 248,
+    "operating_mileage_km": 346.76,
+    "daily_ridership_wan": 301.4,
+    "ridership_intensity": 0.86918906448264,
+    "peak_ridership_wan": 347.63,
+    "peak_ridership_date": "2024-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        89.02,
+        99.46,
+        82.87,
+        111.02,
+        90.09,
+        150.61,
+        178.03,
+        193.36,
+        201.71
+      ]
+    }
+  },
+  {
+    "city": "taiyuan",
+    "city_cn": "太原",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 1,
+    "lines_under_construction": 1,
+    "operating_stations": 23,
+    "operating_mileage_km": 23.65,
+    "daily_ridership_wan": 0.0,
+    "ridership_intensity": 0.0,
+    "peak_ridership_wan": 59.95,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "values": [
+        14.69,
+        10.7,
+        9.06,
+        12.61,
+        13.15,
+        16.26
+      ]
+    }
+  },
+  {
+    "city": "tianjin",
+    "city_cn": "天津",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 11,
+    "lines_under_construction": 5,
+    "operating_stations": 233,
+    "operating_mileage_km": 314.69,
+    "daily_ridership_wan": 226.11,
+    "ridership_intensity": 0.71851663541898,
+    "peak_ridership_wan": 364.6,
+    "peak_ridership_date": "2025-11-07",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        134.61,
+        143.59,
+        93.36,
+        126.62,
+        86.81,
+        155.86,
+        175.39,
+        183.44,
+        188.38
+      ]
+    }
+  },
+  {
+    "city": "wuhan",
+    "city_cn": "武汉",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 12,
+    "lines_under_construction": 6,
+    "operating_stations": 312,
+    "operating_mileage_km": 518.1,
+    "daily_ridership_wan": 527.41,
+    "ridership_intensity": 1.0179695039568,
+    "peak_ridership_wan": 602.2,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        283.92,
+        334.94,
+        205.5,
+        274.54,
+        242.0,
+        367.63,
+        397.71,
+        392.3,
+        392.74
+      ]
+    }
+  },
+  {
+    "city": "wuhu",
+    "city_cn": "芜湖",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 2,
+    "lines_under_construction": 0,
+    "operating_stations": 36,
+    "operating_mileage_km": 46.25,
+    "daily_ridership_wan": 0.0,
+    "ridership_intensity": 0.0,
+    "peak_ridership_wan": 21.6,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "values": [
+        5.54,
+        11.9,
+        14.17,
+        16.37,
+        17.66
+      ]
+    }
+  },
+  {
+    "city": "wuxi",
+    "city_cn": "无锡",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 4,
+    "lines_under_construction": 1,
+    "operating_stations": 87,
+    "operating_mileage_km": 113.95,
+    "daily_ridership_wan": 0.0,
+    "ridership_intensity": 0.0,
+    "peak_ridership_wan": 141.12,
+    "peak_ridership_date": "2024-02-16",
+    "yearly_avg_ridership": {
+      "years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        35.68,
+        40.16,
+        58.3,
+        71.13,
+        117.25,
+        101.49,
+        110.26
+      ]
+    }
+  },
+  {
+    "city": "xiamen",
+    "city_cn": "厦门",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 3,
+    "lines_under_construction": 2,
+    "operating_stations": 74,
+    "operating_mileage_km": 98.4,
+    "daily_ridership_wan": 88.87,
+    "ridership_intensity": 0.90315040650407,
+    "peak_ridership_wan": 112.14,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        11.42,
+        15.94,
+        31.22,
+        46.56,
+        53.98,
+        67.51,
+        72.91,
+        75.68,
+        75.16
+      ]
+    }
+  },
+  {
+    "city": "xian",
+    "city_cn": "西安",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 12,
+    "lines_under_construction": 3,
+    "operating_stations": 270,
+    "operating_mileage_km": 403.31,
+    "daily_ridership_wan": 499.1,
+    "ridership_intensity": 1.2375096079939,
+    "peak_ridership_wan": 622.9,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        202.86,
+        258.99,
+        199.63,
+        281.14,
+        224.32,
+        353.65,
+        382.23,
+        423.56,
+        435.14
+      ]
+    }
+  },
+  {
+    "city": "zhengzhou",
+    "city_cn": "郑州",
+    "scrape_date": "2026-05-05",
+    "operating_lines": 11,
+    "lines_under_construction": 3,
+    "operating_stations": 238,
+    "operating_mileage_km": 371.23,
+    "daily_ridership_wan": 277.14,
+    "ridership_intensity": 0.74654526843197,
+    "peak_ridership_wan": 456.89,
+    "peak_ridership_date": "2025-12-31",
+    "yearly_avg_ridership": {
+      "years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "values": [
+        79.85,
+        112.66,
+        93.02,
+        138.04,
+        89.66,
+        160.11,
+        197.67,
+        228.65,
+        241.11
+      ]
+    }
+  }
+];
+
+// === 初始化 ===
+document.getElementById("updateDate").textContent = DATA.length > 0 ? DATA[0].scrape_date : "-";
+document.getElementById("cityCount").textContent = DATA.length;
+
+// === Phase 1: 数据有效性辅助函数 ===
+const hasValidDailyRidership = d => d.daily_ridership_wan > 0;
+const fmtDaily = d => hasValidDailyRidership(d) ? d.daily_ridership_wan.toFixed(1) + " 万" : "暂无数据";
+const fmtDailyValue = d => hasValidDailyRidership(d) ? d.daily_ridership_wan : null;
+const getMetricValue = (d, metric) => {
+  if (metric === "daily_ridership_wan") return hasValidDailyRidership(d) ? d.daily_ridership_wan : null;
+  return d[metric] || 0;
+};
+const isMetricValid = (d, metric) => {
+  if (metric === "daily_ridership_wan") return hasValidDailyRidership(d);
+  if (metric === "ridership_intensity") return d.ridership_intensity > 0;
+  return d.operating_stations > 0;
+};
+const formatMetricValue = (d, metric) => {
+  const meta = METRIC_LABELS[metric];
+  const value = getMetricValue(d, metric);
+  if (value == null) return "暂无数据";
+  return Number(value).toFixed(meta.decimals) + (meta.unit ? " " + meta.unit : "");
+};
+const METRIC_LABELS = {
+  daily_ridership_wan: { name: "日客流量", unit: "万人次", decimals: 1 },
+  operating_mileage_km: { name: "运营里程", unit: "km", decimals: 0 },
+  operating_stations: { name: "运营站点", unit: "座", decimals: 0 },
+  ridership_intensity: { name: "客流强度", unit: "", decimals: 2 },
+};
+
+const validData = DATA.filter(d => d.operating_stations > 0);
+
+// === Phase 2: 全局状态 ===
+const state = { keyword: "", metric: "daily_ridership_wan", topN: 10 };
+
+// === ECharts 实例复用 ===
+const charts = {};
+const getChart = id => {
+  if (!charts[id]) charts[id] = echarts.init(document.getElementById(id));
+  return charts[id];
+};
+
+const colorPalette = [
+  "#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc","#48b8d0",
+  "#ff9f7f","#87cefa","#da70d6","#32cd32","#ffa07a","#20b2aa","#778899","#ffb6c1","#98fb98","#dda0dd",
+  "#f0e68c","#add8e6","#ffb347","#77dd77","#fdfd96","#aec6cf","#cb99c9","#c23b22","#779ecb","#f7b7d0",
+  "#b39eb5","#fdfc8f","#836953","#b19cd9","#ff6961"
+];
+
+// === 城市坐标 ===
+const CITY_COORDS = {
+  beijing:[116.46,39.92],shanghai:[121.48,31.22],guangzhou:[113.23,23.16],shenzhen:[114.07,22.62],
+  chengdu:[104.06,30.67],wuhan:[114.31,30.52],chongqing:[106.54,29.59],xian:[108.95,34.27],
+  hangzhou:[120.19,30.26],nanjing:[118.78,32.04],tianjin:[117.20,39.13],zhengzhou:[113.65,34.76],
+  changsha:[112.94,28.23],shenyang:[123.38,41.80],suzhou:[120.62,31.32],nanning:[108.33,22.84],
+  changchun:[125.35,43.88],taiyuan:[112.55,37.87],qingdao:[120.33,36.07],dalian:[121.62,38.92],
+  hohhot:[111.65,40.82],changzhou:[119.95,31.79],kunming:[102.73,25.04],dongguan:[113.75,23.04],
+  guiyang:[106.71,26.57],nanchang:[115.89,28.68],hefei:[117.27,31.86],harbin:[126.63,45.75],
+  shijiazhuang:[114.48,38.03],xiamen:[118.10,24.46],lanzhou:[103.73,36.03],wuxi:[120.29,31.59],
+  wuhu:[118.38,31.33],foshan:[113.11,23.05],shaoxing:[120.58,30.01],nantong:[120.86,32.01],
+  fuzhou:[119.30,26.08],ningbo:[121.56,29.86],wenzhou:[120.65,28.01],jinan:[117.00,36.65],
+  luoyang:[112.44,34.66],xuzhou:[117.18,34.26],urumqi:[87.68,43.77],hongkong:[114.17,22.28],
+  macau:[113.54,22.19],kaohsiung:[120.31,22.62],taichung:[120.67,24.15],taipei:[121.52,25.03],
+  jinhua:[119.65,29.08],taizhou:[121.42,28.66],taoyuan:[121.30,24.96]
+};
+
+// === 数据过滤 ===
+function getFilteredData() {
+  let base = validData;
+  if (state.keyword) {
+    const kw = state.keyword.toLowerCase();
+    base = base.filter(d => d.city_cn.includes(kw) || d.city.toLowerCase().includes(kw));
+  }
+  return base;
+}
+
+// === 指标卡片更新 ===
+function updateCards() {
+  const data = getFilteredData();
+  const withDaily = data.filter(hasValidDailyRidership);
+  const totalCities = data.length;
+  const totalLines = data.reduce((s, d) => s + d.operating_lines, 0);
+  const totalStations = data.reduce((s, d) => s + d.operating_stations, 0);
+  const totalMileage = data.reduce((s, d) => s + d.operating_mileage_km, 0).toFixed(0);
+  const totalDaily = withDaily.reduce((s, d) => s + d.daily_ridership_wan, 0).toFixed(0);
+
+  const cardDefs = [
+    { label: "覆盖城市", value: totalCities, unit: "座" },
+    { label: "运营线路", value: totalLines, unit: "条" },
+    { label: "运营站点", value: totalStations, unit: "座" },
+    { label: "总里程", value: totalMileage, unit: "km" },
+    { label: "日总客流", value: totalDaily, unit: "万" },
+  ];
+  document.getElementById("cards").innerHTML = cardDefs.map(c =>
+    `<div class="card"><div class="value">${c.value}</div><div class="label">${c.label}（${c.unit}）</div></div>`
+  ).join("");
+
+  const noData = validData.filter(d => !hasValidDailyRidership(d)).length;
+  document.getElementById("disclaimer").textContent = noData > 0
+    ? `日客流统计已排除 ${noData} 个暂无数据城市` : "";
+}
+
+// === 排行榜图表更新 ===
+function updateRankChart() {
+  const ml = METRIC_LABELS[state.metric];
+  document.getElementById("rankTitle").textContent = ml.name + "排行榜（" + ml.unit + "）";
+  const data = getFilteredData()
+    .filter(d => isMetricValid(d, state.metric))
+    .sort((a, b) => getMetricValue(b, state.metric) - getMetricValue(a, state.metric));
+  const sliced = state.topN > 0 ? data.slice(0, state.topN) : data;
+  const vals = sliced.map(d => getMetricValue(d, state.metric));
+  const colors = ["#1565C0","#2E7D32","#E65100","#6A1B9A","#00838F"];
+  const ci = ["daily_ridership_wan","operating_mileage_km","operating_stations","ridership_intensity"]
+    .indexOf(state.metric);
+
+  getChart("chartRank").setOption({
+    tooltip: { trigger: "axis", axisPointer: { type: "shadow" },
+      formatter: p => `${p.name}<br/>${ml.name}: ${p.value != null ? p.value.toFixed(ml.decimals) : "--"} ${ml.unit}` },
+    grid: { left: "3%", right: "8%", bottom: "3%", top: "3%", containLabel: true },
+    xAxis: { type: "value", axisLabel: { color: "#aaa" }, splitLine: { lineStyle: { color: "#1a3a5a" } } },
+    yAxis: { type: "category", data: sliced.map(d => d.city_cn).reverse(), axisLabel: { color: "#ccc" } },
+    series: [{ type: "bar", data: vals.reverse(),
+      itemStyle: { color: new echarts.graphic.LinearGradient(0,0,1,0,[
+        {offset:0,color:colors[ci]||"#1565C0"},{offset:1,color:"#42A5F5"}]) },
+      label: { show: true, position: "right", color: "#ccc", fontSize: 11,
+               formatter: p => p.value != null ? p.value.toFixed(ml.decimals) : "--" }
+    }],
+  }, true);
+}
+
+// === 里程排行 ===
+function updateMileageChart() {
+  const data = getFilteredData().sort((a, b) => b.operating_mileage_km - a.operating_mileage_km);
+  const sliced = state.topN > 0 ? data.slice(0, state.topN) : data;
+  getChart("chartMileage").setOption({
+    tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+    grid: { left: "3%", right: "8%", bottom: "3%", top: "3%", containLabel: true },
+    xAxis: { type: "value", axisLabel: { color: "#aaa" }, splitLine: { lineStyle: { color: "#1a3a5a" } } },
+    yAxis: { type: "category", data: sliced.map(d => d.city_cn).reverse(), axisLabel: { color: "#ccc" } },
+    series: [{ type: "bar", data: sliced.map(d => d.operating_mileage_km).reverse(),
+      itemStyle: { color: new echarts.graphic.LinearGradient(0,0,1,0,[
+        {offset:0,color:"#2E7D32"},{offset:1,color:"#66BB6A"}]) },
+      label: { show: true, position: "right", color: "#ccc", fontSize: 11, formatter: p => p.value.toFixed(0) }
+    }]
+  }, true);
+}
+
+// === 年度趋势（统一年份对齐）===
+function updateTrendChart() {
+  const ranked = getFilteredData()
+    .filter(hasValidDailyRidership)
+    .sort((a, b) => b.daily_ridership_wan - a.daily_ridership_wan);
+  const top8 = ranked.slice(0, 8);
+  document.getElementById("trendTitle").textContent = `Top ${Math.min(8, top8.length)} 城市年度客流趋势`;
+
+  // 合并所有年份并去重排序
+  const yearSet = new Set();
+  top8.forEach(d => d.yearly_avg_ridership.years.forEach(y => yearSet.add(y)));
+  const allYears = [...yearSet].sort((a, b) => a - b);
+
+  // 每个城市按 allYears 对齐数据，缺失年份填 null
+  const seriesData = top8.map(d => {
+    const map = {};
+    d.yearly_avg_ridership.years.forEach((y, i) => { map[y] = d.yearly_avg_ridership.values[i]; });
+    return allYears.map(y => (y in map) ? map[y] : null);
+  });
+
+  getChart("chartTrend").setOption({
+    tooltip: { trigger: "axis" },
+    legend: { data: top8.map(d => d.city_cn), textStyle: { color: "#ccc", fontSize: 11 }, top: 0, type: "scroll" },
+    grid: { left: "3%", right: "4%", bottom: "3%", top: "40", containLabel: true },
+    xAxis: { type: "category", data: allYears, axisLabel: { color: "#aaa" }, splitLine: { lineStyle: { color: "#1a3a5a" } } },
+    yAxis: { type: "value", axisLabel: { color: "#aaa" }, splitLine: { lineStyle: { color: "#1a3a5a" } } },
+    series: top8.map((d, i) => ({
+      name: d.city_cn, type: "line", smooth: true,
+      data: seriesData[i],
+      connectNulls: false,
+      lineStyle: { width: 2 }, symbolSize: 4,
+      itemStyle: { color: colorPalette[i % colorPalette.length] }
+    }))
+  }, true);
+}
+
+// === 客流强度 ===
+function updateIntensityChart() {
+  const data = getFilteredData()
+    .filter(d => d.ridership_intensity > 0)
+    .sort((a, b) => b.ridership_intensity - a.ridership_intensity);
+  const sliced = state.topN > 0 ? data.slice(0, state.topN) : data;
+  getChart("chartIntensity").setOption({
+    tooltip: { trigger: "axis", axisPointer: { type: "shadow" },
+               formatter: p => `${p.name}<br/>客流强度: ${p.value.toFixed(3)}` },
+    grid: { left: "3%", right: "8%", bottom: "3%", top: "3%", containLabel: true },
+    xAxis: { type: "value", axisLabel: { color: "#aaa" }, splitLine: { lineStyle: { color: "#1a3a5a" } } },
+    yAxis: { type: "category", data: sliced.map(d => d.city_cn).reverse(), axisLabel: { color: "#ccc" } },
+    series: [{ type: "bar", data: sliced.map(d => d.ridership_intensity).reverse(),
+      itemStyle: { color: new echarts.graphic.LinearGradient(0,0,1,0,[
+        {offset:0,color:"#E65100"},{offset:1,color:"#FFB74D"}]) },
+      label: { show: true, position: "right", color: "#ccc", fontSize: 11, formatter: p => p.value.toFixed(2) }
+    }]
+  }, true);
+}
+
+// === 地图散点 ===
+let mapReady = false;
+let mapChart = null;
+let mapFallbackMode = false;
+
+function buildMapData() {
+  const metric = state.metric;
+  const ml = METRIC_LABELS[metric];
+  const data = getFilteredData().filter(d => CITY_COORDS[d.city] && isMetricValid(d, metric));
+
+  const bubble = data.map(d => {
+    const v = getMetricValue(d, metric);
+    return { name: d.city_cn, value: [...CITY_COORDS[d.city], v], city: d.city, rawData: d };
+  });
+
+  const sorted = [...data].sort((a, b) => getMetricValue(b, metric) - getMetricValue(a, metric));
+  const top = sorted.slice(0, 10);
+  const ripple = top.map(d => {
+    const v = getMetricValue(d, metric);
+    return { name: d.city_cn, value: [...CITY_COORDS[d.city], v], city: d.city, rawData: d };
+  });
+
+  document.getElementById("mapTitle").textContent = `全国城市散点地图 — ${ml.name}`;
+  return { bubble, ripple };
+}
+
+function getMapOption(mapData) {
+  const metric = state.metric;
+  const ml = METRIC_LABELS[metric];
+  const maxVal = Math.max(...mapData.bubble.map(d => d.value[2]), 1);
+
+  return {
+    tooltip: {
+      trigger: "item",
+      formatter: p => {
+        if (p.seriesType === "effectScatter" || p.seriesType === "scatter") {
+          const d = p.data.rawData;
+          return `<b style="font-size:14px">${d.city_cn}</b><br/>` +
+            `${ml.name}: <b>${formatMetricValue(d, metric)}</b><br/>` +
+            `运营里程: ${d.operating_mileage_km} km<br/>` +
+            `站点数: ${d.operating_stations} 座<br/>` +
+            `客流强度: ${d.ridership_intensity.toFixed(2)}`;
+        }
+        return p.name;
+      }
+    },
+    geo: {
+      map: "china", roam: true, zoom: 1.2, center: [105, 36],
+      label: { show: false },
+      itemStyle: { areaColor: "#0d2550", borderColor: "#1e5a8a", borderWidth: 0.8 },
+      emphasis: { itemStyle: { areaColor: "#1a3a6a" }, label: { show: false } }
+    },
+    series: [
+      {
+        name: ml.name, type: "scatter", coordinateSystem: "geo",
+        data: mapData.bubble,
+        symbolSize: val => Math.max(6, Math.sqrt(val[2] / maxVal * 900)),
+        itemStyle: {
+          color: p => {
+            const ratio = p.value[2] / maxVal;
+            if (ratio > 0.7) return "#ff5252";
+            if (ratio > 0.4) return "#ff9800";
+            if (ratio > 0.2) return "#ffd740";
+            if (ratio > 0.1) return "#69f0ae";
+            return "#40c4ff";
+          },
+          shadowBlur: 8, shadowColor: "rgba(33,150,243,0.4)"
+        },
+        label: { show: true, formatter: "{b}", position: "right", fontSize: 10, color: "#b0c4de" }
+      },
+      {
+        name: "Top 涟漪", type: "effectScatter", coordinateSystem: "geo",
+        data: mapData.ripple,
+        symbolSize: val => Math.max(10, Math.sqrt(val[2] / maxVal * 900)),
+        rippleEffect: { brushType: "stroke", scale: 4, period: 4 },
+        itemStyle: {
+          color: p => {
+            const ratio = p.value[2] / maxVal;
+            if (ratio > 0.8) return "#ff1744";
+            if (ratio > 0.5) return "#ff9100";
+            return "#ffea00";
+          }
+        },
+        label: { show: false }
+      }
+    ]
+  };
+}
+
+function updateMapChart() {
+  if (mapFallbackMode) { showMapFallback(); return; }
+  if (!mapReady || !mapChart) return;
+  mapChart.setOption(getMapOption(buildMapData()), true);
+}
+
+// === Phase 3: 地图 GeoJSON 加载（本地优先 + 远程 fallback + 降级列表）===
+function showMapFallback() {
+  mapFallbackMode = true;
+  const metric = state.metric;
+  const ml = METRIC_LABELS[metric];
+  const data = getFilteredData()
+    .filter(d => isMetricValid(d, metric))
+    .sort((a, b) => {
+      const va = getMetricValue(a, metric), vb = getMetricValue(b, metric);
+      return (vb || 0) - (va || 0);
+    });
+  const el = document.getElementById("chartMap");
+  el.innerHTML =
+    '<div style="color:#90caf9;text-align:center;padding:12px 0;font-size:13px">' +
+    '地图数据加载失败，排行榜和城市详情仍可正常使用</div>' +
+    '<div class="fallback-list"><table><tr>' +
+    '<th>城市</th><th>' + ml.name + '(' + ml.unit + ')</th><th>里程(km)</th><th>站点</th>' +
+    '</tr>' +
+    data.map(d => '<tr>' +
+      '<td>' + d.city_cn + '</td>' +
+      '<td>' + formatMetricValue(d, metric) + '</td>' +
+      '<td>' + d.operating_mileage_km + '</td>' +
+      '<td>' + d.operating_stations + '</td>' +
+      '</tr>').join("") +
+    '</table></div>';
+}
+
+function loadGeoJSON() {
+  // 优先本地
+  fetch("assets/china.json")
+    .then(r => { if (!r.ok) throw new Error("local miss"); return r.json(); })
+    .then(registerAndRender)
+    .catch(() => {
+      // 远程 fallback
+      fetch("https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json")
+        .then(r => { if (!r.ok) throw new Error("remote miss"); return r.json(); })
+        .then(registerAndRender)
+        .catch(() => {
+          mapFallbackMode = true;
+          showMapFallback();
+        });
+    });
+}
+
+function registerAndRender(geoJson) {
+  echarts.registerMap("china", geoJson);
+  mapChart = getChart("chartMap");
+  mapReady = true;
+  mapChart.setOption(getMapOption(buildMapData()));
+  // 点击联动详情
+  mapChart.on("click", function(params) {
+    if (!params.data || !params.data.rawData) return;
+    showCityDetail(params.data.rawData);
+  });
+}
+
+// === 城市详情面板 ===
+function showCityDetail(d) {
+  const yearly = d.yearly_avg_ridership;
+  const trendHTML = yearly.years.length > 0
+    ? `<div style="margin-top:12px"><div class="metric"><span class="k">年度趋势</span></div>` +
+      yearly.years.map((y, i) =>
+        `<div class="metric"><span class="k">${y}</span><span class="v">${yearly.values[i].toFixed(1)} 万</span></div>`
+      ).join("") + "</div>"
+    : "";
+
+  document.getElementById("detailContent").innerHTML =
+    `<div class="city-title">${d.city_cn}</div>` +
+    `<div class="metric"><span class="k">日客流量</span><span class="v">${fmtDaily(d)}</span></div>` +
+    `<div class="metric"><span class="k">历史最高</span><span class="v">${d.peak_ridership_wan} 万 (${d.peak_ridership_date})</span></div>` +
+    `<div class="metric"><span class="k">客流强度</span><span class="v">${d.ridership_intensity.toFixed(2)}</span></div>` +
+    `<div class="metric"><span class="k">运营线路</span><span class="v">${d.operating_lines} 条</span></div>` +
+    `<div class="metric"><span class="k">运营站点</span><span class="v">${d.operating_stations} 座</span></div>` +
+    `<div class="metric"><span class="k">运营里程</span><span class="v">${d.operating_mileage_km} km</span></div>` +
+    `<div class="metric"><span class="k">在建线路</span><span class="v">${d.lines_under_construction} 条</span></div>` +
+    trendHTML;
+}
+
+// === 统一刷新入口 ===
+function updateDashboard() {
+  updateCards();
+  updateRankChart();
+  updateMileageChart();
+  updateTrendChart();
+  updateIntensityChart();
+  updateMapChart();
+}
+
+// === 事件绑定 ===
+document.getElementById("citySearch").addEventListener("input", function() {
+  state.keyword = this.value.trim();
+  updateDashboard();
+});
+document.getElementById("metricSelect").addEventListener("change", function() {
+  state.metric = this.value;
+  updateDashboard();
+});
+document.getElementById("topNSelect").addEventListener("change", function() {
+  state.topN = parseInt(this.value);
+  updateDashboard();
+});
+
+// === 响应式 ===
+window.addEventListener("resize", () => {
+  document.querySelectorAll(".chart, .map-chart").forEach(el => {
+    const inst = echarts.getInstanceByDom(el);
+    if (inst) inst.resize();
+  });
+});
+
+// === 启动 ===
+updateDashboard();
+loadGeoJSON();
+</script>
+</body>
+</html>

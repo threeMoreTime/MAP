@@ -1,0 +1,35 @@
+{
+  "city": "qingdao",
+  "city_cn": "青岛",
+  "scrape_date": "2026-05-05",
+  "operating_lines": 7,
+  "lines_under_construction": 5,
+  "operating_stations": 156,
+  "operating_mileage_km": 318.08,
+  "daily_ridership_wan": 0.0,
+  "ridership_intensity": 0.0,
+  "peak_ridership_wan": 235.01,
+  "peak_ridership_date": "2024-05-02",
+  "yearly_avg_ridership": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "values": [
+      41.86,
+      51.52,
+      31.6,
+      68.98,
+      96.83,
+      135.62,
+      139.8,
+      143.72
+    ]
+  }
+}

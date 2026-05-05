@@ -1,0 +1,37 @@
+{
+  "city": "xian",
+  "city_cn": "西安",
+  "scrape_date": "2026-05-05",
+  "operating_lines": 12,
+  "lines_under_construction": 3,
+  "operating_stations": 270,
+  "operating_mileage_km": 403.31,
+  "daily_ridership_wan": 499.1,
+  "ridership_intensity": 1.2375096079939,
+  "peak_ridership_wan": 622.9,
+  "peak_ridership_date": "2025-12-31",
+  "yearly_avg_ridership": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      202.86,
+      258.99,
+      199.63,
+      281.14,
+      224.32,
+      353.65,
+      382.23,
+      423.56,
+      435.14
+    ]
+  }
+}

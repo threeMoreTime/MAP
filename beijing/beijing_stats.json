@@ -1,0 +1,37 @@
+{
+  "city": "beijing",
+  "city_cn": "北京",
+  "scrape_date": "2026-05-05",
+  "operating_lines": 27,
+  "lines_under_construction": 12,
+  "operating_stations": 522,
+  "operating_mileage_km": 861.0,
+  "daily_ridership_wan": 772.05,
+  "ridership_intensity": 0.89668989547038,
+  "peak_ridership_wan": 1380.78,
+  "peak_ridership_date": "2018-08-17",
+  "yearly_avg_ridership": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      1068.8,
+      1082.15,
+      625.22,
+      838.35,
+      618.24,
+      943.43,
+      986.64,
+      977.1,
+      944.48
+    ]
+  }
+}

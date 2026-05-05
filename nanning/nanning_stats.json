@@ -1,0 +1,37 @@
+{
+  "city": "nanning",
+  "city_cn": "南宁",
+  "scrape_date": "2026-05-05",
+  "operating_lines": 5,
+  "lines_under_construction": 1,
+  "operating_stations": 93,
+  "operating_mileage_km": 128.2,
+  "daily_ridership_wan": 139.5,
+  "ridership_intensity": 1.088143525741,
+  "peak_ridership_wan": 182.36,
+  "peak_ridership_date": "2024-12-31",
+  "yearly_avg_ridership": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      58.55,
+      74.84,
+      56.96,
+      78.85,
+      74.94,
+      95.9,
+      99.05,
+      104.15,
+      139.46
+    ]
+  }
+}

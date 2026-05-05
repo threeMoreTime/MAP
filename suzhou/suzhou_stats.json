@@ -1,0 +1,37 @@
+{
+  "city": "suzhou",
+  "city_cn": "苏州",
+  "scrape_date": "2026-05-05",
+  "operating_lines": 9,
+  "lines_under_construction": 5,
+  "operating_stations": 248,
+  "operating_mileage_km": 346.76,
+  "daily_ridership_wan": 301.4,
+  "ridership_intensity": 0.86918906448264,
+  "peak_ridership_wan": 347.63,
+  "peak_ridership_date": "2024-12-31",
+  "yearly_avg_ridership": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      89.02,
+      99.46,
+      82.87,
+      111.02,
+      90.09,
+      150.61,
+      178.03,
+      193.36,
+      201.71
+    ]
+  }
+}
