@@ -193,3 +193,21 @@ function getChart(id) {
 - ECharts 折线图自动处理 `null` 值，产生断点效果
 
 这种处理方式确保多城市趋势对比时年份轴对齐，数据缺失处直观可见，不会产生误导性的连线。
+
+---
+
+## 自动化验收覆盖
+
+`scripts/acceptance_dashboard.js` 通过 puppeteer-core 覆盖以下 Dashboard 交互项：
+
+| 交互模块 | 验收项 | 检查方式 |
+|----------|--------|----------|
+| 页面加载 | T01/T02/T03 | HTTP 状态、console 错误、ECharts canvas |
+| 搜索框 | T04/T05 | 输入关键词 → ECharts `getOption()` 获取 yAxis.data |
+| 指标选择器 | T06a–T06d | 切换 `metricSelect` → 检查 `rankTitle` 文本 |
+| Top N 选择器 | T07a–T07c | 切换 `topNSelect` → ECharts API 获取城市数量 |
+| 城市详情 | T08/T09 | 调用 `showCityDetail()` → 检查 `detailContent` innerHTML |
+| 移动端 | T10 | 375px viewport reload → `scrollWidth` 检查 |
+| 控制台 | T11 | 全程 console error 过滤（排除 favicon/404/网络错误） |
+
+**关键设计**：使用 ECharts API（`echarts.getInstanceByDom().getOption()`）获取图表数据，而非解析 canvas/SVG innerHTML，确保验收结果可靠。

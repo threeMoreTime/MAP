@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.0.0
-- 当前阶段：Phase 2 - 数据结构标准化（已完成）
+- 当前阶段：Phase 3 - 自动化验收脚本（已完成）
 - 浏览器验收：16/16 PASS
 - 数据覆盖：全国主要城市地铁客流数据
 
@@ -54,21 +54,21 @@
 
 ---
 
-## Phase 3：自动化验收脚本
+## Phase 3：自动化验收脚本（已完成）
 
 **目标**：将浏览器测试正式化，集成到开发流程。
 
 **产物**：
-- [ ] 正式化的 puppeteer 测试套件（可重复执行）
-- [ ] 测试报告自动生成（HTML/JSON 格式）
-- [ ] npm scripts 集成：`npm test` 一键运行
-- [ ] CI 就绪的测试配置
+- [x] `scripts/acceptance_dashboard.js` — puppeteer-core 浏览器验收（16 项）
+- [x] `scripts/check_dashboard_syntax.py` — Dashboard JS 语法检查
+- [x] `scripts/run_acceptance.py` — 总验收入口（4 步串行）
+- [x] `package.json` — npm scripts 集成（test:data / test:dashboard / test:acceptance）
 
 **验收标准**：
-- `npm test` 可一键执行全部测试
-- 测试报告包含每个用例的通过/失败状态
-- 测试可在 CI 环境（GitHub Actions）中运行
-- 新增测试用例可方便扩展
+- `python scripts/run_acceptance.py` 一键执行全部验收
+- 浏览器验收 16/16 PASS
+- 自动启停静态服务，Chrome 路径自动检测
+- 失败时退出码 1，全部通过退出码 0
 
 ---
 

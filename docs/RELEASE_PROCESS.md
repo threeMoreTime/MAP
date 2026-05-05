@@ -62,22 +62,24 @@ python scrape_metrodb.py
 
 ## 步骤 4：执行验收
 
-### 4.1 JS 语法检查
+### 4.1 一键验收（推荐）
 
 ```bash
-find . -name "*.js" -not -path "*/node_modules/*" -exec node --check {} \;
+python scripts/run_acceptance.py
 ```
 
-所有文件无输出即为通过。
+该命令自动执行：数据构建 → 数据校验 → JS 语法检查 → 浏览器真实验收。
 
-### 4.2 浏览器验收
+`build_data_index.py` 采用稳定写入：当源数据未变化时不会重写 `data/latest/*.json`，避免无意义的 `generated_at` 时间戳 diff。
+
+### 4.2 分步验收
 
 ```bash
-# 启动本地静态服务
-python -m http.server 8000 &
+# JS 语法检查
+python scripts/check_dashboard_syntax.py
 
-# 运行浏览器测试
-node tests/browser_test.js
+# 浏览器验收
+node scripts/acceptance_dashboard.js
 ```
 
 验收标准：**16/16 PASS**（详见 [TESTING_ACCEPTANCE.md](./TESTING_ACCEPTANCE.md)）

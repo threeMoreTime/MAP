@@ -241,11 +241,27 @@ def build_schema():
     }
 
 
-def write_json(path, data):
+def serialize(data):
+    return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+
+
+def strip_generated_at(obj):
+    if isinstance(obj, dict):
+        return {k: v for k, v in obj.items() if k != "generated_at"}
+    return obj
+
+
+def write_json_if_changed(path, data):
     os.makedirs(os.path.dirname(path), exist_ok=True)
+    new_text = serialize(data)
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            old_text = f.read()
+        if strip_generated_at(json.loads(old_text)) == strip_generated_at(data):
+            return False
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-        f.write("\n")
+        f.write(new_text)
+    return True
 
 
 def main():
@@ -259,26 +275,26 @@ def main():
     # 1. metro_stats.json
     stats, no_daily = build_metro_stats(cities)
     stats_path = os.path.join(ROOT, "data", "latest", "metro_stats.json")
-    write_json(stats_path, stats)
-    print(f"  metro_stats.json: {stats['city_count']} 个城市")
+    changed = write_json_if_changed(stats_path, stats)
+    print(f"  metro_stats.json: {stats['city_count']} 个城市 — {'UPDATED' if changed else 'UNCHANGED'}")
 
     # 2. city_assets_index.json
     assets = build_city_assets_index(cities)
     assets_path = os.path.join(ROOT, "data", "latest", "city_assets_index.json")
-    write_json(assets_path, assets)
-    print(f"  city_assets_index.json: {assets['city_count']} 个城市")
+    changed = write_json_if_changed(assets_path, assets)
+    print(f"  city_assets_index.json: {assets['city_count']} 个城市 — {'UPDATED' if changed else 'UNCHANGED'}")
 
     # 3. manifest.json
     manifest = build_manifest(stats, assets)
     manifest_path = os.path.join(ROOT, "data", "latest", "manifest.json")
-    write_json(manifest_path, manifest)
-    print(f"  manifest.json: 版本 {manifest['version']}")
+    changed = write_json_if_changed(manifest_path, manifest)
+    print(f"  manifest.json: 版本 {manifest['version']} — {'UPDATED' if changed else 'UNCHANGED'}")
 
     # 4. metro_stats.schema.json
     schema = build_schema()
     schema_path = os.path.join(ROOT, "data", "schema", "metro_stats.schema.json")
-    write_json(schema_path, schema)
-    print(f"  metro_stats.schema.json")
+    changed = write_json_if_changed(schema_path, schema)
+    print(f"  metro_stats.schema.json — {'UPDATED' if changed else 'UNCHANGED'}")
 
     # 统计摘要
     net_count = manifest["network_map_count"]

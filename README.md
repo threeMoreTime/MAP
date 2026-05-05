@@ -80,6 +80,20 @@ python generate_charts.py
 python -m http.server 8000
 ```
 
+## 自动化验收
+
+```bash
+# 一键运行全部验收（数据构建 + 校验 + 语法检查 + 浏览器测试）
+python scripts/run_acceptance.py
+
+# 也可以分步运行
+python scripts/validate_data.py           # 数据校验
+python scripts/check_dashboard_syntax.py  # JS 语法检查
+node scripts/acceptance_dashboard.js      # 浏览器真实验收
+```
+
+验收依赖：Node.js + puppeteer-core（`npm install`）+ Chrome 浏览器。
+
 ## 验收状态
 
 | 检查项 | 结果 |

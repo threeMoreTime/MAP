@@ -137,7 +137,78 @@ python -m http.server 8000
 
 ---
 
-## 11. Phase 2 数据层验收
+## 11. Phase 3 自动化验收
+
+### 11.1 一键验收
+
+```bash
+python scripts/run_acceptance.py
+```
+
+该脚本按顺序执行：
+1. `scripts/build_data_index.py` — 构建数据索引
+2. `scripts/validate_data.py` — 校验数据完整性
+3. `scripts/check_dashboard_syntax.py` — Dashboard 内联 JS 语法检查
+4. `scripts/acceptance_dashboard.js` — 浏览器真实验收（16 项）
+
+任一步失败立即停止，退出码 1。全部通过输出 `Phase 3 acceptance PASS`。
+
+### 11.2 分步执行
+
+```bash
+# 数据校验
+python scripts/validate_data.py
+
+# JS 语法检查
+python scripts/check_dashboard_syntax.py
+
+# 浏览器验收（自动启停静态服务）
+node scripts/acceptance_dashboard.js
+```
+
+### 11.3 npm scripts
+
+```bash
+npm run test:data       # 数据校验
+npm run test:dashboard  # 浏览器验收
+npm run test:acceptance # 全部验收
+```
+
+### 11.4 浏览器验收项（16/16）
+
+| 编号 | 测试项 | 验证方式 |
+| ---- | ------ | -------- |
+| T01 | 页面首次加载 | HTTP 200 |
+| T02 | 加载阶段无关键错误 | console error 过滤 |
+| T03 | 地图正常显示 | chartMap canvas 存在 |
+| T04 | 搜索"厦门" | ECharts API 获取城市列表 |
+| T05 | 搜索"广" | 匹配广州，排除北京 |
+| T06a | 指标切换-日客流 | rankTitle 含"日客流量"+"万人次" |
+| T06b | 指标切换-运营里程 | rankTitle 含"运营里程"+"km" |
+| T06c | 指标切换-运营站点 | rankTitle 含"运营站点"+"座" |
+| T06d | 指标切换-客流强度 | rankTitle 含"客流强度" |
+| T07a | Top 10 | 排行图城市数 <= 10 |
+| T07b | Top 20 | 排行图城市数 > 10 且 <= 20 |
+| T07c | 全部显示 | 排行图城市数 > 20 |
+| T08 | 城市详情-厦门 | 包含 98.4km、74座、88.9万 |
+| T09 | 缺失日客流"暂无数据" | 详情面板含"暂无数据" |
+| T10 | 375px 无横向滚动 | scrollWidth <= 400 |
+| T11 | 全程无关键错误 | console error 过滤 |
+
+### 11.5 稳定写入
+
+`build_data_index.py` 实现了稳定写入逻辑：生成新数据后与旧文件对比（忽略 `generated_at`），仅在有真实内容变化时才写入文件。当源数据未变化时，`run_acceptance.py` 可重复运行且不产生 `data/latest` 时间戳噪音。
+
+### 11.6 失败退出码
+
+| 退出码 | 含义 |
+| ------ | ---- |
+| 0 | 全部通过 |
+| 1 | 存在失败项 |
+
+---
+
+## 12. Phase 2 数据层验收
 
 ### 11.1 构建数据索引
 
