@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test:data": "python scripts/validate_data.py",
+    "test:data": "python3 scripts/validate_data.py",
     "test:dashboard": "node scripts/acceptance_dashboard.js",
-    "test:acceptance": "python scripts/run_acceptance.py"
+    "test:acceptance": "python3 scripts/run_acceptance.py"
   },
   "dependencies": {
     "puppeteer-core": "^24.42.0"
