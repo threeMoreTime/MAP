@@ -1,0 +1,37 @@
+{
+  "city": "wuhan",
+  "city_cn": "武汉",
+  "scrape_date": "2026-05-08",
+  "operating_lines": 12,
+  "lines_under_construction": 6,
+  "operating_stations": 312,
+  "operating_mileage_km": 518.1,
+  "daily_ridership_wan": 385.99,
+  "ridership_intensity": 0.74501061571125,
+  "peak_ridership_wan": 602.2,
+  "peak_ridership_date": "2025-12-31",
+  "yearly_avg_ridership": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      283.92,
+      334.94,
+      205.5,
+      274.54,
+      242.0,
+      367.63,
+      397.71,
+      392.3,
+      393.87
+    ]
+  }
+}

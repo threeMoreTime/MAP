@@ -1,0 +1,31 @@
+{
+  "city": "hohhot",
+  "city_cn": "呼和浩特",
+  "scrape_date": "2026-05-08",
+  "operating_lines": 2,
+  "lines_under_construction": 0,
+  "operating_stations": 43,
+  "operating_mileage_km": 49.03,
+  "daily_ridership_wan": 0.0,
+  "ridership_intensity": 0.0,
+  "peak_ridership_wan": 72.44,
+  "peak_ridership_date": "2023-12-31",
+  "yearly_avg_ridership": {
+    "years": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "values": [
+      14.34,
+      14.79,
+      19.61,
+      26.0,
+      40.6,
+      38.19
+    ]
+  }
+}

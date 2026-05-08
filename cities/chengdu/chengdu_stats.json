@@ -1,0 +1,37 @@
+{
+  "city": "chengdu",
+  "city_cn": "成都",
+  "scrape_date": "2026-05-08",
+  "operating_lines": 15,
+  "lines_under_construction": 7,
+  "operating_stations": 388,
+  "operating_mileage_km": 632.84,
+  "daily_ridership_wan": 692.7,
+  "ridership_intensity": 1.0945894696922,
+  "peak_ridership_wan": 997.13,
+  "peak_ridership_date": "2025-12-31",
+  "yearly_avg_ridership": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      316.89,
+      382.98,
+      331.05,
+      489.3,
+      427.53,
+      577.44,
+      600.25,
+      613.97,
+      643.21
+    ]
+  }
+}

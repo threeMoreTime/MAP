@@ -1,0 +1,37 @@
+{
+  "city": "shenzhen",
+  "city_cn": "深圳",
+  "scrape_date": "2026-05-08",
+  "operating_lines": 12,
+  "lines_under_construction": 8,
+  "operating_stations": 284,
+  "operating_mileage_km": 555.39,
+  "daily_ridership_wan": 975.59,
+  "ridership_intensity": 1.7565854624678,
+  "peak_ridership_wan": 1302.63,
+  "peak_ridership_date": "2025-12-31",
+  "yearly_avg_ridership": {
+    "years": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      511.25,
+      549.37,
+      441.3,
+      596.25,
+      483.83,
+      739.96,
+      845.25,
+      897.16,
+      902.68
+    ]
+  }
+}

@@ -1,8 +1,11 @@
 {
   "name": "metro-ridership-visualization",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
+    "scrape:metrodb": "python scrapers/scrape_metrodb.py",
+    "scrape:cities": "python scrapers/scrape_all_cities.py",
+    "generate:charts": "python scrapers/generate_charts.py",
     "test:data": "python scripts/validate_data.py",
     "test:dashboard": "node scripts/acceptance_dashboard.js",
     "test:acceptance": "python scripts/run_acceptance.py"

@@ -1,0 +1,35 @@
+{
+  "city": "changchun",
+  "city_cn": "长春",
+  "scrape_date": "2026-05-08",
+  "operating_lines": 6,
+  "lines_under_construction": 5,
+  "operating_stations": 100,
+  "operating_mileage_km": 140.8,
+  "daily_ridership_wan": 84.44,
+  "ridership_intensity": 0.59971590909091,
+  "peak_ridership_wan": 107.21,
+  "peak_ridership_date": "2025-09-20",
+  "yearly_avg_ridership": {
+    "years": [
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "values": [
+      65.34,
+      42.03,
+      53.46,
+      36.53,
+      59.93,
+      60.75,
+      81.89,
+      72.3
+    ]
+  }
+}

@@ -1,3 +1,4 @@
 node_modules/
-scrape_log.txt
-scrape_metrodb_log.txt
+scrapers/scrape_log.txt
+scrapers/scrape_metrodb_log.txt
+__pycache__/

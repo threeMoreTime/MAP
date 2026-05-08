@@ -1,11 +1,14 @@
 {
-  "generated_at": "2026-05-05T12:53:29Z",
+  "generated_at": "2026-05-08T13:58:00Z",
   "source": "metrodb.org",
   "city_count": 34,
   "no_daily_data_cities": [
+    "changsha",
     "dalian",
+    "dongguan",
     "hangzhou",
     "hohhot",
+    "nanning",
     "nantong",
     "qingdao",
     "taiyuan",
@@ -16,13 +19,13 @@
     {
       "city": "beijing",
       "city_cn": "北京",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 27,
       "lines_under_construction": 12,
       "operating_stations": 522,
       "operating_mileage_km": 861.0,
-      "daily_ridership_wan": 772.05,
-      "ridership_intensity": 0.89668989547038,
+      "daily_ridership_wan": 1078.61,
+      "ridership_intensity": 1.2527409988386,
       "peak_ridership_wan": 1380.78,
       "peak_ridership_date": "2018-08-17",
       "yearly_avg_ridership": {
@@ -46,20 +49,20 @@
           943.43,
           986.64,
           977.1,
-          944.48
+          942.86
         ]
       }
     },
     {
       "city": "changchun",
       "city_cn": "长春",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 6,
       "lines_under_construction": 5,
       "operating_stations": 100,
       "operating_mileage_km": 140.8,
-      "daily_ridership_wan": 83.36,
-      "ridership_intensity": 0.59204545454545,
+      "daily_ridership_wan": 84.44,
+      "ridership_intensity": 0.59971590909091,
       "peak_ridership_wan": 107.21,
       "peak_ridership_date": "2025-09-20",
       "yearly_avg_ridership": {
@@ -81,20 +84,20 @@
           59.93,
           60.75,
           81.89,
-          71.99
+          72.3
         ]
       }
     },
     {
       "city": "changsha",
       "city_cn": "长沙",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 6,
       "lines_under_construction": 4,
       "operating_stations": 140,
       "operating_mileage_km": 218.28,
-      "daily_ridership_wan": 394.79,
-      "ridership_intensity": 1.8086402785413,
+      "daily_ridership_wan": 0.0,
+      "ridership_intensity": 0.0,
       "peak_ridership_wan": 467.5,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -118,20 +121,20 @@
           256.62,
           278.04,
           277.55,
-          280.13
+          282.2
         ]
       }
     },
     {
       "city": "changzhou",
       "city_cn": "常州",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 2,
       "lines_under_construction": 0,
       "operating_stations": 43,
       "operating_mileage_km": 53.99,
-      "daily_ridership_wan": 29.31,
-      "ridership_intensity": 0.5428783107983,
+      "daily_ridership_wan": 18.91,
+      "ridership_intensity": 0.35025004630487,
       "peak_ridership_wan": 42.88,
       "peak_ridership_date": "2026-04-11",
       "yearly_avg_ridership": {
@@ -153,20 +156,20 @@
           20.03,
           19.7,
           20.3,
-          20.96
+          21.02
         ]
       }
     },
     {
       "city": "chengdu",
       "city_cn": "成都",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 15,
       "lines_under_construction": 7,
       "operating_stations": 388,
       "operating_mileage_km": 632.84,
-      "daily_ridership_wan": 624.91,
-      "ridership_intensity": 0.98746918652424,
+      "daily_ridership_wan": 692.7,
+      "ridership_intensity": 1.0945894696922,
       "peak_ridership_wan": 997.13,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -190,20 +193,20 @@
           577.44,
           600.25,
           613.97,
-          642.77
+          643.21
         ]
       }
     },
     {
       "city": "chongqing",
       "city_cn": "重庆",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 13,
       "lines_under_construction": 11,
       "operating_stations": 305,
       "operating_mileage_km": 522.54,
-      "daily_ridership_wan": 507.1,
-      "ridership_intensity": 0.97045202281165,
+      "daily_ridership_wan": 416.1,
+      "ridership_intensity": 0.79630267539327,
       "peak_ridership_wan": 615.0,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -227,14 +230,14 @@
           365.71,
           398.07,
           415.88,
-          411.36
+          411.95
         ]
       }
     },
     {
       "city": "dalian",
       "city_cn": "大连",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 5,
       "lines_under_construction": 2,
       "operating_stations": 79,
@@ -264,20 +267,20 @@
           66.29,
           73.41,
           71.84,
-          65.86
+          66.03
         ]
       }
     },
     {
       "city": "dongguan",
       "city_cn": "东莞",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 1,
       "lines_under_construction": 2,
       "operating_stations": 15,
       "operating_mileage_km": 37.79,
-      "daily_ridership_wan": 41.67,
-      "ridership_intensity": 1.1026726647261,
+      "daily_ridership_wan": 0.0,
+      "ridership_intensity": 0.0,
       "peak_ridership_wan": 65.0,
       "peak_ridership_date": "2026-01-01",
       "yearly_avg_ridership": {
@@ -301,20 +304,20 @@
           12.42,
           13.51,
           14.15,
-          56.48
+          53.96
         ]
       }
     },
     {
       "city": "guangzhou",
       "city_cn": "广州",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 15,
       "lines_under_construction": 11,
       "operating_stations": 290,
       "operating_mileage_km": 662.58,
-      "daily_ridership_wan": 832.5,
-      "ridership_intensity": 1.2564520510731,
+      "daily_ridership_wan": 967.3,
+      "ridership_intensity": 1.4598991819856,
       "peak_ridership_wan": 1409.32,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -338,20 +341,20 @@
           857.24,
           887.93,
           931.23,
-          933.84
+          934.28
         ]
       }
     },
     {
       "city": "guiyang",
       "city_cn": "贵阳",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 2,
       "lines_under_construction": 3,
       "operating_stations": 57,
       "operating_mileage_km": 118.73,
-      "daily_ridership_wan": 93.23,
-      "ridership_intensity": 0.78522698559757,
+      "daily_ridership_wan": 74.29,
+      "ridership_intensity": 0.62570538195907,
       "peak_ridership_wan": 143.01,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -375,14 +378,14 @@
           36.67,
           69.46,
           78.3,
-          73.39
+          73.76
         ]
       }
     },
     {
       "city": "hangzhou",
       "city_cn": "杭州",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 11,
       "lines_under_construction": 4,
       "operating_stations": 241,
@@ -419,13 +422,13 @@
     {
       "city": "harbin",
       "city_cn": "哈尔滨",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 3,
       "lines_under_construction": 1,
       "operating_stations": 78,
       "operating_mileage_km": 91.57,
-      "daily_ridership_wan": 142.6,
-      "ridership_intensity": 1.5572785846893,
+      "daily_ridership_wan": 110.76,
+      "ridership_intensity": 1.2095664518947,
       "peak_ridership_wan": 173.0,
       "peak_ridership_date": "2024-12-31",
       "yearly_avg_ridership": {
@@ -449,20 +452,20 @@
           77.07,
           98.74,
           114.04,
-          109.6
+          109.91
         ]
       }
     },
     {
       "city": "hefei",
       "city_cn": "合肥",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 6,
       "lines_under_construction": 3,
       "operating_stations": 161,
       "operating_mileage_km": 232.1,
-      "daily_ridership_wan": 197.15,
-      "ridership_intensity": 0.84941835415769,
+      "daily_ridership_wan": 178.8,
+      "ridership_intensity": 0.77035760448083,
       "peak_ridership_wan": 361.28,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -486,14 +489,14 @@
           112.57,
           143.27,
           155.96,
-          198.26
+          198.13
         ]
       }
     },
     {
       "city": "hohhot",
       "city_cn": "呼和浩特",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 2,
       "lines_under_construction": 0,
       "operating_stations": 43,
@@ -524,13 +527,13 @@
     {
       "city": "kunming",
       "city_cn": "昆明",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 5,
       "lines_under_construction": 5,
       "operating_stations": 92,
       "operating_mileage_km": 165.85,
-      "daily_ridership_wan": 68.18,
-      "ridership_intensity": 0.41109436237564,
+      "daily_ridership_wan": 76.52,
+      "ridership_intensity": 0.46138076575219,
       "peak_ridership_wan": 146.16,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -554,20 +557,20 @@
           80.02,
           83.88,
           81.8,
-          80.1
+          80.32
         ]
       }
     },
     {
       "city": "lanzhou",
       "city_cn": "兰州",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 1,
       "lines_under_construction": 1,
       "operating_stations": 20,
       "operating_mileage_km": 35.03,
-      "daily_ridership_wan": 50.39,
-      "ridership_intensity": 1.4384813017414,
+      "daily_ridership_wan": 35.52,
+      "ridership_intensity": 1.0139880102769,
       "peak_ridership_wan": 77.16,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -589,20 +592,20 @@
           23.43,
           44.01,
           39.83,
-          37.29
+          37.46
         ]
       }
     },
     {
       "city": "nanchang",
       "city_cn": "南昌",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 4,
       "lines_under_construction": 0,
       "operating_stations": 121,
       "operating_mileage_km": 128.5,
-      "daily_ridership_wan": 183.49,
-      "ridership_intensity": 1.4279377431907,
+      "daily_ridership_wan": 95.21,
+      "ridership_intensity": 0.74093385214008,
       "peak_ridership_wan": 269.96,
       "peak_ridership_date": "2025-10-01",
       "yearly_avg_ridership": {
@@ -626,20 +629,20 @@
           104.4,
           119.93,
           118.17,
-          117.97
+          118.47
         ]
       }
     },
     {
       "city": "nanjing",
       "city_cn": "南京",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 13,
       "lines_under_construction": 11,
       "operating_stations": 227,
       "operating_mileage_km": 505.86,
-      "daily_ridership_wan": 451.84,
-      "ridership_intensity": 0.89321156051081,
+      "daily_ridership_wan": 333.42,
+      "ridership_intensity": 0.6591151702052,
       "peak_ridership_wan": 533.1,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -663,20 +666,20 @@
           276.61,
           299.4,
           310.63,
-          334.35
+          335.38
         ]
       }
     },
     {
       "city": "nanning",
       "city_cn": "南宁",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 5,
       "lines_under_construction": 1,
       "operating_stations": 93,
       "operating_mileage_km": 128.2,
-      "daily_ridership_wan": 139.5,
-      "ridership_intensity": 1.088143525741,
+      "daily_ridership_wan": 0.0,
+      "ridership_intensity": 0.0,
       "peak_ridership_wan": 182.36,
       "peak_ridership_date": "2024-12-31",
       "yearly_avg_ridership": {
@@ -700,14 +703,14 @@
           95.9,
           99.05,
           104.15,
-          139.46
+          139.98
         ]
       }
     },
     {
       "city": "nantong",
       "city_cn": "南通",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 1,
       "lines_under_construction": 1,
       "operating_stations": 28,
@@ -736,7 +739,7 @@
     {
       "city": "qingdao",
       "city_cn": "青岛",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 7,
       "lines_under_construction": 5,
       "operating_stations": 156,
@@ -771,13 +774,13 @@
     {
       "city": "shanghai",
       "city_cn": "上海",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 20,
       "lines_under_construction": 5,
       "operating_stations": 510,
       "operating_mileage_km": 896.0,
-      "daily_ridership_wan": 792.0,
-      "ridership_intensity": 0.88392857142857,
+      "daily_ridership_wan": 1139.0,
+      "ridership_intensity": 1.2712053571429,
       "peak_ridership_wan": 1339.7,
       "peak_ridership_date": "2024-03-08",
       "yearly_avg_ridership": {
@@ -801,20 +804,20 @@
           1002.34,
           1028.11,
           1015.83,
-          982.27
+          981.94
         ]
       }
     },
     {
       "city": "shenyang",
       "city_cn": "沈阳",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 4,
       "lines_under_construction": 5,
       "operating_stations": 85,
       "operating_mileage_km": 163.7,
-      "daily_ridership_wan": 206.09,
-      "ridership_intensity": 1.2589492974954,
+      "daily_ridership_wan": 206.44,
+      "ridership_intensity": 1.2610873549175,
       "peak_ridership_wan": 288.93,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -838,20 +841,20 @@
           137.21,
           178.32,
           193.61,
-          189.38
+          189.6
         ]
       }
     },
     {
       "city": "shenzhen",
       "city_cn": "深圳",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 12,
       "lines_under_construction": 8,
       "operating_stations": 284,
       "operating_mileage_km": 555.39,
-      "daily_ridership_wan": 718.77,
-      "ridership_intensity": 1.2941716631556,
+      "daily_ridership_wan": 975.59,
+      "ridership_intensity": 1.7565854624678,
       "peak_ridership_wan": 1302.63,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -875,20 +878,20 @@
           739.96,
           845.25,
           897.16,
-          903.88
+          902.68
         ]
       }
     },
     {
       "city": "shijiazhuang",
       "city_cn": "石家庄",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 3,
       "lines_under_construction": 1,
       "operating_stations": 63,
       "operating_mileage_km": 76.53,
-      "daily_ridership_wan": 52.25,
-      "ridership_intensity": 0.6827387952437,
+      "daily_ridership_wan": 47.53,
+      "ridership_intensity": 0.62106363517575,
       "peak_ridership_wan": 295.78,
       "peak_ridership_date": "2023-12-31",
       "yearly_avg_ridership": {
@@ -912,20 +915,20 @@
           47.41,
           54.16,
           51.88,
-          51.11
+          51.14
         ]
       }
     },
     {
       "city": "suzhou",
       "city_cn": "苏州",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 9,
       "lines_under_construction": 5,
       "operating_stations": 248,
       "operating_mileage_km": 346.76,
-      "daily_ridership_wan": 301.4,
-      "ridership_intensity": 0.86918906448264,
+      "daily_ridership_wan": 190.8,
+      "ridership_intensity": 0.55023647479525,
       "peak_ridership_wan": 347.63,
       "peak_ridership_date": "2024-12-31",
       "yearly_avg_ridership": {
@@ -949,14 +952,14 @@
           150.61,
           178.03,
           193.36,
-          201.71
+          202.03
         ]
       }
     },
     {
       "city": "taiyuan",
       "city_cn": "太原",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 1,
       "lines_under_construction": 1,
       "operating_stations": 23,
@@ -987,13 +990,13 @@
     {
       "city": "tianjin",
       "city_cn": "天津",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 11,
       "lines_under_construction": 5,
       "operating_stations": 233,
       "operating_mileage_km": 314.69,
-      "daily_ridership_wan": 226.11,
-      "ridership_intensity": 0.71851663541898,
+      "daily_ridership_wan": 199.8,
+      "ridership_intensity": 0.63491054688741,
       "peak_ridership_wan": 364.6,
       "peak_ridership_date": "2025-11-07",
       "yearly_avg_ridership": {
@@ -1017,20 +1020,20 @@
           155.86,
           175.39,
           183.44,
-          188.38
+          188.69
         ]
       }
     },
     {
       "city": "wuhan",
       "city_cn": "武汉",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 12,
       "lines_under_construction": 6,
       "operating_stations": 312,
       "operating_mileage_km": 518.1,
-      "daily_ridership_wan": 527.41,
-      "ridership_intensity": 1.0179695039568,
+      "daily_ridership_wan": 385.99,
+      "ridership_intensity": 0.74501061571125,
       "peak_ridership_wan": 602.2,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -1054,14 +1057,14 @@
           367.63,
           397.71,
           392.3,
-          392.74
+          393.87
         ]
       }
     },
     {
       "city": "wuhu",
       "city_cn": "芜湖",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 2,
       "lines_under_construction": 0,
       "operating_stations": 36,
@@ -1090,7 +1093,7 @@
     {
       "city": "wuxi",
       "city_cn": "无锡",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 4,
       "lines_under_construction": 1,
       "operating_stations": 87,
@@ -1123,13 +1126,13 @@
     {
       "city": "xiamen",
       "city_cn": "厦门",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 3,
       "lines_under_construction": 2,
       "operating_stations": 74,
       "operating_mileage_km": 98.4,
-      "daily_ridership_wan": 88.87,
-      "ridership_intensity": 0.90315040650407,
+      "daily_ridership_wan": 81.58,
+      "ridership_intensity": 0.82906504065041,
       "peak_ridership_wan": 112.14,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -1153,20 +1156,20 @@
           67.51,
           72.91,
           75.68,
-          75.16
+          75.24
         ]
       }
     },
     {
       "city": "xian",
       "city_cn": "西安",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 12,
       "lines_under_construction": 3,
       "operating_stations": 270,
       "operating_mileage_km": 403.31,
-      "daily_ridership_wan": 499.1,
-      "ridership_intensity": 1.2375096079939,
+      "daily_ridership_wan": 426.8,
+      "ridership_intensity": 1.0582430388535,
       "peak_ridership_wan": 622.9,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -1190,20 +1193,20 @@
           353.65,
           382.23,
           423.56,
-          435.14
+          434.97
         ]
       }
     },
     {
       "city": "zhengzhou",
       "city_cn": "郑州",
-      "scrape_date": "2026-05-05",
+      "scrape_date": "2026-05-08",
       "operating_lines": 11,
       "lines_under_construction": 3,
       "operating_stations": 238,
       "operating_mileage_km": 371.23,
-      "daily_ridership_wan": 277.14,
-      "ridership_intensity": 0.74654526843197,
+      "daily_ridership_wan": 228.84,
+      "ridership_intensity": 0.61643724914474,
       "peak_ridership_wan": 456.89,
       "peak_ridership_date": "2025-12-31",
       "yearly_avg_ridership": {
@@ -1227,7 +1230,7 @@
           160.11,
           197.67,
           228.65,
-          241.11
+          241.54
         ]
       }
     }

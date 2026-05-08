@@ -11,6 +11,7 @@ import os
 from datetime import datetime, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CITIES_DIR = os.path.join(ROOT, "cities")
 
 # 目录名 → 中文名（与 scrape_metrodb.py 保持一致）
 CITY_CN_MAP = {
@@ -29,9 +30,6 @@ CITY_CN_MAP = {
     "jinhua": "金华", "taizhou": "台州", "taoyuan": "桃园",
 }
 
-EXCLUDED_DIRS = {"assets", "docs", "data", "scripts", ".github", "node_modules", "__pycache__"}
-
-
 def iso_now():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -43,12 +41,12 @@ def get_city_cn(city_dir_name, stats_data=None):
 
 
 def scan_city_dirs():
+    if not os.path.isdir(CITIES_DIR):
+        return []
     cities = []
-    for name in sorted(os.listdir(ROOT)):
-        full = os.path.join(ROOT, name)
-        if not os.path.isdir(full):
-            continue
-        if name.startswith(".") or name in EXCLUDED_DIRS:
+    for name in sorted(os.listdir(CITIES_DIR)):
+        full = os.path.join(CITIES_DIR, name)
+        if not os.path.isdir(full) or name.startswith("."):
             continue
         cities.append(name)
     return cities
@@ -58,7 +56,7 @@ def build_metro_stats(cities):
     items = []
     no_daily = []
     for city in cities:
-        json_path = os.path.join(ROOT, city, f"{city}_stats.json")
+        json_path = os.path.join(CITIES_DIR, city, f"{city}_stats.json")
         if not os.path.exists(json_path):
             continue
         with open(json_path, "r", encoding="utf-8") as f:
@@ -78,16 +76,16 @@ def build_metro_stats(cities):
 def build_city_assets_index(cities):
     items = []
     for city in cities:
-        city_dir = os.path.join(ROOT, city)
+        city_dir = os.path.join(CITIES_DIR, city)
         stats_data = None
         stats_path = os.path.join(city_dir, f"{city}_stats.json")
         if os.path.exists(stats_path):
             with open(stats_path, "r", encoding="utf-8") as f:
                 stats_data = json.load(f)
 
-        network_map = f"{city}/{city}_network.png"
-        plan_map = f"{city}/{city}_plan.png"
-        yearly_trend = f"{city}/{city}_yearly_trend.png"
+        network_map = f"cities/{city}/{city}_network.png"
+        plan_map = f"cities/{city}/{city}_plan.png"
+        yearly_trend = f"cities/{city}/{city}_yearly_trend.png"
 
         items.append({
             "city": city,
@@ -98,7 +96,7 @@ def build_city_assets_index(cities):
             "has_plan_map": os.path.exists(os.path.join(ROOT, plan_map)),
             "plan_map_path": plan_map if os.path.exists(os.path.join(ROOT, plan_map)) else None,
             "has_stats": stats_data is not None,
-            "stats_path": f"{city}/{city}_stats.json" if stats_data else None,
+            "stats_path": f"cities/{city}/{city}_stats.json" if stats_data else None,
             "has_yearly_trend": os.path.exists(os.path.join(ROOT, yearly_trend)),
             "yearly_trend_path": yearly_trend if os.path.exists(os.path.join(ROOT, yearly_trend)) else None,
         })
