@@ -1,8 +1,8 @@
 # 项目路线图
 
 > 项目：全国城市地铁客流数据可视化大屏
-> 版本：v1.1.0
-> 日期：2026-05-08
+> 版本：v1.2.0-dev
+> 日期：2026-05-09
 > 仓库：threeMoreTime/MAP
 
 ---
@@ -80,7 +80,51 @@
 
 ---
 
-## Phase 4：Dashboard 数据外置
+## 目录结构优化（已完成）
+
+**目标**：优化项目目录结构，将城市目录和脚本分类归整。
+
+**产物**：
+- [x] 50 个城市目录收归至 `cities/`
+- [x] 爬虫脚本整理至 `scrapers/`
+- [x] 生成产物输出至 `output/`
+- [x] 更新所有脚本和文档中的路径引用
+
+---
+
+## Phase 4：React 前端迁移（进行中）
+
+**目标**：将单文件 dashboard.html 迁移为 React + TypeScript + Vite 前端项目。
+
+**Phase 4.1：脚手架与 UI 骨架（已完成）**
+- [x] 创建 `frontend/` React 项目（Vite + React + TypeScript）
+- [x] 实现 HashRouter 三页路由（/dashboard, /cities, /about）
+- [x] 数据同步脚本 `scripts/sync-data.cjs`
+- [x] 数据加载层（useMetroData, useDashboardFilters）
+- [x] DashboardPage 骨架（统计卡片 + 筛选 + 图表占位）
+- [x] CitiesPage 城市总览（50 城卡片网格 + 筛选标签）
+- [x] AboutPage 数据说明页
+- [x] 全局深蓝主题样式
+- [x] `npm run typecheck` 和 `npm run build` 通过
+
+**Phase 4.2：ECharts 图表迁移（待开始）**
+- [ ] MetroMapChart 地图散点迁移
+- [ ] RankChart 排行榜迁移
+- [ ] TrendChart 趋势图迁移
+- [ ] IntensityChart 客流强度迁移
+- [ ] MileageChart 里程排行迁移
+- [ ] 城市详情面板
+
+**验收标准**：
+- `dashboard.html` 不受影响，保留为稳定基线
+- `npm run typecheck` 通过
+- `npm run build` 通过
+- 三页路由可正常访问
+- 旧版 `python scripts/run_acceptance.py` 继续通过
+
+---
+
+## Phase 5：Dashboard 数据外置
 
 **目标**：将嵌入在 HTML 中的 DATA 对象分离为独立 JSON 文件。
 

@@ -1,0 +1,24 @@
+:root {
+  --bg-primary: #0a192f;
+  --bg-deep: #060e1a;
+  --bg-card: #112240;
+  --bg-card-hover: #1a3358;
+  --border-dim: rgba(0, 180, 255, 0.08);
+  --border-light: rgba(0, 180, 255, 0.15);
+  --accent: #00d4ff;
+  --accent-blue: #448aff;
+  --accent-green: #4caf50;
+  --accent-yellow: #ffd740;
+  --accent-orange: #ff9800;
+  --accent-purple: #9c27b0;
+  --accent-red: #ff5252;
+  --text-primary: #c8d6e5;
+  --text-secondary: #5a7a9a;
+  --text-dim: #2a3a4a;
+  --text-label: #4a6a8a;
+  --header-height: 52px;
+  --max-width: 1180px;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}

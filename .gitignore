@@ -2,3 +2,9 @@ node_modules/
 scrapers/scrape_log.txt
 scrapers/scrape_metrodb_log.txt
 __pycache__/
+frontend/node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
+frontend/public/data/
+frontend/public/assets/china.json
+参考图*.png
