@@ -107,13 +107,21 @@
 - [x] 全局深蓝主题样式
 - [x] `npm run typecheck` 和 `npm run build` 通过
 
-**Phase 4.2：ECharts 图表迁移（待开始）**
-- [ ] MetroMapChart 地图散点迁移
-- [ ] RankChart 排行榜迁移
-- [ ] TrendChart 趋势图迁移
-- [ ] IntensityChart 客流强度迁移
-- [ ] MileageChart 里程排行迁移
-- [ ] 城市详情面板
+**Phase 4.2：ECharts 图表迁移（已完成）**
+- [x] MetroMapChart 地图散点迁移（GeoJSON 本地优先 + 远程 fallback + 降级列表）
+- [x] RankChart 排行榜迁移（支持四项指标切换、topN 筛选）
+- [x] TrendChart 趋势图迁移（统一年份轴 + null 对齐）
+- [x] IntensityChart 客流强度迁移
+- [x] MileageChart 里程排行迁移（不排除无客流城市）
+- [x] 城市详情面板 CityDetailPanel
+- [x] useEChart Hook（原生 echarts，ResizeObserver，StrictMode 兼容）
+- [x] withBaseUrl 提取到 utils/path.ts
+- [x] MergedCity 补充 lines_under_construction, peak_ridership_wan, peak_ridership_date 字段
+- [x] 响应式布局（chart-map-row, chart-grid-2col, 移动端单列）
+- [x] chartUtils.ts 共享颜色、样式常量
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
 **验收标准**：
 - `dashboard.html` 不受影响，保留为稳定基线

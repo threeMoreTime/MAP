@@ -8,6 +8,9 @@ export interface MergedCity extends CityAsset {
   operating_lines: number;
   operating_stations: number;
   operating_mileage_km: number;
+  lines_under_construction: number;
+  peak_ridership_wan: number;
+  peak_ridership_date: string;
 }
 
 export interface MetroDataState {
@@ -34,14 +37,14 @@ function mergeData(assets: CityAsset[], stats: MetroCity[]): MergedCity[] {
       operating_lines: s?.operating_lines ?? 0,
       operating_stations: s?.operating_stations ?? 0,
       operating_mileage_km: s?.operating_mileage_km ?? 0,
+      lines_under_construction: s?.lines_under_construction ?? 0,
+      peak_ridership_wan: s?.peak_ridership_wan ?? 0,
+      peak_ridership_date: s?.peak_ridership_date ?? '',
     };
   });
 }
 
-function withBaseUrl(path: string): string {
-  const base = import.meta.env.BASE_URL || './';
-  return `${base}${path.replace(/^\/+/, '')}`;
-}
+import { withBaseUrl } from '../utils/path';
 
 async function fetchJSON<T>(url: string): Promise<T> {
   const resp = await fetch(url);

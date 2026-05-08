@@ -64,7 +64,44 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   background: linear-gradient(90deg, rgba(0,180,255,0.15), transparent);
 }
 
+.chart-map-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chart-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 320px;
+}
+
+.chart-container--map {
+  height: 480px;
+}
+
+.chart-container--detail {
+  height: 480px;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+  .chart-map-row { flex-direction: column; }
+  .chart-grid-2col { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 600px) {
   .page-container { padding: 0 12px; }
   .section-header h2 { font-size: 15px; }
+  .chart-container { height: 280px; }
+  .chart-container--map { height: 360px; }
+  .chart-container--detail { height: 360px; }
+  .chart-map-row { flex-direction: column; }
+  .chart-grid-2col { grid-template-columns: 1fr; }
 }

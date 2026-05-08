@@ -1,10 +1,17 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useMetroData, type MergedCity } from '../hooks/useMetroData';
 import { useDashboardFilters, hasValidDailyRidership } from '../hooks/useDashboardFilters';
+import { METRIC_LABELS } from '../types/metro';
 import SectionTitle from '../components/common/SectionTitle';
 import StatCard from '../components/common/StatCard';
 import FilterToolbar from '../components/common/FilterToolbar';
 import ChartCard from '../components/common/ChartCard';
+import MetroMapChart from '../components/charts/MetroMapChart';
+import RankChart from '../components/charts/RankChart';
+import MileageChart from '../components/charts/MileageChart';
+import TrendChart from '../components/charts/TrendChart';
+import IntensityChart from '../components/charts/IntensityChart';
+import CityDetailPanel from '../components/charts/CityDetailPanel';
 
 function HeroSection({ date, cityCount, statsCount }: { date: string; cityCount: number; statsCount: number }) {
   return (
@@ -57,20 +64,19 @@ function StatsRow({ cities }: { cities: MergedCity[] }) {
   );
 }
 
-function ChartPlaceholder({ label }: { label: string }) {
-  return (
-    <div style={{
-      height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: '#2a4a6a', fontSize: 13, border: '1px dashed rgba(0,180,255,0.1)', borderRadius: 6,
-    }}>
-      {label} — Phase 4.2 迁移 ECharts
-    </div>
-  );
-}
-
 export default function DashboardPage() {
   const { merged, manifest, loading, error } = useMetroData();
-  const { keyword, setKeyword, metric, setMetric, topN, setTopN, filteredCities, rankedCities } = useDashboardFilters(merged);
+  const { keyword, setKeyword, metric, setMetric, topN, setTopN, filteredCities } = useDashboardFilters(merged);
+  const [selectedCityName, setSelectedCityName] = useState<string | null>(null);
+
+  const handleCitySelect = useCallback((city: string) => {
+    setSelectedCityName(city);
+  }, []);
+
+  const selectedCity = useMemo(() => {
+    if (!selectedCityName) return null;
+    return merged.find((c) => c.city === selectedCityName) ?? null;
+  }, [selectedCityName, merged]);
 
   if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#4a6a8a' }}>加载数据中...</div>;
   if (error) return <div style={{ textAlign: 'center', padding: 80, color: '#ff5252' }}>加载失败：{error}</div>;
@@ -78,6 +84,8 @@ export default function DashboardPage() {
   const date = manifest?.generated_at?.split('T')[0] || '-';
   const statsCount = merged.filter((c) => c.has_stats).length;
   const noDataCount = filteredCities.filter((d) => !hasValidDailyRidership(d)).length;
+  const ml = METRIC_LABELS[metric];
+  const trendCount = Math.min(8, filteredCities.filter(hasValidDailyRidership).length);
 
   return (
     <>
@@ -101,35 +109,51 @@ export default function DashboardPage() {
           onTopNChange={setTopN}
         />
 
-        <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 16, marginBottom: 16 }}>
-          <ChartCard title="全国城市地铁散点地图">
-            <ChartPlaceholder label="MetroMapChart" />
+        {/* Row 1: Map + Detail Panel */}
+        <div className="chart-map-row">
+          <ChartCard title={`全国城市散点地图 — ${ml.name}`} style={{ flex: '3 1 0%' }}>
+            <div className="chart-container chart-container--map">
+              <MetroMapChart
+                data={filteredCities}
+                metric={metric}
+                selectedCity={selectedCityName}
+                onCitySelect={handleCitySelect}
+                keyword={keyword}
+              />
+            </div>
           </ChartCard>
-          <ChartCard title="城市详情">
-            <div style={{
-              height: 360, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#2a3a4a', fontSize: 14,
-            }}>
-              点击地图上的城市查看详细指标
+          <ChartCard title="城市详情" style={{ flex: '2 1 0%' }}>
+            <div className="chart-container chart-container--detail">
+              <CityDetailPanel city={selectedCity} />
             </div>
           </ChartCard>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-          <ChartCard title={`${rankedCities.length} 城市日客流排行榜（万）`}>
-            <ChartPlaceholder label="RankChart" />
+        {/* Row 2: Rank + Mileage */}
+        <div className="chart-grid-2col">
+          <ChartCard title={`${ml.name}排行榜（${ml.unit}）`}>
+            <div className="chart-container">
+              <RankChart data={filteredCities} metric={metric} topN={topN} />
+            </div>
           </ChartCard>
           <ChartCard title="运营里程排行榜（km）">
-            <ChartPlaceholder label="MileageChart" />
+            <div className="chart-container">
+              <MileageChart data={filteredCities} topN={topN} />
+            </div>
           </ChartCard>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-          <ChartCard title={`Top ${Math.min(8, filteredCities.filter(hasValidDailyRidership).length)} 城市年度客流趋势`}>
-            <ChartPlaceholder label="TrendChart" />
+        {/* Row 3: Trend + Intensity */}
+        <div className="chart-grid-2col">
+          <ChartCard title={`Top ${trendCount} 城市年度客流趋势`}>
+            <div className="chart-container">
+              <TrendChart data={filteredCities} />
+            </div>
           </ChartCard>
           <ChartCard title="客流强度对比">
-            <ChartPlaceholder label="IntensityChart" />
+            <div className="chart-container">
+              <IntensityChart data={filteredCities} topN={topN} />
+            </div>
           </ChartCard>
         </div>
       </div>
