@@ -123,6 +123,17 @@
 - [x] `npm run build` 通过
 - [x] `python scripts/run_acceptance.py` 16/16 PASS
 
+**Phase 4.3：浏览器验收 + 构建优化 + 交互稳定性（已完成）**
+- [x] 创建 `frontend/scripts/acceptance-react.cjs` 浏览器验收脚本（T01-T15）
+- [x] 新增 `npm run test:ui` 命令
+- [x] ECharts manualChunks 构建优化（echarts + vendor 分包）
+- [x] 创建 `docs/FRONTEND_ACCEPTANCE.md` 验收文档
+- [x] 更新 `docs/REACT_MIGRATION_PLAN.md` Phase 4.3 状态
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `npm run test:ui` 通过
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
 **验收标准**：
 - `dashboard.html` 不受影响，保留为稳定基线
 - `npm run typecheck` 通过

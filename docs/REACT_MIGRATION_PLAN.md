@@ -86,8 +86,8 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 |-------|------|------|
 | 4.1 | React 脚手架 + 三页 UI 骨架 + 数据加载层 | 已完成 |
 | 4.2 | ECharts 图表迁移（地图、排行榜、趋势图、强度图、详情面板） | 已完成 |
-| 4.3 | 城市详情面板 + 地图点击联动 | 已合并至 4.2 |
-| 4.4 | 视觉打磨 + 响应式优化 + 前端验收脚本 | 待开始 |
+| 4.3 | 浏览器验收 + 构建优化 + 交互稳定性 | 已完成 |
+| 4.4 | 视觉打磨 + 响应式优化 | 待开始 |
 
 ## 6. 验收命令
 
@@ -96,9 +96,29 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
+npm run test:ui       # React 前端浏览器验收（T01-T15）
 
 # 回到根目录验证旧版不受影响
 python scripts/run_acceptance.py
+```
+
+React 前端验收详情见 [docs/FRONTEND_ACCEPTANCE.md](./FRONTEND_ACCEPTANCE.md)。
+
+## 6.5 构建优化
+
+ECharts 通过 Vite `manualChunks` 拆分为独立 chunk，避免单一 ~1.2MB 大包：
+
+```ts
+build: {
+  rollupOptions: {
+    output: {
+      manualChunks: {
+        echarts: ['echarts'],
+        vendor: ['react', 'react-dom', 'react-router-dom']
+      }
+    }
+  }
+}
 ```
 
 ## 7. 回滚方案
