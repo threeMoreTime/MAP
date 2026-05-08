@@ -4,6 +4,32 @@
 
 ---
 
+## [v1.1.0] - 2026-05-08
+
+### 变更
+
+- 项目目录结构全面优化
+- 50 个城市目录从根目录收归至 `cities/` 子目录
+- 爬虫脚本（`scrape_metrodb.py`、`generate_charts.py`）移至 `scrapers/` 目录
+- 生成产物（`national_comparison.png`、`overview_dashboard.png`）输出至 `output/` 目录
+- 更新所有脚本中的路径引用（`build_data_index.py`、`scrape_metrodb.py`、`generate_charts.py`）
+- 更新 `package.json`，新增 `scrape:*` 和 `generate:*` npm scripts
+- 更新全部项目文档中的路径引用（11 篇）
+- 更新 `.gitignore`，适配新的日志文件路径
+
+### 影响范围
+
+| 变更项 | 说明 |
+|--------|------|
+| `cities/` | 50 个城市目录统一存放 |
+| `scrapers/` | 数据采集与图表生成脚本 |
+| `output/` | 生成产物（截图、对比图） |
+| `scripts/` | 构建/校验/验收脚本（不变） |
+| `data/` | 统一数据层（不变） |
+| `docs/` | 项目文档（不变） |
+
+---
+
 ## [v1.0.0] - 2026-05-05
 
 ### 已完成

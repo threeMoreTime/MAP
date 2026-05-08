@@ -167,7 +167,7 @@ if daily_ridership_wan is null OR daily_ridership_wan <= 0:
 | `city_cn` | string | 城市中文名 |
 | `dir` | string | 城市目录名 |
 | `has_network_map` | boolean | 是否有线路图 |
-| `network_map_path` | string\|null | 线路图相对路径 |
+| `network_map_path` | string\|null | 线路图相对路径（如 `cities/beijing/beijing_network.png`） |
 | `has_plan_map` | boolean | 是否有规划图 |
 | `plan_map_path` | string\|null | 规划图相对路径 |
 | `has_stats` | boolean | 是否有客流数据 |

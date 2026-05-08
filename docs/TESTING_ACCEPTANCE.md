@@ -1,20 +1,20 @@
 # 验收测试文档
 
 > 项目：全国城市地铁客流数据可视化大屏
-> 版本：v1.0.0
-> 日期：2026-05-05
+> 版本：v1.1.0
+> 日期：2026-05-08
 > 仓库：threeMoreTime/MAP
 
 ---
 
 ## 1. 验收环境
 
-| 项目         | 说明                                    |
-| ------------ | --------------------------------------- |
-| 浏览器       | Chrome headless（通过 puppeteer-core）  |
-| JS 语法检查  | `node --check`                          |
-| 本地静态服务 | `python -m http.server`（默认 8000 端口）|
-| 操作系统     | Windows / macOS / Linux 均可            |
+| 项目 | 说明 |
+|------|------|
+| 浏览器 | Chrome headless（通过 puppeteer-core） |
+| JS 语法检查 | `node --check` |
+| 本地静态服务 | `python -m http.server`（默认 8000 端口） |
+| 操作系统 | Windows / macOS / Linux 均可 |
 
 ---
 
@@ -24,7 +24,7 @@
 
 ```bash
 # 检查所有 JS 文件
-find . -name "*.js" -not -path "*/node_modules/*" -exec node --check {} \;
+Get-ChildItem -Recurse -Filter "*.js" -Exclude "node_modules" | ForEach-Object { node --check $_.FullName }
 ```
 
 若所有文件无输出，表示语法检查通过。
@@ -36,7 +36,7 @@ find . -name "*.js" -not -path "*/node_modules/*" -exec node --check {} \;
 启动方式：
 
 ```bash
-cd D:/sotre/MAP
+cd /path/to/MAP
 python -m http.server 8000
 ```
 
@@ -46,24 +46,24 @@ python -m http.server 8000
 
 ## 4. 浏览器验收表（16/16 PASS）
 
-| 编号 | 测试项                     | 描述                                                         | 结果 |
-| ---- | -------------------------- | ------------------------------------------------------------ | ---- |
-| T01  | 页面加载                   | Dashboard 页面正常加载，HTTP 状态 200，无白屏               | PASS |
-| T02  | 控制台错误检查（加载阶段） | 页面加载完成后控制台无 JS 错误                               | PASS |
-| T03  | 地图显示                   | ECharts 地图正常渲染，显示中国地图轮廓及城市气泡             | PASS |
-| T04  | 搜索 - "厦门"              | 搜索框输入"厦门"，地图仅高亮厦门，各图表同步过滤             | PASS |
-| T05  | 搜索 - "广"                | 搜索框输入"广"，所有包含"广"的城市（广州、广汉等）被过滤显示 | PASS |
-| T06a | 指标切换 - 客流量          | 切换到"客流量"指标，tooltip/单位/地图气泡均对应客流量数据     | PASS |
-| T06b | 指标切换 - 营业里程        | 切换到"营业里程"指标，tooltip/单位/地图气泡均对应里程数据     | PASS |
-| T06c | 指标切换 - 客流强度        | 切换到"客流强度"指标，tooltip/单位/地图气泡均对应强度数据     | PASS |
-| T06d | 指标切换 - 恢复默认        | 切换回默认指标，所有图表恢复正常状态                         | PASS |
-| T07a | Top N - 客流排行           | Top N 下拉选择客流排行，排行图表正确显示                     | PASS |
-| T07b | Top N - 里程排行           | Top N 下拉选择里程排行，里程图表正确显示                     | PASS |
-| T07c | Top N - 强度排行           | Top N 下拉选择强度排行，强度图表正确显示                     | PASS |
-| T08  | 城市详情面板               | 点击城市气泡弹出详情面板，显示正确的城市名及各项指标         | PASS |
-| T09  | 缺失数据"暂无数据"         | 无数据城市在详情面板中显示"暂无数据"提示                     | PASS |
-| T10  | 移动端 375px 无水平滚动    | 视口宽度 375px 时页面无水平滚动条，布局自适应                | PASS |
-| T11  | 最终控制台检查             | 全部操作完成后控制台无 JS 错误                               | PASS |
+| 编号 | 测试项 | 描述 | 结果 |
+|------|--------|------|------|
+| T01 | 页面加载 | Dashboard 页面正常加载，HTTP 状态 200，无白屏 | PASS |
+| T02 | 控制台错误检查（加载阶段） | 页面加载完成后控制台无 JS 错误 | PASS |
+| T03 | 地图显示 | ECharts 地图正常渲染，显示中国地图轮廓及城市气泡 | PASS |
+| T04 | 搜索 - "厦门" | 搜索框输入"厦门"，地图仅高亮厦门，各图表同步过滤 | PASS |
+| T05 | 搜索 - "广" | 搜索框输入"广"，所有包含"广"的城市被过滤显示 | PASS |
+| T06a | 指标切换 - 客流量 | 切换到"客流量"指标，tooltip/单位/地图气泡均对应客流量数据 | PASS |
+| T06b | 指标切换 - 营业里程 | 切换到"营业里程"指标，tooltip/单位/地图气泡均对应里程数据 | PASS |
+| T06c | 指标切换 - 客流强度 | 切换到"客流强度"指标，tooltip/单位/地图气泡均对应强度数据 | PASS |
+| T06d | 指标切换 - 恢复默认 | 切换回默认指标，所有图表恢复正常状态 | PASS |
+| T07a | Top N - 客流排行 | Top N 下拉选择客流排行，排行图表正确显示 | PASS |
+| T07b | Top N - 里程排行 | Top N 下拉选择里程排行，里程图表正确显示 | PASS |
+| T07c | Top N - 强度排行 | Top N 下拉选择强度排行，强度图表正确显示 | PASS |
+| T08 | 城市详情面板 | 点击城市气泡弹出详情面板，显示正确的城市名及各项指标 | PASS |
+| T09 | 缺失数据"暂无数据" | 无数据城市在详情面板中显示"暂无数据"提示 | PASS |
+| T10 | 移动端 375px 无水平滚动 | 视口宽度 375px 时页面无水平滚动条，布局自适应 | PASS |
+| T11 | 最终控制台检查 | 全部操作完成后控制台无 JS 错误 | PASS |
 
 **验收结果：16/16 PASS**
 
@@ -177,7 +177,7 @@ npm run test:acceptance # 全部验收
 ### 11.4 浏览器验收项（16/16）
 
 | 编号 | 测试项 | 验证方式 |
-| ---- | ------ | -------- |
+|------|--------|----------|
 | T01 | 页面首次加载 | HTTP 200 |
 | T02 | 加载阶段无关键错误 | console error 过滤 |
 | T03 | 地图正常显示 | chartMap canvas 存在 |
@@ -202,7 +202,7 @@ npm run test:acceptance # 全部验收
 ### 11.6 失败退出码
 
 | 退出码 | 含义 |
-| ------ | ---- |
+|--------|------|
 | 0 | 全部通过 |
 | 1 | 存在失败项 |
 
@@ -210,7 +210,7 @@ npm run test:acceptance # 全部验收
 
 ## 12. Phase 2 数据层验收
 
-### 11.1 构建数据索引
+### 12.1 构建数据索引
 
 ```bash
 python scripts/build_data_index.py
@@ -218,11 +218,11 @@ python scripts/build_data_index.py
 
 预期输出：
 - `data/latest/metro_stats.json` — 34 个城市客流数据
-- `data/latest/city_assets_index.json` — 48 个城市资源索引
+- `data/latest/city_assets_index.json` — 50 个城市资源索引
 - `data/latest/manifest.json` — 整体统计
 - `data/schema/metro_stats.schema.json` — JSON Schema
 
-### 11.2 校验数据完整性
+### 12.2 校验数据完整性
 
 ```bash
 python scripts/validate_data.py
@@ -230,10 +230,10 @@ python scripts/validate_data.py
 
 预期输出：`PASS`（0 errors，warnings 仅限日客流缺失城市）
 
-### 11.3 验收检查项
+### 12.3 验收检查项
 
 | 编号 | 检查项 | 结果 |
-| ---- | ------ | ---- |
+|------|--------|------|
 | D01 | `metro_stats.json` 存在且 city_count = 34 | PASS |
 | D02 | `city_assets_index.json` 存在且 city_count = 48 | PASS |
 | D03 | `manifest.json` 存在且统计数值与实际一致 | PASS |

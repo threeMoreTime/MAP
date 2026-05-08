@@ -1,8 +1,8 @@
 # 发布流程
 
 > 项目：全国城市地铁客流数据可视化大屏
-> 版本：v1.0.0
-> 日期：2026-05-05
+> 版本：v1.1.0
+> 日期：2026-05-08
 > 仓库：threeMoreTime/MAP
 
 ---
@@ -21,7 +21,7 @@
 
 ```bash
 # 运行爬虫脚本采集 MetroDB 数据
-python scrape_metrodb.py
+python scrapers/scrape_metrodb.py
 ```
 
 - 确认采集脚本无报错
@@ -35,24 +35,22 @@ python scrape_metrodb.py
 运行图表生成脚本。
 
 ```bash
-python generate_charts.py
+python scrapers/generate_charts.py
 ```
 
 - 确认图表配置生成无报错
-- 检查输出文件内容是否完整
+- 检查输出文件（`output/` 和 `cities/` 下的趋势图）内容是否完整
 
 ---
 
 ## 步骤 3：更新 Dashboard
 
-将最新数据嵌入到 Dashboard 页面。
+将最新数据嵌入到 Dashboard 页面（当前为内嵌模式，Phase 4 将改为外部加载）。
 
 ```bash
-# 方式一：运行数据嵌入脚本
-python embed_data.py
-
-# 方式二：直接运行采集脚本（已包含嵌入逻辑）
-python scrape_metrodb.py
+# 当前：数据已内嵌在 dashboard.html 中，无需额外操作
+# 运行采集脚本时数据会自动写入
+python scrapers/scrape_metrodb.py
 ```
 
 - 确认 `dashboard.html` 中 DATA 对象已更新
@@ -75,6 +73,9 @@ python scripts/run_acceptance.py
 ### 4.2 分步验收
 
 ```bash
+# 数据校验
+python scripts/validate_data.py
+
 # JS 语法检查
 python scripts/check_dashboard_syntax.py
 
@@ -92,12 +93,12 @@ node scripts/acceptance_dashboard.js
 
 根据本次变更内容更新以下文档：
 
-| 文档                   | 更新时机                     |
-| ---------------------- | ---------------------------- |
-| `CHANGELOG.md`         | 每次发布必须更新             |
-| `docs/ROADMAP.md`      | 阶段完成或计划变更时更新     |
+| 文档 | 更新时机 |
+|------|----------|
+| `CHANGELOG.md` | 每次发布必须更新 |
+| `docs/ROADMAP.md` | 阶段完成或计划变更时更新 |
 | `docs/KNOWN_ISSUES.md` | 发现新问题或修复已有问题时更新 |
-| `docs/TESTING_ACCEPTANCE.md` | 测试用例变更时更新      |
+| `docs/TESTING_ACCEPTANCE.md` | 测试用例变更时更新 |
 
 ---
 

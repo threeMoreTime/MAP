@@ -6,7 +6,7 @@
 |------|------|
 | Python 3 | 所有脚本的运行环境 |
 | curl | bash 版本脚本所需（可选） |
-| matplotlib | `generate_charts.py` 依赖，需单独安装 |
+| matplotlib | `scrapers/generate_charts.py` 依赖，需单独安装 |
 
 安装 matplotlib：
 
@@ -16,19 +16,19 @@ pip install matplotlib
 
 ---
 
-## 运行 scrape_all_cities.py
+## 运行 scrapers/scrape_all_cities.py
 
-**功能**：从 metroman.cn 抓取全国 48 个城市的地铁线路图和规划图。
+**功能**：从 metroman.cn 抓取全国 50 个城市的地铁线路图和规划图。
 
 **命令**：
 
 ```bash
-python scrape_all_cities.py
+python scrapers/scrape_all_cities.py
 ```
 
 **预期输出**：
 
-- 每个城市创建独立目录 `{city}/`
+- 每个城市在 `cities/{city}/` 目录下创建文件
 - 每个目录下生成 `{city}_network.png`（运营线路图）和 `{city}_plan.png`（规划线路图）
 - 自动过滤小于 2KB 的占位图文件
 - 运行耗时约 1 分钟（8 并发线程）
@@ -36,49 +36,53 @@ python scrape_all_cities.py
 **目录结构示例**：
 
 ```
-北京/
-  北京_network.png
-  北京_plan.png
-上海/
-  上海_network.png
-  上海_plan.png
+cities/
+  beijing/
+    beijing_network.png
+    beijing_plan.png
+  shanghai/
+    shanghai_network.png
+    shanghai_plan.png
 ...
 ```
 
 ---
 
-## 运行 scrape_metrodb.py
+## 运行 scrapers/scrape_metrodb.py
 
 **功能**：从 metrodb.org 抓取各城市地铁客流量统计数据。
 
 **命令**：
 
 ```bash
-python scrape_metrodb.py
+python scrapers/scrape_metrodb.py
 ```
 
 **预期输出**：
 
-- 每个城市目录下生成 `{city}_stats.json`
+- 每个城市目录下生成 `cities/{city}/{city}_stats.json`
 - JSON 中包含从页面提取的 `rollNum()` 值和 `yearly_avg_ridership` 数组
 - 自动跳过 `NO_DATA_CITIES` 列表中的无数据城市
 - 8 并发线程加速抓取
+- 日志写入 `scrapers/scrape_metrodb_log.txt`
 
 **JSON 结构示例**：
 
 ```json
 {
-  "city": "北京",
-  "yearly_avg_ridership": [
-    {"year": 2020, "value": 750.3},
-    {"year": 2021, "value": 820.1}
-  ]
+  "city": "beijing",
+  "city_cn": "北京",
+  "daily_ridership_wan": 750.3,
+  "yearly_avg_ridership": {
+    "years": [2020, 2021],
+    "values": [750.3, 820.1]
+  }
 }
 ```
 
 ---
 
-## 运行 generate_charts.py
+## 运行 scrapers/generate_charts.py
 
 **功能**：读取所有 `*_stats.json` 文件，使用 matplotlib 生成年度趋势图表。
 
@@ -86,14 +90,14 @@ python scrape_metrodb.py
 
 ```bash
 pip install matplotlib
-python generate_charts.py
+python scrapers/generate_charts.py
 ```
 
 **预期输出**：
 
-- 每个城市的年度客流趋势 PNG 图表
-- 全国对比图 `national_comparison.png`
-- 总览仪表盘图 `overview_dashboard.png`
+- 每个城市的年度客流趋势 PNG 图表（`cities/{city}/{city}_yearly_trend.png`）
+- 全国对比图 `output/national_comparison.png`
+- 总览仪表盘图 `output/overview_dashboard.png`
 - 自动检测系统中的中文字体，图表标题和标签支持中文显示
 
 **注意事项**：
@@ -107,12 +111,12 @@ python generate_charts.py
 
 | 文件路径 | 来源脚本 | 说明 |
 |----------|----------|------|
-| `{city}/{city}_network.png` | scrape_all_cities.py | 城市运营线路图 |
-| `{city}/{city}_plan.png` | scrape_all_cities.py | 城市规划线路图 |
-| `{city}/{city}_stats.json` | scrape_metrodb.py | 城市客流量统计数据 |
-| `{city}/{city}_yearly_trend.png` | generate_charts.py | 城市年度客流趋势图 |
-| `national_comparison.png` | generate_charts.py | 全国城市客流对比图 |
-| `overview_dashboard.png` | generate_charts.py | 总览仪表盘图 |
+| `cities/{city}/{city}_network.png` | scrape_all_cities.py | 城市运营线路图 |
+| `cities/{city}/{city}_plan.png` | scrape_all_cities.py | 城市规划线路图 |
+| `cities/{city}/{city}_stats.json` | scrape_metrodb.py | 城市客流量统计数据 |
+| `cities/{city}/{city}_yearly_trend.png` | generate_charts.py | 城市年度客流趋势图 |
+| `output/national_comparison.png` | generate_charts.py | 全国城市客流对比图 |
+| `output/overview_dashboard.png` | generate_charts.py | 总览仪表盘图 |
 
 ---
 
@@ -120,10 +124,10 @@ python generate_charts.py
 
 | 日志文件 | 来源脚本 | 内容 |
 |----------|----------|------|
-| `scrape_log.txt` | scrape_all_cities.py | 记录城市线路图抓取的详细日志，包含成功/失败状态 |
-| `scrape_metrodb_log.txt` | scrape_metrodb.py | 记录客流数据抓取的详细日志，包含跳过城市和解析错误 |
+| `scrapers/scrape_log.txt` | scrape_all_cities.py | 记录城市线路图抓取的详细日志，包含成功/失败状态 |
+| `scrapers/scrape_metrodb_log.txt` | scrape_metrodb.py | 记录客流数据抓取的详细日志，包含跳过城市和解析错误 |
 
-日志位于项目根目录，每次运行会追加记录。
+日志位于 `scrapers/` 目录，每次运行会覆盖记录。
 
 ---
 
@@ -156,18 +160,18 @@ python generate_charts.py
 
 ```bash
 # 删除所有城市目录下的旧数据
-find . -name "*_stats.json" -delete
-find . -name "*_network.png" -delete
-find . -name "*_plan.png" -delete
-find . -name "*_yearly_trend.png" -delete
+Get-ChildItem -Path cities -Recurse -Filter "*_stats.json" | Remove-Item
+Get-ChildItem -Path cities -Recurse -Filter "*_network.png" | Remove-Item
+Get-ChildItem -Path cities -Recurse -Filter "*_plan.png" | Remove-Item
+Get-ChildItem -Path cities -Recurse -Filter "*_yearly_trend.png" | Remove-Item
 ```
 
 - **完整重跑顺序**：
 
 ```bash
-python scrape_all_cities.py
-python scrape_metrodb.py
-python generate_charts.py
+python scrapers/scrape_all_cities.py
+python scrapers/scrape_metrodb.py
+python scrapers/generate_charts.py
 ```
 
 三个脚本按顺序执行，后者依赖前者的输出文件。

@@ -74,15 +74,16 @@ https://metroman.cn/assets/img/metro/{map|plan}/routemap_{code}_cn.png
 | 6 | 徐州 | xuzhou |
 | 7 | 乌鲁木齐 | urumqi |
 | 8 | 香港 | hongkong |
-| 9 | 澳门 | macao |
+| 9 | 澳门 | macau |
 | 10 | 高雄 | kaohsiung |
-| 11 | 桃园 | taoyuan |
-| 12 | 台中 | taichung |
-| 13 | 台北 | taipei |
-| 14 | 金华 | jinhua |
-| 15 | 台州 | taizhou |
+| 11 | 台中 | taichung |
+| 12 | 台北 | taipei |
+| 13 | 金华 | jinhua |
+| 14 | 台州 | taizhou |
+| 15 | 佛山 | foshan |
+| 16 | 绍兴 | shaoxing |
 
-> 共计 **15 个城市**缺数据，上述城市在 `{city}_stats.json` 中仅保留基础城市信息，运营统计字段为 `null` 或缺失。
+> 共计 **16 个城市**缺数据，上述城市目录下无 `{city}_stats.json` 文件。其中佛山、绍兴为空目录（MetroMan 亦无对应资源）。
 
 ---
 

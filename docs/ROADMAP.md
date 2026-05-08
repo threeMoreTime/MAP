@@ -1,16 +1,16 @@
 # 项目路线图
 
 > 项目：全国城市地铁客流数据可视化大屏
-> 版本：v1.0.0
-> 日期：2026-05-05
+> 版本：v1.1.0
+> 日期：2026-05-08
 > 仓库：threeMoreTime/MAP
 
 ---
 
 ## 当前状态
 
-- 版本：v1.0.0
-- 当前阶段：Phase 3.5 - Dashboard 视觉重设计与结构重构（已完成）
+- 版本：v1.1.0
+- 当前阶段：Phase 3.5 - Dashboard 视觉重设计与结构重构（已完成）+ 目录结构优化（已完成）
 - 浏览器验收：16/16 PASS
 - 数据覆盖：全国主要城市地铁客流数据
 
@@ -27,11 +27,6 @@
 - [x] `docs/KNOWN_ISSUES.md` - 已知问题清单
 - [x] `.github/PULL_REQUEST_TEMPLATE.md` - PR 模板
 
-**验收标准**：
-- 所有文档文件已创建并提交
-- 文档内容与项目现状一致
-- PR 模板可在 GitHub 正常使用
-
 ---
 
 ## Phase 2：数据结构标准化（已完成）
@@ -40,17 +35,11 @@
 
 **产物**：
 - [x] `data/latest/metro_stats.json` — 汇总 34 城市客流数据
-- [x] `data/latest/city_assets_index.json` — 索引 48 城市资源文件
+- [x] `data/latest/city_assets_index.json` — 索引 50 城市资源文件
 - [x] `data/latest/manifest.json` — 数据层整体统计
 - [x] `data/schema/metro_stats.schema.json` — JSON Schema 定义
 - [x] `scripts/build_data_index.py` — 数据索引构建脚本
 - [x] `scripts/validate_data.py` — 数据校验脚本
-
-**验收标准**：
-- `build_data_index.py` 可重复生成数据层文件
-- `validate_data.py` 输出 PASS（0 errors）
-- dashboard.html 未被修改
-- 文档已同步更新（DATA_SCHEMA、ARCHITECTURE_DATA_FLOW、TESTING_ACCEPTANCE）
 
 ---
 
@@ -64,12 +53,6 @@
 - [x] `scripts/run_acceptance.py` — 总验收入口（4 步串行）
 - [x] `package.json` — npm scripts 集成（test:data / test:dashboard / test:acceptance）
 
-**验收标准**：
-- `python scripts/run_acceptance.py` 一键执行全部验收
-- 浏览器验收 16/16 PASS
-- 自动启停静态服务，Chrome 路径自动检测
-- 失败时退出码 1，全部通过退出码 0
-
 ---
 
 ## Phase 3.5：Dashboard 视觉重设计与结构重构（已完成）
@@ -78,20 +61,22 @@
 
 **产物**：
 - [x] 全新 CSS 配色方案（#060e1a 深蓝背景 + #00d4ff 青色主色调）
-- [x] Sticky 导航栏（品牌名 + 锚点导航：总览、城市资源、数据说明）
-- [x] Hero 平台介绍区（渐变标题 + 徽章 + 描述文字）
-- [x] 玻璃拟态指标卡片（半透明背景 + 发光线 + hover 浮起）
-- [x] 图表容器发光边框效果
-- [x] 城市资源网格区（`#cityResourceGrid`，卡片式布局）
-- [x] 数据说明区（数据来源、字段说明、校验状态、已知限制）
-- [x] 增强页脚（品牌信息 + 导航链接 + 版权声明）
-- [x] 保留全部 DOM ID 和业务逻辑，验收测试 16/16 PASS
+- [x] Sticky 导航栏、Hero 平台介绍区、玻璃拟态指标卡片
+- [x] 城市资源网格区、数据说明区、增强页脚
 - [x] 新增 `updateCityResourceGrid()` JS 函数，搜索联动
+- [x] 保留全部 DOM ID 和业务逻辑，验收测试 16/16 PASS
 
-**验收标准**：
-- CSS/HTML/JS 重构后所有验收测试通过（16/16 PASS）
-- 移动端 375px 无横向滚动（scrollWidth=375）
-- 无新增 console 错误
+---
+
+## 目录结构优化（已完成）
+
+**目标**：优化项目目录结构，将城市目录和脚本分类归整。
+
+**产物**：
+- [x] 50 个城市目录收归至 `cities/`
+- [x] 爬虫脚本整理至 `scrapers/`
+- [x] 生成产物输出至 `output/`
+- [x] 更新所有脚本和文档中的路径引用
 
 ---
 
@@ -169,15 +154,16 @@
 
 ## 时间线（预估）
 
-| 阶段   | 内容                 | 预估工期 | 依赖       |
-| ------ | -------------------- | -------- | ---------- |
-| Phase 1 | 文档基线建设        | 已完成   | 无         |
-| Phase 2 | 数据结构标准化      | 1 周     | Phase 1    |
-| Phase 3 | 自动化验收脚本      | 1 周     | Phase 1    |
-| Phase 4 | 数据外置            | 3 天     | Phase 2    |
-| Phase 5 | GitHub Pages 发布   | 1 天     | Phase 4    |
-| Phase 6 | 增量更新与定期采集  | 1 周     | Phase 3, 5 |
-| Phase 7 | 城市详情页增强      | 2 周     | Phase 4, 5 |
+| 阶段 | 内容 | 预估工期 | 依赖 |
+|------|------|----------|------|
+| Phase 1 | 文档基线建设 | 已完成 | 无 |
+| Phase 2 | 数据结构标准化 | 已完成 | Phase 1 |
+| Phase 3 | 自动化验收脚本 | 已完成 | Phase 1 |
+| 目录优化 | 项目结构重组 | 已完成 | Phase 2, 3 |
+| Phase 4 | 数据外置 | 3 天 | Phase 2 |
+| Phase 5 | GitHub Pages 发布 | 1 天 | Phase 4 |
+| Phase 6 | 增量更新与定期采集 | 1 周 | Phase 3, 5 |
+| Phase 7 | 城市详情页增强 | 2 周 | Phase 4, 5 |
 
 ---
 
