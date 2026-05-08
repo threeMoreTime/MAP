@@ -38,6 +38,11 @@ function mergeData(assets: CityAsset[], stats: MetroCity[]): MergedCity[] {
   });
 }
 
+function withBaseUrl(path: string): string {
+  const base = import.meta.env.BASE_URL || './';
+  return `${base}${path.replace(/^\/+/, '')}`;
+}
+
 async function fetchJSON<T>(url: string): Promise<T> {
   const resp = await fetch(url);
   if (!resp.ok) throw new Error(`Failed to fetch ${url}: ${resp.status}`);
@@ -60,9 +65,9 @@ export function useMetroData(): MetroDataState {
     async function load() {
       try {
         const [statsData, assetsData, manifestData] = await Promise.all([
-          fetchJSON<MetroStats>('/data/latest/metro_stats.json'),
-          fetchJSON<CityAssetsIndex>('/data/latest/city_assets_index.json'),
-          fetchJSON<Manifest>('/data/latest/manifest.json'),
+          fetchJSON<MetroStats>(withBaseUrl('data/latest/metro_stats.json')),
+          fetchJSON<CityAssetsIndex>(withBaseUrl('data/latest/city_assets_index.json')),
+          fetchJSON<Manifest>(withBaseUrl('data/latest/manifest.json')),
         ]);
 
         if (cancelled) return;

@@ -76,7 +76,9 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 - 复制 `assets/china.json` 到 `frontend/public/assets/`
 - 不复制 `node_modules`、`cities/` 图片等大文件
 
-运行时通过 `fetch('/data/latest/metro_stats.json')` 加载数据。
+运行时通过 `import.meta.env.BASE_URL` 拼接数据路径（`withBaseUrl` 工具函数），确保 GitHub Pages 子路径部署时不会因绝对路径 `/data` 导致 404。
+
+`frontend/public/data/` 为同步产物，不提交仓库。
 
 ## 5. 分阶段迁移计划
 
