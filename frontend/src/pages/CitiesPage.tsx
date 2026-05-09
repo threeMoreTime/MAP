@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useMetroData } from '../hooks/useMetroData';
 import { useDashboardFilters, hasValidDailyRidership } from '../hooks/useDashboardFilters';
 import type { CityFilterTag } from '../types/metro';
@@ -38,9 +39,25 @@ function isTallCard(index: number): boolean {
 function CityCard({ city, index }: { city: MergedCity; index: number }) {
   const hasDaily = hasValidDailyRidership(city);
   const tall = isTallCard(index);
+  const navigate = useNavigate();
+
+  const handleClick = () => navigate(`/city/${city.city}`);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleClick();
+    }
+  };
 
   return (
-    <div className={`city-card${tall ? '' : ''}`}>
+    <div
+      className={`city-card${tall ? '' : ''}`}
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      aria-label={`查看${city.city_cn}城市详情`}
+    >
       {/* Cover */}
       <div className={`city-card-cover${tall ? ' city-card-cover--tall' : ''}`}>
         <div

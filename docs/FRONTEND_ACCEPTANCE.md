@@ -13,7 +13,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # 浏览器自动化验收（T01-T15）
+npm run test:ui       # 浏览器自动化验收（T01-T19）
 ```
 
 > `npm run test:ui` 会先执行 `npm run build`，再启动 Vite preview 服务器运行浏览器验收。
@@ -30,9 +30,10 @@ npm run test:ui       # 浏览器自动化验收（T01-T15）
 |------|------|------|
 | `/#/dashboard` | 数据总览 | Hero 区域 + 统计卡片 + 筛选工具栏 + 6 个图表区域 |
 | `/#/cities` | 城市资源总览 | 城市卡片网格 + 搜索 + 筛选标签 |
+| `/#/city/:id` | 城市详情 | 面包屑 + 统计卡片 + 趋势图 + 资源预览 + 数据说明 |
 | `/#/about` | 数据说明 | 数据来源、字段说明、更新机制、已知限制、免责声明 |
 
-## 验收测试项（T01-T15）
+## 验收测试项（T01-T19）
 
 | 编号 | 测试项 | 状态类型 | 说明 |
 |------|--------|----------|------|
@@ -51,6 +52,10 @@ npm run test:ui       # 浏览器自动化验收（T01-T15）
 | T13 | 控制台错误检查 | PASS/FAIL | 排除 favicon 404 和 sourcemap 警告 |
 | T14 | 375px 移动端 | PASS/FAIL | 三页 scrollWidth <= innerWidth + 1 |
 | T15 | 静态资源路径 | PASS/FAIL | data/latest 和 assets/china.json 成功加载 |
+| T16 | 城市详情页可访问 | PASS/FAIL | /#/city/xiamen 包含"厦门""运营线路""年度客流趋势""线路图""数据说明" |
+| T17 | Cities 点击导航 | PASS/FAIL | 搜索"厦门"并点击卡片，URL 变为 #/city/xiamen |
+| T18 | 不存在城市处理 | PASS/FAIL | /#/city/not-exist 显示"未找到城市"，无 JS 错误 |
+| T19 | 城市详情页移动端 | PASS/FAIL | 375px /#/city/xiamen scrollWidth <= innerWidth + 1 |
 
 ### 状态类型说明
 
@@ -79,13 +84,13 @@ npm run test:ui       # 浏览器自动化验收（T01-T15）
 |------|---------------|-----------------|
 | 入口 | `cd frontend && npm run test:ui` | `python scripts/run_acceptance.py` |
 | 目标 | React 前端（Vite 构建） | dashboard.html 单文件 |
-| 测试项 | T01-T15（15 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
+| 测试项 | T01-T19（19 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
 | 共存 | 两者独立运行，互不影响 | 两者独立运行，互不影响 |
 
 ## 验收结果汇总格式
 
 ```
-Total: 15  PASS: 13  FAIL: 0  MANUAL: 1  SKIP: 0
+Total: 19  PASS: 17  FAIL: 0  MANUAL: 1  SKIP: 0
 ```
 
 - FAIL > 0 时退出码为 1

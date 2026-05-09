@@ -181,6 +181,21 @@
 - [x] `npm run test:ui` 通过（14 PASS / 0 FAIL / 1 MANUAL）
 - [x] `python scripts/run_acceptance.py` 16/16 PASS
 
+**Phase 4.6：城市详情页 /city/:id（已完成）**
+- [x] 新增 /city/:id 路由（CityDetailPage）
+- [x] CitiesPage 城市卡片点击导航（useNavigate + aria-label + 键盘支持）
+- [x] 面包屑导航（返回按钮 + 城市名）
+- [x] 6 统计卡片网格（运营线路/站点/里程/日客流/客流强度/峰值客流）
+- [x] 年度客流趋势面积图（ECharts + cyan 渐变填充）
+- [x] 资源预览 Tab（线路图/规划图 placeholder）
+- [x] 数据说明手风琴（可折叠 + 无数据警告）
+- [x] 城市不存在 404 状态
+- [x] EmptyState 通用空状态组件
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `npm run test:ui` 通过（18 PASS / 0 FAIL / 1 MANUAL）
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
 ---
 
 ## Phase 5：Dashboard 数据外置

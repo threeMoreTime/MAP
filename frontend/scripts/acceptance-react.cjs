@@ -439,6 +439,82 @@ async function runTests(baseUrl) {
   record('T15', '静态资源路径检查（data/latest + china.json）',
     t15dataLoaded && data404s.length === 0,
     `dataLoaded=${t15dataLoaded}, pathErrors=${data404s.length}`);
+
+  // T16: /#/city/xiamen accessible
+  await gotoHash(BASE, '#/city/xiamen');
+  const t16 = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    return {
+      hasXiamen: body.includes('厦门'),
+      hasLines: body.includes('运营线路'),
+      hasTrend: body.includes('年度客流趋势'),
+      hasMap: body.includes('线路图'),
+      hasNote: body.includes('数据说明'),
+    };
+  });
+  record('T16', '/#/city/xiamen 可访问，含关键内容',
+    t16.hasXiamen && t16.hasLines && t16.hasTrend && t16.hasMap && t16.hasNote,
+    `xiamen=${t16.hasXiamen}, lines=${t16.hasLines}, trend=${t16.hasTrend}, map=${t16.hasMap}, note=${t16.hasNote}`);
+
+  // T17: From /#/cities, search "厦门", click card with aria-label, verify URL
+  await gotoHash(BASE, '#/cities');
+  const t17errBefore = [...consoleErrors];
+  const t17 = await page.evaluate(async () => {
+    // Search for 厦门
+    const input = document.querySelector('input[type="text"]');
+    if (!input) return { ok: false, detail: 'search input not found' };
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    nativeInputValueSetter.call(input, '厦门');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    await new Promise(r => setTimeout(r, 1500));
+
+    // Click card with aria-label
+    const card = document.querySelector('[aria-label="查看厦门城市详情"]');
+    if (!card) return { ok: false, detail: 'card with aria-label not found' };
+    card.click();
+    await new Promise(r => setTimeout(r, 1500));
+
+    const hash = window.location.hash;
+    const body = document.body.innerText || '';
+    return {
+      ok: hash.includes('/city/xiamen') && body.includes('厦门'),
+      detail: `hash=${hash}`,
+    };
+  });
+  const t17errors = consoleErrors.filter(isCriticalError);
+  record('T17', '从 Cities 搜索厦门并点击卡片导航',
+    t17.ok && t17errors.length === 0,
+    t17.ok ? 'OK' : t17.detail);
+
+  // T18: /#/city/not-exist shows "未找到城市"
+  consoleErrors = [];
+  await gotoHash(BASE, '#/city/not-exist');
+  const t18 = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    return { hasNotFound: body.includes('未找到城市') };
+  });
+  const t18errors = consoleErrors.filter(isCriticalError);
+  record('T18', '/#/city/not-exist 显示"未找到城市"且无 JS 错误',
+    t18.hasNotFound && t18errors.length === 0,
+    `notFound=${t18.hasNotFound}, errors=${t18errors.length}`);
+
+  // T19: 375px viewport /#/city/xiamen scrollWidth <= innerWidth + 1
+  await page.setViewport({ width: 375, height: 812 });
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 20000 });
+  await wait(1500);
+  const t19 = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+  }));
+  const t19pass = t19.scrollWidth <= t19.innerWidth + 1;
+
+  // Restore viewport
+  await page.setViewport({ width: 1280, height: 800 });
+  await wait(500);
+
+  record('T19', '375px /#/city/xiamen 无横向溢出', t19pass,
+    t19pass ? 'OK' : `scrollWidth=${t19.scrollWidth}, innerWidth=${t19.innerWidth}`);
 }
 
 // === 主流程 ===

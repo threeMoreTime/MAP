@@ -92,6 +92,7 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 | 4.3.1 | 验收脚本依赖与端口处理修复 | 已完成 |
 | 4.4 | UI 细节打磨 + 响应式优化 | 已完成 |
 | 4.5 | 城市资源页 Masonry 瀑布流与卡片精细还原 | 已完成 |
+| 4.6 | 城市详情页 /city/:id（点击导航、统计卡片、趋势图、资源预览、数据说明） | 已完成 |
 
 ## 6. 验收命令
 
@@ -100,7 +101,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # React 前端浏览器验收（T01-T15）
+npm run test:ui       # React 前端浏览器验收（T01-T19）
 
 # 回到根目录验证旧版不受影响
 python scripts/run_acceptance.py
@@ -141,6 +142,23 @@ Phase 4.5 完成 CitiesPage 的 Masonry 瀑布流与城市卡片精细还原：
 - **空状态**：居中 glass-card，图标 + 标题 + 提示文案
 - **未新增**：城市详情路由、外部图片、大型 UI 库
 - **验收兼容**：隐藏 div 保留"线路/站点""日客流"文本，验收脚本无需修改
+
+### 6.4 Phase 4.6 城市详情页
+
+Phase 4.6 完成 CityDetailPage 城市详情页的完整实现：
+
+- **路由**：新增 `/city/:id` 路由，支持通过城市 slug 直接访问
+- **点击导航**：CitiesPage 城市卡片添加点击导航（useNavigate），支持键盘 Enter/Space 触发
+- **无障碍**：卡片添加 `role="button"`, `tabIndex={0}`, `aria-label` 属性
+- **面包屑导航**：返回按钮（capsule 样式）+ 分隔符 + 城市名
+- **6 统计卡片网格**：运营线路/站点/里程/日客流/客流强度/峰值客流，响应式 2/3/6 列
+- **年度趋势图**：ECharts 面积图（cyan 渐变填充），无数据时显示空状态
+- **资源预览 Tab**：线路图/规划图切换，显示 placeholder 状态
+- **数据说明手风琴**：可折叠，含客流口径说明和无数据警告
+- **404 状态**：城市不存在时显示"未找到城市"
+- **EmptyState 通用组件**：可复用的空状态展示组件
+- **验收**：新增 T16-T19 四项验收测试
+- **未新增**：Recharts 或其他 UI 依赖
 
 ## 6.5 构建优化
 
