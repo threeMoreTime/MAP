@@ -1,0 +1,58 @@
+# React 前端静态部署草案
+
+## 1. 当前状态
+- React 前端位于 frontend/
+- 旧版 dashboard.html 仍保留为稳定基线
+- React 版使用 HashRouter
+- 当前入口包括：
+  - /#/dashboard
+  - /#/cities
+  - /#/about
+- Phase 4.6 完成后会新增：
+  - /#/city/:id
+
+## 2. 本地构建命令
+
+```bash
+cd frontend
+npm ci
+npm run typecheck
+npm run build
+npm run check:static
+npm run test:ui
+```
+
+## 3. 数据同步机制
+- prebuild 会执行 scripts/sync-data.cjs
+- data/latest/*.json 会复制到 frontend/public/data/latest/
+- assets/china.json 会复制到 frontend/public/assets/china.json
+- frontend/public/data/ 和 frontend/public/assets/china.json 是同步产物，不提交仓库
+- build 后进入 frontend/dist/
+
+## 4. 静态路由策略
+- 使用 HashRouter
+- 不依赖服务端 rewrite
+- GitHub Pages 子路径下应通过 /MAP/#/dashboard 等形式访问
+
+## 5. check:static 检查内容
+
+| 编号 | 检查项 | 说明 |
+|------|--------|------|
+| T01 | dist/index.html 存在 | 确认构建输出根入口文件 |
+| T02 | dist/assets/ 目录存在 | 确认静态资源目录 |
+| T03 | data/latest 三个 JSON 存在 | metro_stats.json、city_assets_index.json、manifest.json |
+| T04 | china.json 存在 | dist/assets/china.json 中国地图 GeoJSON |
+| T05 | index.html 不使用根路径资源 | 不含 `src="/assets/"`、`href="/assets/"`、`src="/data/"`、`href="/data/"` |
+| T06 | 构建 JS/HTML 不含硬编码绝对数据路径 | 不含 `"/data/latest/"`、`"/assets/china.json"` 等绝对路径；允许相对路径 |
+| T07 | dist 含 JS 和 CSS 资源 | assets/ 目录下至少各有一个 .js 和 .css 文件 |
+
+## 6. 与旧版 dashboard.html 的关系
+- React 静态部署不删除 dashboard.html
+- dashboard.html 仍可通过旧验收脚本验证
+- React Pages 发布失败时，可回退到旧版 dashboard.html
+
+## 7. 后续待办
+- Phase 4.6 完成后补充 /#/city/:id 验收
+- 后续再新增 GitHub Actions CI
+- 后续再新增 workflow_dispatch 手动部署 Pages
+- 暂不自动部署到 GitHub Pages
