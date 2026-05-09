@@ -16,28 +16,46 @@ import CityDetailPanel from '../components/charts/CityDetailPanel';
 function HeroSection({ date, cityCount, statsCount }: { date: string; cityCount: number; statsCount: number }) {
   return (
     <section style={{
-      textAlign: 'center', padding: '48px 24px 36px',
-      background: 'linear-gradient(180deg, rgba(0,30,60,0.5) 0%, transparent 100%)',
+      textAlign: 'center', padding: '44px 24px 32px',
+      background: 'linear-gradient(180deg, rgba(0,30,60,0.45) 0%, transparent 100%)',
       position: 'relative',
     }}>
       <div style={{
         position: 'absolute', bottom: 0, left: '10%', right: '10%', height: 1,
-        background: 'linear-gradient(90deg, transparent, rgba(0,200,255,0.15), transparent)',
+        background: 'linear-gradient(90deg, transparent, rgba(0,200,255,0.12), transparent)',
       }} />
       <div style={{
-        display: 'inline-block', fontSize: 11, color: '#00d4ff', letterSpacing: 2,
-        border: '1px solid rgba(0,200,255,0.2)', borderRadius: 20,
-        padding: '4px 16px', marginBottom: 16, background: 'rgba(0,200,255,0.05)',
+        display: 'inline-flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', justifyContent: 'center',
       }}>
-        NATIONAL METRO DATA PLATFORM
+        {[
+          { text: 'React 前端', color: '#448aff' },
+          { text: '数据快照', color: '#4caf50' },
+          { text: `${cityCount} 城市资源`, color: '#ff9800' },
+          { text: `${statsCount} 客流统计城市`, color: '#9c27b0' },
+        ].map(tag => (
+          <span key={tag.text} style={{
+            fontSize: 10, color: tag.color, letterSpacing: 1,
+            border: `1px solid ${tag.color}33`, borderRadius: 12,
+            padding: '3px 12px', background: `${tag.color}0a`,
+          }}>
+            {tag.text}
+          </span>
+        ))}
       </div>
-      <h1 className="gradient-text" style={{ fontSize: 32, fontWeight: 700, letterSpacing: 6, marginBottom: 12 }}>
+      <h1 className="gradient-text" style={{
+        fontSize: 30, fontWeight: 700, letterSpacing: 6, marginBottom: 10,
+      }}>
         全国城市地铁客流可视化平台
       </h1>
-      <p style={{ color: '#5a7a9a', fontSize: 14, maxWidth: 640, margin: '0 auto', lineHeight: 1.8 }}>
-        覆盖全国 {cityCount} 个城市地铁线路资源，{statsCount} 个城市客流统计数据，数据可视化大屏
+      <p style={{
+        color: 'var(--text-secondary)', fontSize: 13,
+        maxWidth: 600, margin: '0 auto', lineHeight: 1.8,
+      }}>
+        覆盖全国 {cityCount} 个城市地铁线路资源，{statsCount} 个城市客流统计数据
         <br />
-        <span style={{ color: '#4a8aaa', fontSize: 12 }}>数据来源：MetroDB.org · 更新日期：{date}</span>
+        <span style={{ color: 'var(--text-label)', fontSize: 11 }}>
+          数据来源：MetroDB.org · 更新日期：{date}
+        </span>
       </p>
     </section>
   );
@@ -56,7 +74,7 @@ function StatsRow({ cities }: { cities: MergedCity[] }) {
   }, [cities]);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', gap: 16, padding: '18px 24px', flexWrap: 'wrap' }}>
+    <div className="stat-cards-row">
       {cards.map((c) => (
         <StatCard key={c.label} {...c} />
       ))}
@@ -78,8 +96,8 @@ export default function DashboardPage() {
     return merged.find((c) => c.city === selectedCityName) ?? null;
   }, [selectedCityName, merged]);
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#4a6a8a' }}>加载数据中...</div>;
-  if (error) return <div style={{ textAlign: 'center', padding: 80, color: '#ff5252' }}>加载失败：{error}</div>;
+  if (loading) return <div className="state-message state-message--loading">加载数据中...</div>;
+  if (error) return <div className="state-message state-message--error">加载失败：{error}</div>;
 
   const date = manifest?.generated_at?.split('T')[0] || '-';
   const statsCount = merged.filter((c) => c.has_stats).length;
@@ -95,7 +113,10 @@ export default function DashboardPage() {
         <SectionTitle icon="◎" title="数据总览" />
         <StatsRow cities={filteredCities} />
         {noDataCount > 0 && (
-          <div style={{ textAlign: 'center', color: '#2a3a4a', fontSize: 11, padding: '0 32px 6px' }}>
+          <div style={{
+            textAlign: 'center', color: 'var(--text-dim)', fontSize: 11,
+            padding: '0 32px 6px',
+          }}>
             日客流统计已排除 {noDataCount} 个暂无数据城市
           </div>
         )}

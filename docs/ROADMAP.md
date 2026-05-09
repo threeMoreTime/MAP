@@ -152,6 +152,20 @@
 - 三页路由可正常访问
 - 旧版 `python scripts/run_acceptance.py` 继续通过
 
+**Phase 4.4：React 前端 UI 细节打磨与响应式优化（已完成）**
+- [x] 全局样式统一（CSS 变量、card-glass 基类、focus 状态）
+- [x] Dashboard Hero 区轻量状态标签、StatCard grid 布局
+- [x] FilterToolbar 统一 filter-input 样式和 aria-label
+- [x] CitiesPage 城市卡片增加线路图/规划图标签、空状态
+- [x] AboutPage 统一卡片样式
+- [x] Footer 4 列布局移动端折叠
+- [x] 响应式断点统一（1200 / 900 / 600px）
+- [x] 375px 移动端无横向溢出
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `npm run test:ui` 通过（14 PASS / 0 FAIL / 1 MANUAL）
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
 ---
 
 ## Phase 5：Dashboard 数据外置

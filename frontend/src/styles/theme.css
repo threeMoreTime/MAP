@@ -5,6 +5,7 @@
   --bg-card-hover: #1a3358;
   --border-dim: rgba(0, 180, 255, 0.08);
   --border-light: rgba(0, 180, 255, 0.15);
+  --border-accent: rgba(0, 212, 255, 0.25);
   --accent: #00d4ff;
   --accent-blue: #448aff;
   --accent-green: #4caf50;
@@ -16,9 +17,15 @@
   --text-secondary: #5a7a9a;
   --text-dim: #2a3a4a;
   --text-label: #4a6a8a;
+  --text-bright: #e8f4ff;
   --header-height: 52px;
   --max-width: 1180px;
   --radius: 10px;
   --radius-sm: 6px;
+  --radius-lg: 14px;
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.25);
+  --shadow-card-hover: 0 4px 20px rgba(0, 100, 200, 0.15);
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
   --font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }

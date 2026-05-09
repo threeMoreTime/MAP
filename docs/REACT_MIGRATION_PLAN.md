@@ -90,7 +90,7 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 | 4.2 | ECharts 图表迁移（地图、排行榜、趋势图、强度图、详情面板） | 已完成 |
 | 4.3 | 浏览器验收 + 构建优化 + 交互稳定性 | 已完成 |
 | 4.3.1 | 验收脚本依赖与端口处理修复 | 已完成 |
-| 4.4 | 视觉打磨 + 响应式优化 | 待开始 |
+| 4.4 | UI 细节打磨 + 响应式优化 | 已完成 |
 
 ## 6. 验收命令
 
@@ -113,6 +113,18 @@ React 前端验收详情见 [docs/FRONTEND_ACCEPTANCE.md](./FRONTEND_ACCEPTANCE.
 - Preview 服务器使用 `--strictPort` 模式，按 4173-4177 顺序尝试端口
 - T10 地图点击详情保留为 MANUAL（人工验证项），不计入自动 PASS
 - 验收结果区分 PASS / FAIL / MANUAL / SKIP 四种状态
+
+### 6.2 Phase 4.4 UI 优化说明
+
+Phase 4.4 完成 React 前端视觉细节打磨与响应式优化：
+
+- **全局样式**：统一 CSS 变量体系，新增 `--border-accent`、`--shadow-card`、`--transition-*` 等；网格背景透明度降低
+- **Dashboard**：Hero 区新增轻量状态标签（React 前端 / 数据快照 / 城市资源 / 客流统计）；StatCard 改用 grid 布局自适应；FilterToolbar 使用统一样式
+- **Cities**：城市卡片增加"有线路图""有规划图"标签；筛选按钮添加 aria-label；空状态展示"暂无匹配城市"
+- **About**：说明卡片使用统一样式
+- **Header / Footer**：Footer 4 列布局移动端折叠为 2 列
+- **响应式**：统一断点（1200 / 900 / 600px），375px 无横向溢出
+- **无障碍**：input / select / button 添加 focus-visible 和 aria-label
 
 ## 6.5 构建优化
 

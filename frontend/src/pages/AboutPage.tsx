@@ -27,11 +27,11 @@ const CARDS: AboutCardData[] = [
           ['运营站点（座）', '已开通运营的车站数量'],
           ['客流强度', '日客流量 / 运营里程（万/km）'],
           ['历史最高', '单日客流量最高纪录'],
-          ['daily_ridership_wan <= 0', '表示暂无当日客流数据，不代表真实零客流'],
+          ['daily_ridership_wan ≤ 0', '表示暂无当日客流数据，不代表真实零客流'],
         ].map(([dt, dd]) => (
-          <div key={dt as string} style={{ marginBottom: 6 }}>
-            <dt style={{ color: '#7aa0c0', fontSize: 12, fontWeight: 600 }}>{dt}</dt>
-            <dd style={{ color: '#4a6a8a', fontSize: 11, marginLeft: 0 }}>{dd}</dd>
+          <div key={dt as string} style={{ marginBottom: 8 }}>
+            <dt style={{ color: 'var(--text-label)', fontSize: 12, fontWeight: 600 }}>{dt}</dt>
+            <dd style={{ color: 'var(--text-secondary)', fontSize: 11, marginLeft: 0, marginTop: 2 }}>{dd}</dd>
           </div>
         ))}
       </dl>
@@ -68,21 +68,19 @@ const CARDS: AboutCardData[] = [
 
 function AboutCard({ data }: { data: AboutCardData }) {
   return (
-    <div style={{
-      background: 'linear-gradient(135deg, rgba(8,22,48,0.7), rgba(12,30,58,0.5))',
-      border: '1px solid rgba(0,150,220,0.08)', borderRadius: 'var(--radius)',
-      padding: 20,
-    }}>
+    <div className="card-glass" style={{ padding: 20 }}>
       <h3 style={{
-        fontSize: 14, color: '#00b8ff', marginBottom: 10, fontWeight: 500,
-        paddingLeft: 10, borderLeft: '3px solid #00b8ff',
+        fontSize: 14, color: '#00b8ff', marginBottom: 12, fontWeight: 500,
+        paddingLeft: 12, borderLeft: '3px solid #00b8ff',
       }}>
         {data.title}
       </h3>
       {data.items.length > 0 && (
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {data.items.map((item) => (
-            <li key={item} style={{ fontSize: 12, color: '#5a7a9a', lineHeight: 1.8 }}>
+            <li key={item} style={{
+              fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.9,
+            }}>
               <span style={{ color: '#00b8ff', marginRight: 8 }}>›</span>
               {item}
             </li>
@@ -98,15 +96,14 @@ export default function AboutPage() {
   return (
     <div className="page-container" style={{ paddingTop: 32, paddingBottom: 40 }}>
       <SectionTitle icon="ⓘ" title="数据说明" />
-      <p style={{ color: '#5a7a9a', fontSize: 13, marginBottom: 20, marginTop: -12 }}>
+      <p style={{
+        color: 'var(--text-secondary)', fontSize: 13,
+        marginBottom: 20, marginTop: -12,
+      }}>
         了解本平台的数据来源、字段含义与使用须知
       </p>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-        gap: 16,
-      }}>
+      <div className="about-cards-grid">
         {CARDS.map((card) => (
           <AboutCard key={card.title} data={card} />
         ))}

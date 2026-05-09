@@ -8,11 +8,10 @@ body {
   background: var(--bg-deep);
   color: var(--text-primary);
   font-family: var(--font-family);
-  overflow-x: hidden;
   min-height: 100vh;
   background-image:
-    linear-gradient(rgba(0, 40, 80, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 40, 80, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(0, 40, 80, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 40, 80, 0.04) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -21,11 +20,25 @@ body {
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-deep); }
-::-webkit-scrollbar-thumb { background: rgba(0, 180, 255, 0.2); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0, 180, 255, 0.4); }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 180, 255, 0.18); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 180, 255, 0.35); }
 
+/* === Focus States === */
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--border-accent) !important;
+}
+
+/* === Layout === */
 .page-container {
   max-width: var(--max-width);
   margin: 0 auto;
@@ -33,6 +46,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   width: 100%;
 }
 
+/* === Gradient Text === */
 .gradient-text {
   background: linear-gradient(135deg, #00d4ff, #448aff, #00e5ff);
   -webkit-background-clip: text;
@@ -40,6 +54,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   background-clip: text;
 }
 
+/* === Section Title === */
 .section-header {
   display: flex;
   align-items: center;
@@ -49,10 +64,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 .section-icon {
   width: 36px; height: 36px; border-radius: 8px;
-  background: linear-gradient(135deg, rgba(0,180,255,0.15), rgba(0,100,200,0.08));
+  background: linear-gradient(135deg, rgba(0,180,255,0.12), rgba(0,100,200,0.06));
   display: flex; align-items: center; justify-content: center;
   font-size: 16px; color: var(--accent);
-  border: 1px solid rgba(0,180,255,0.12);
+  border: 1px solid rgba(0,180,255,0.1);
 }
 
 .section-header h2 {
@@ -64,6 +79,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   background: linear-gradient(90deg, rgba(0,180,255,0.15), transparent);
 }
 
+/* === Chart Layout === */
 .chart-map-row {
   display: flex;
   gap: 16px;
@@ -79,29 +95,177 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 .chart-container {
   width: 100%;
-  height: 320px;
+  height: 340px;
 }
 
 .chart-container--map {
-  height: 480px;
+  height: 490px;
 }
 
 .chart-container--detail {
-  height: 480px;
+  height: 490px;
   overflow-y: auto;
+}
+
+/* === Card Base === */
+.card-glass {
+  background: linear-gradient(135deg, rgba(8,22,48,0.8), rgba(12,30,58,0.65));
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.card-glass:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* === Stat Cards Grid === */
+.stat-cards-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  padding: 18px 24px;
+}
+
+/* === Filter Toolbar === */
+.filter-toolbar {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 24px 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-toolbar label {
+  color: var(--text-label);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.filter-input {
+  background: rgba(6,18,38,0.9);
+  border: 1px solid rgba(0,150,220,0.2);
+  color: #c8d6e5;
+  border-radius: var(--radius-sm);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+}
+
+.filter-input:focus {
+  border-color: var(--border-accent);
+  outline: none;
+}
+
+/* === City Cards Grid === */
+.city-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+/* === About Cards Grid === */
+.about-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+/* === Empty State === */
+.empty-state {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 40px 20px;
+  font-size: 14px;
+}
+
+/* === Loading / Error States === */
+.state-message {
+  text-align: center;
+  padding: 80px 24px;
+  font-size: 14px;
+}
+
+.state-message--loading {
+  color: var(--text-label);
+}
+
+.state-message--error {
+  color: var(--accent-red);
+}
+
+/* === Responsive: Tablet === */
+@media (max-width: 1200px) {
+  .stat-cards-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .city-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 900px) {
   .chart-map-row { flex-direction: column; }
   .chart-grid-2col { grid-template-columns: 1fr; }
+  .stat-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .city-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .about-cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
+/* === Responsive: Mobile === */
 @media (max-width: 600px) {
   .page-container { padding: 0 12px; }
   .section-header h2 { font-size: 15px; }
+  .section-header { gap: 8px; margin-bottom: 16px; }
   .chart-container { height: 280px; }
-  .chart-container--map { height: 360px; }
-  .chart-container--detail { height: 360px; }
+  .chart-container--map { height: 380px; }
+  .chart-container--detail { height: 340px; }
   .chart-map-row { flex-direction: column; }
   .chart-grid-2col { grid-template-columns: 1fr; }
+  .stat-cards-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 12px 12px;
+  }
+  .city-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .filter-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 12px 12px;
+    gap: 10px;
+  }
+  .filter-toolbar > div {
+    justify-content: space-between;
+  }
+  .about-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === Footer Responsive === */
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto 16px;
+  text-align: left;
+}
+
+@media (max-width: 600px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
 }
