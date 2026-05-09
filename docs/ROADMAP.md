@@ -166,6 +166,21 @@
 - [x] `npm run test:ui` 通过（14 PASS / 0 FAIL / 1 MANUAL）
 - [x] `python scripts/run_acceptance.py` 16/16 PASS
 
+**Phase 4.5：城市资源页 Masonry 瀑布流与卡片精细还原（已完成）**
+- [x] CSS columns Masonry 瀑布流布局（1/2/3/4 列响应式）
+- [x] 城市卡片封面区 CSS 渐变 + radial-gradient、tall 交错高度
+- [x] 封面底部渐变遮罩、城市名/线路信息浮层、数据可用性徽章
+- [x] 三列核心指标（运营里程/日客流/客流强度）
+- [x] 三个资源状态标签（线路图/规划图/客流数据）
+- [x] Hover 动效：卡片上浮 + 边框高亮 + 封面缩放 + 箭头浮现
+- [x] 毛玻璃搜索筛选栏（搜索图标、清空按钮、胶囊标签组、图例）
+- [x] 空状态 glass-card（图标 + 标题 + 提示）
+- [x] theme.css 补充语义颜色变量（navy/cyan/emerald/amber/slate）
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `npm run test:ui` 通过（14 PASS / 0 FAIL / 1 MANUAL）
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
 ---
 
 ## Phase 5：Dashboard 数据外置

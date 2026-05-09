@@ -28,4 +28,21 @@
   --transition-fast: 0.2s ease;
   --transition-normal: 0.3s ease;
   --font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Semantic color tokens for city cards */
+  --navy-900: #0a192f;
+  --navy-800: #0d2137;
+  --navy-700: #112240;
+  --cyan-400: #22d3ee;
+  --cyan-500: #06b6d4;
+  --emerald-300: #6ee7b7;
+  --emerald-400: #34d399;
+  --emerald-500: #10b981;
+  --amber-300: #fcd34d;
+  --amber-400: #fbbf24;
+  --amber-500: #f59e0b;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
 }

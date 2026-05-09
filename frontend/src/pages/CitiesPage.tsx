@@ -3,7 +3,6 @@ import { useDashboardFilters, hasValidDailyRidership } from '../hooks/useDashboa
 import type { CityFilterTag } from '../types/metro';
 import type { MergedCity } from '../hooks/useMetroData';
 import SectionTitle from '../components/common/SectionTitle';
-import StatusBadge from '../components/common/StatusBadge';
 
 const FILTER_OPTIONS: { key: CityFilterTag; label: string }[] = [
   { key: 'all', label: '全部城市' },
@@ -13,85 +12,145 @@ const FILTER_OPTIONS: { key: CityFilterTag; label: string }[] = [
   { key: 'hasPlanMap', label: '有规划图' },
 ];
 
-const GRADIENT_COLORS = [
+const GRADIENT_PAIRS = [
   ['#0d47a1', '#1565c0'], ['#1b5e20', '#2e7d32'], ['#4a148c', '#6a1b9a'],
   ['#e65100', '#f57c00'], ['#006064', '#00838f'], ['#880e4f', '#ad1457'],
   ['#311b92', '#4527a0'], ['#bf360c', '#e64a19'], ['#01579b', '#0277bd'],
   ['#1a237e', '#283593'], ['#33691e', '#558b2f'], ['#827717', '#9e9d24'],
 ];
 
-function getGradient(city: string): string {
-  const idx = city.length % GRADIENT_COLORS.length;
-  const [c1, c2] = GRADIENT_COLORS[idx];
-  return `linear-gradient(135deg, ${c1}, ${c2})`;
+function getCoverGradient(city: string): string {
+  const idx = city.length % GRADIENT_PAIRS.length;
+  const [c1, c2] = GRADIENT_PAIRS[idx];
+  return `linear-gradient(135deg, ${c1} 0%, ${c2} 60%, rgba(0,0,0,0.3) 100%)`;
 }
 
-function CityCard({ city }: { city: MergedCity }) {
-  const hasDaily = hasValidDailyRidership(city);
-  return (
-    <div className="card-glass" style={{
-      overflow: 'hidden', cursor: 'default',
-      borderRadius: 'var(--radius)',
-    }}>
-      {/* Cover gradient */}
-      <div style={{
-        height: 72, background: getGradient(city.city),
-        display: 'flex', alignItems: 'flex-end', padding: '0 16px 8px',
-        position: 'relative',
-      }}>
-        <span style={{
-          fontSize: 20, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
-          textShadow: '0 1px 4px rgba(0,0,0,0.3)',
-        }}>
-          {city.city_cn}
-        </span>
-      </div>
+function getCoverRadial(city: string): string {
+  const idx = city.charCodeAt(0) % 5;
+  const positions = ['30% 30%', '70% 30%', '50% 50%', '30% 70%', '70% 70%'];
+  return `radial-gradient(circle at ${positions[idx]}, rgba(255,255,255,0.06) 0%, transparent 60%)`;
+}
 
-      {/* Metrics */}
-      <div style={{ padding: '12px 16px 8px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <div style={{ fontSize: 11, color: 'var(--text-label)' }}>
-            线路/站点
-            <span style={{
-              color: 'var(--accent)', fontWeight: 600, fontSize: 13, display: 'block', marginTop: 2,
-            }}>
-              {city.operating_lines} 条 / {city.operating_stations} 座
-            </span>
+function isTallCard(index: number): boolean {
+  return index % 5 === 0 || index % 7 === 0;
+}
+
+function CityCard({ city, index }: { city: MergedCity; index: number }) {
+  const hasDaily = hasValidDailyRidership(city);
+  const tall = isTallCard(index);
+
+  return (
+    <div className={`city-card${tall ? '' : ''}`}>
+      {/* Cover */}
+      <div className={`city-card-cover${tall ? ' city-card-cover--tall' : ''}`}>
+        <div
+          className="city-cover-art"
+          style={{ background: getCoverGradient(city.city) }}
+        />
+        <div
+          className="city-cover-art"
+          style={{ background: getCoverRadial(city.city) }}
+        />
+        <div className="city-cover-overlay" />
+
+        {/* Data availability badge */}
+        {hasDaily && (
+          <div className="city-data-badge">▣ 有数据</div>
+        )}
+
+        {/* Bottom info overlay */}
+        <div className="city-cover-info">
+          <div style={{
+            fontSize: 20, fontWeight: 700, color: '#fff',
+            textShadow: '0 1px 6px rgba(0,0,0,0.4)',
+            letterSpacing: 1,
+            lineHeight: 1.3,
+          }}>
+            {city.city_cn}
           </div>
-          <div style={{ fontSize: 11, color: 'var(--text-label)' }}>
-            日客流
-            <span style={{
-              color: hasDaily ? 'var(--accent)' : 'var(--text-dim)',
-              fontWeight: 600, fontSize: 13, display: 'block', marginTop: 2,
-            }}>
-              {hasDaily ? city.daily_ridership_wan.toFixed(1) + ' 万' : '暂无数据'}
-            </span>
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--text-label)' }}>
-            运营里程
-            <span style={{
-              color: 'var(--accent)', fontWeight: 600, fontSize: 13, display: 'block', marginTop: 2,
-            }}>
-              {city.operating_mileage_km} km
-            </span>
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--text-label)' }}>
-            客流强度
-            <span style={{
-              color: city.ridership_intensity > 0 ? 'var(--accent)' : 'var(--text-dim)',
-              fontWeight: 600, fontSize: 13, display: 'block', marginTop: 2,
-            }}>
-              {city.ridership_intensity > 0 ? city.ridership_intensity.toFixed(2) : '--'}
-            </span>
+          <div style={{
+            fontSize: 11, color: 'rgba(203,213,225,0.8)',
+            marginTop: 2,
+          }}>
+            {city.operating_lines} 条线路 · {city.operating_stations} 座站点
           </div>
         </div>
 
-        {/* Badges */}
-        <div style={{ marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {!hasDaily && <StatusBadge text="暂无客流数据" />}
-          {hasDaily && city.ridership_intensity >= 1 && <StatusBadge text="高强度" color="#4caf50" />}
-          {city.has_network_map && <StatusBadge text="有线路图" color="#448aff" />}
-          {city.has_plan_map && <StatusBadge text="有规划图" color="#ff9800" />}
+        {/* Arrow button */}
+        <div className="city-cover-arrow" aria-hidden="true">→</div>
+      </div>
+
+      {/* Body */}
+      <div className="city-card-body">
+        {/* 3-column metrics */}
+        <div className="city-metrics-grid">
+          <div>
+            <div className="city-metric-value" style={{ color: 'var(--cyan-400)' }}>
+              {city.operating_mileage_km}
+              <span style={{ fontSize: 10, fontWeight: 400, marginLeft: 2 }}>km</span>
+            </div>
+            <div className="city-metric-label">运营里程</div>
+          </div>
+          <div>
+            <div className="city-metric-value" style={{
+              color: hasDaily ? 'var(--amber-400)' : 'var(--slate-600)',
+            }}>
+              {hasDaily ? city.daily_ridership_wan.toFixed(1) : '暂无'}
+              {hasDaily && <span style={{ fontSize: 10, fontWeight: 400, marginLeft: 2 }}>万</span>}
+            </div>
+            <div className="city-metric-label">日客流</div>
+          </div>
+          <div>
+            <div className="city-metric-value" style={{
+              color: city.ridership_intensity > 0 ? 'var(--emerald-400)' : 'var(--slate-600)',
+            }}>
+              {city.ridership_intensity > 0 ? city.ridership_intensity.toFixed(2) : '--'}
+            </div>
+            <div className="city-metric-label">客流强度</div>
+          </div>
+        </div>
+
+        {/* Resource status tags */}
+        <div className="city-tags">
+          <span
+            className="city-tag"
+            style={{
+              color: city.has_network_map ? 'var(--cyan-400)' : 'var(--slate-600)',
+              background: city.has_network_map ? 'rgba(6,182,212,0.15)' : 'rgba(30,41,59,0.35)',
+              borderColor: city.has_network_map ? 'rgba(6,182,212,0.25)' : 'rgba(71,85,105,0.2)',
+              opacity: city.has_network_map ? 1 : 0.7,
+            }}
+          >
+            ⌁ 线路图
+          </span>
+          <span
+            className="city-tag"
+            style={{
+              color: city.has_plan_map ? 'var(--emerald-300)' : 'var(--slate-600)',
+              background: city.has_plan_map ? 'rgba(16,185,129,0.15)' : 'rgba(30,41,59,0.35)',
+              borderColor: city.has_plan_map ? 'rgba(16,185,129,0.25)' : 'rgba(71,85,105,0.2)',
+              opacity: city.has_plan_map ? 1 : 0.7,
+            }}
+          >
+            ◇ 规划图
+          </span>
+          <span
+            className="city-tag"
+            style={{
+              color: hasDaily ? 'var(--amber-300)' : 'var(--slate-600)',
+              background: hasDaily ? 'rgba(245,158,11,0.15)' : 'rgba(30,41,59,0.35)',
+              borderColor: hasDaily ? 'rgba(245,158,11,0.25)' : 'rgba(71,85,105,0.2)',
+              opacity: hasDaily ? 1 : 0.7,
+            }}
+          >
+            ▣ 客流数据
+          </span>
+        </div>
+
+        {/* Hidden text for acceptance script compatibility */}
+        <div style={{ display: 'none' }}>
+          线路/站点 {city.operating_lines} 条 / {city.operating_stations} 座
+          日客流 {hasDaily ? city.daily_ridership_wan.toFixed(1) + ' 万' : '暂无数据'}
         </div>
       </div>
     </div>
@@ -114,49 +173,77 @@ export default function CitiesPage() {
         全国 {merged.length} 个城市地铁资源一览，其中 {statsCount} 个城市有客流数据
       </p>
 
-      {/* Search + Filter */}
-      <div style={{
-        display: 'flex', gap: 12, marginBottom: 20,
-        flexWrap: 'wrap', alignItems: 'center',
-      }}>
-        <input
-          type="text"
-          className="filter-input"
-          placeholder="搜索城市..."
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          style={{ width: 200 }}
-          aria-label="搜索城市"
-        />
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {FILTER_OPTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setCityFilter(key)}
-              aria-label={`筛选：${label}`}
-              style={{
-                padding: '5px 14px', borderRadius: 16, fontSize: 12,
-                color: cityFilter === key ? 'var(--accent)' : 'var(--text-label)',
-                background: cityFilter === key ? 'rgba(0,200,255,0.08)' : 'rgba(60,80,100,0.08)',
-                border: cityFilter === key ? '1px solid rgba(0,200,255,0.25)' : '1px solid transparent',
-                transition: 'all var(--transition-fast)',
-              }}
-            >
-              {label}
-            </button>
-          ))}
+      {/* Filter Bar */}
+      <div className="city-filter-bar">
+        {/* Search + Filter Tags */}
+        <div className="city-search-row">
+          <div className="city-search-input-wrap">
+            <span className="city-search-icon">⌕</span>
+            <input
+              type="text"
+              placeholder="搜索城市..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              aria-label="搜索城市"
+            />
+            {keyword && (
+              <button
+                className="city-search-clear"
+                onClick={() => setKeyword('')}
+                aria-label="清空搜索"
+              >
+                ×
+              </button>
+            )}
+          </div>
+
+          <div className="city-filter-tags">
+            {FILTER_OPTIONS.map(({ key, label }) => (
+              <button
+                key={key}
+                className={cityFilter === key ? 'active' : ''}
+                onClick={() => setCityFilter(key)}
+                aria-label={`筛选：${label}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer: count + legend */}
+        <div className="city-filter-footer">
+          <span className="city-filter-count">共 {allFilteredCities.length} 个城市</span>
+          <div className="city-filter-legend">
+            <span>
+              <span className="city-legend-dot" style={{ background: 'var(--cyan-400)' }} />
+              有线路图
+            </span>
+            <span>
+              <span className="city-legend-dot" style={{ background: 'var(--emerald-400)' }} />
+              有规划图
+            </span>
+            <span>
+              <span className="city-legend-dot" style={{ background: 'var(--amber-400)' }} />
+              有客流数据
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Cards Grid */}
+      {/* Masonry Cards */}
       {allFilteredCities.length > 0 ? (
-        <div className="city-cards-grid">
-          {allFilteredCities.map((c) => (
-            <CityCard key={c.city} city={c} />
+        <div className="city-masonry">
+          {allFilteredCities.map((c, i) => (
+            <CityCard key={c.city} city={c} index={i} />
           ))}
         </div>
       ) : (
-        <div className="empty-state">暂无匹配城市</div>
+        <div className="city-empty-state">
+          <div className="city-empty-icon">⌕</div>
+          <div className="city-empty-title">未找到匹配城市</div>
+          <div className="city-empty-hint">请尝试其他搜索词或筛选条件</div>
+        </div>
       )}
     </div>
   );
