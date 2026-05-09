@@ -7,9 +7,10 @@
 - 当前入口包括：
   - /#/dashboard
   - /#/cities
-  - /#/about
-- Phase 4.6 完成后会新增：
   - /#/city/:id
+  - /#/about
+
+/#/city/:id 已在 Phase 4.6 完成，用于展示城市详情页。
 
 ## 2. 本地构建命令
 
@@ -52,7 +53,7 @@ npm run test:ui
 - React Pages 发布失败时，可回退到旧版 dashboard.html
 
 ## 7. 后续待办
-- Phase 4.6 完成后补充 /#/city/:id 验收
+- 后续可在 GitHub Actions CI 中纳入 /#/city/:id 静态部署验收
 - 后续再新增 GitHub Actions CI
 - 后续再新增 workflow_dispatch 手动部署 Pages
 - 暂不自动部署到 GitHub Pages
