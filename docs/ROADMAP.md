@@ -134,6 +134,17 @@
 - [x] `npm run test:ui` 通过
 - [x] `python scripts/run_acceptance.py` 16/16 PASS
 
+**Phase 4.3.1：验收脚本依赖与端口处理修复（已完成）**
+- [x] `puppeteer-core` 加入 `frontend/devDependencies`，验收脚本自洽
+- [x] Preview 服务器改用 `--strictPort`，端口递增 4173-4177
+- [x] T10 地图点击详情从自动 PASS 改为 MANUAL 状态
+- [x] 验收结果区分 PASS / FAIL / MANUAL / SKIP 四种状态
+- [x] 更新验收文档和迁移计划
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `npm run test:ui` 通过（T10 为 MANUAL）
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
 **验收标准**：
 - `dashboard.html` 不受影响，保留为稳定基线
 - `npm run typecheck` 通过

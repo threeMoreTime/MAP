@@ -1,6 +1,6 @@
 # React 前端迁移计划
 
-> 版本：v1.0.0 | 日期：2026-05-09
+> 版本：v1.1.0 | 日期：2026-05-09
 
 ## 1. 为什么要迁移到 React
 
@@ -30,7 +30,8 @@ frontend/
 ├── tsconfig.json                 # TypeScript 配置
 ├── vite.config.ts                # Vite 构建配置
 ├── scripts/
-│   └── sync-data.cjs             # 数据同步脚本（predev/prebuild 自动执行）
+│   ├── sync-data.cjs             # 数据同步脚本（predev/prebuild 自动执行）
+│   └── acceptance-react.cjs      # React 浏览器验收脚本
 ├── public/
 │   ├── data/latest/              # 从根项目同步的 JSON 数据
 │   └── assets/china.json         # 从根项目同步的 GeoJSON
@@ -85,8 +86,10 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 | Phase | 内容 | 状态 |
 |-------|------|------|
 | 4.1 | React 脚手架 + 三页 UI 骨架 + 数据加载层 | 已完成 |
+| 4.1.1 | React 静态部署数据路径兼容 | 已完成 |
 | 4.2 | ECharts 图表迁移（地图、排行榜、趋势图、强度图、详情面板） | 已完成 |
 | 4.3 | 浏览器验收 + 构建优化 + 交互稳定性 | 已完成 |
+| 4.3.1 | 验收脚本依赖与端口处理修复 | 已完成 |
 | 4.4 | 视觉打磨 + 响应式优化 | 待开始 |
 
 ## 6. 验收命令
@@ -103,6 +106,13 @@ python scripts/run_acceptance.py
 ```
 
 React 前端验收详情见 [docs/FRONTEND_ACCEPTANCE.md](./FRONTEND_ACCEPTANCE.md)。
+
+### 6.1 验收依赖说明
+
+- `puppeteer-core` 已声明为 `frontend/devDependencies`，验收脚本完全自洽于 frontend 子项目
+- Preview 服务器使用 `--strictPort` 模式，按 4173-4177 顺序尝试端口
+- T10 地图点击详情保留为 MANUAL（人工验证项），不计入自动 PASS
+- 验收结果区分 PASS / FAIL / MANUAL / SKIP 四种状态
 
 ## 6.5 构建优化
 

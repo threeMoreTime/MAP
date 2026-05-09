@@ -1,6 +1,6 @@
 # React 前端验收文档
 
-> 版本：v1.0.0 | 日期：2026-05-09
+> 版本：v1.1.0 | 日期：2026-05-09
 
 ## 验收目标
 
@@ -16,6 +16,14 @@ npm run build         # 生产构建
 npm run test:ui       # 浏览器自动化验收（T01-T15）
 ```
 
+> `npm run test:ui` 会先执行 `npm run build`，再启动 Vite preview 服务器运行浏览器验收。
+
+## 依赖说明
+
+- `puppeteer-core` 已声明为 `frontend/devDependencies`，不依赖根目录 `node_modules`
+- 验收脚本通过 `require('puppeteer-core')` 加载，需本地已安装 Chrome 浏览器
+- `npm install` 即可自动安装所有验收依赖
+
 ## 页面覆盖
 
 | 路由 | 页面 | 说明 |
@@ -26,23 +34,44 @@ npm run test:ui       # 浏览器自动化验收（T01-T15）
 
 ## 验收测试项（T01-T15）
 
-| 编号 | 测试项 | 说明 |
-|------|--------|------|
-| T01 | 构建成功 | `npm run build` 正常完成 |
-| T02 | Preview 服务响应 | Vite preview 服务器在 4173-4177 端口启动 |
-| T03 | Dashboard 页可访问 | 包含标题"全国城市地铁客流可视化平台"、统计卡片、筛选工具栏、图表区域 |
-| T04 | Cities 页可访问 | 城市卡片数量 > 0 |
-| T05 | About 页可访问 | 包含"数据来源"和"免责声明"内容 |
-| T06 | Dashboard ECharts 实例 | 至少 4 个 ECharts 实例（地图/排行/里程/趋势/强度） |
-| T07 | 搜索"厦门" | 无控制台错误、无白屏 |
-| T08 | 指标切换 | 日客流/运营里程/运营站点/客流强度四项切换无错误 |
-| T09 | TopN 切换 | 10/20/全部三档切换无错误 |
-| T10 | 地图点击详情 | 自动化点击不稳定，列为手动验证项 |
-| T11 | Cities 筛选标签 | 全部城市/有客流数据/暂无客流/有线路图/有规划图五项无错误 |
-| T12 | About 内容区块 | 至少 5 个内容区块 |
-| T13 | 控制台错误检查 | 排除 favicon 404 和 sourcemap 警告，JSON 404/JS 异常/React 错误计为失败 |
-| T14 | 375px 移动端 | 三页 scrollWidth <= innerWidth + 1 |
-| T15 | 静态资源路径 | data/latest 和 assets/china.json 成功加载 |
+| 编号 | 测试项 | 状态类型 | 说明 |
+|------|--------|----------|------|
+| T01 | 构建成功 | PASS/FAIL | `npm run build` 正常完成 |
+| T02 | Preview 服务响应 | PASS/FAIL | Vite preview 服务器在 4173-4177 端口启动 |
+| T03 | Dashboard 页可访问 | PASS/FAIL | 包含标题、统计卡片、筛选工具栏、图表区域 |
+| T04 | Cities 页可访问 | PASS/FAIL | 城市卡片数量 > 0 |
+| T05 | About 页可访问 | PASS/FAIL | 包含"数据来源"和"免责声明"内容 |
+| T06 | Dashboard ECharts 实例 | PASS/FAIL | 至少 4 个 ECharts 实例（含 fallback 降级判断） |
+| T07 | 搜索"厦门" | PASS/FAIL | 无控制台错误、无白屏 |
+| T08 | 指标切换 | PASS/FAIL | 日客流/运营里程/运营站点/客流强度四项切换无错误 |
+| T09 | TopN 切换 | PASS/FAIL | 10/20/全部三档切换无错误 |
+| T10 | 地图点击城市详情 | **MANUAL** | ECharts canvas 点击坐标不稳定，需人工验证城市详情面板联动 |
+| T11 | Cities 筛选标签 | PASS/FAIL | 全部城市/有客流数据/暂无客流/有线路图/有规划图五项无错误 |
+| T12 | About 内容区块 | PASS/FAIL | 至少 5 个内容区块 |
+| T13 | 控制台错误检查 | PASS/FAIL | 排除 favicon 404 和 sourcemap 警告 |
+| T14 | 375px 移动端 | PASS/FAIL | 三页 scrollWidth <= innerWidth + 1 |
+| T15 | 静态资源路径 | PASS/FAIL | data/latest 和 assets/china.json 成功加载 |
+
+### 状态类型说明
+
+| 状态 | 含义 | 计入失败 |
+|------|------|----------|
+| PASS | 自动化验证通过 | 否 |
+| FAIL | 自动化验证失败 | 是 |
+| MANUAL | 需人工验证，不计入自动 PASS | 否 |
+| SKIP | 跳过，不计入失败 | 否 |
+
+> **注意**：自动化 PASS 不代表人工地图点击已完成。T10 需人工在浏览器中验证地图气泡点击后城市详情面板联动是否正常。
+
+## Preview 服务器端口策略
+
+验收脚本使用 `--strictPort` 模式启动 Vite preview：
+
+- 按顺序尝试端口 4173 → 4174 → 4175 → 4176 → 4177
+- 某端口被占用时，启动失败并自动尝试下一个端口
+- 成功启动后记录真实使用的端口
+- 不依赖 Vite 自动换端口行为，避免端口误判
+- 所有端口均失败时输出清晰错误信息并退出
 
 ## 与旧版验收的关系
 
@@ -50,8 +79,18 @@ npm run test:ui       # 浏览器自动化验收（T01-T15）
 |------|---------------|-----------------|
 | 入口 | `cd frontend && npm run test:ui` | `python scripts/run_acceptance.py` |
 | 目标 | React 前端（Vite 构建） | dashboard.html 单文件 |
-| 测试项 | T01-T15（15 项） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
+| 测试项 | T01-T15（15 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
 | 共存 | 两者独立运行，互不影响 | 两者独立运行，互不影响 |
+
+## 验收结果汇总格式
+
+```
+Total: 15  PASS: 13  FAIL: 0  MANUAL: 1  SKIP: 0
+```
+
+- FAIL > 0 时退出码为 1
+- MANUAL / SKIP 不导致失败
+- 输出中明确标注 MANUAL 项
 
 ## 前置条件
 
