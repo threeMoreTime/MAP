@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useMetroData } from '../hooks/useMetroData';
 import { useDashboardFilters, hasValidDailyRidership } from '../hooks/useDashboardFilters';
+import { withBaseUrl } from '../utils/path';
 import type { CityFilterTag } from '../types/metro';
 import type { MergedCity } from '../hooks/useMetroData';
 import SectionTitle from '../components/common/SectionTitle';
@@ -24,6 +25,10 @@ function getCoverGradient(city: string): string {
   const idx = city.length % GRADIENT_PAIRS.length;
   const [c1, c2] = GRADIENT_PAIRS[idx];
   return `linear-gradient(135deg, ${c1} 0%, ${c2} 60%, rgba(0,0,0,0.3) 100%)`;
+}
+
+function getCityCoverUrl(city: string): string {
+  return withBaseUrl('assets/city-covers/' + city + '.webp');
 }
 
 function getCoverRadial(city: string): string {
@@ -61,8 +66,10 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
       {/* Cover */}
       <div className={`city-card-cover${tall ? ' city-card-cover--tall' : ''}`}>
         <div
-          className="city-cover-art"
-          style={{ background: getCoverGradient(city.city) }}
+          className="city-cover-art city-cover-image"
+          style={{
+            backgroundImage: `url(${getCityCoverUrl(city.city)}), ${getCoverGradient(city.city)})`,
+          }}
         />
         <div
           className="city-cover-art"

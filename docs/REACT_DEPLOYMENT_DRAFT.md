@@ -27,7 +27,8 @@ npm run test:ui
 - prebuild 会执行 scripts/sync-data.cjs
 - data/latest/*.json 会复制到 frontend/public/data/latest/
 - assets/china.json 会复制到 frontend/public/assets/china.json
-- frontend/public/data/ 和 frontend/public/assets/china.json 是同步产物，不提交仓库
+- assets/city-covers/ 会复制到 frontend/public/assets/city-covers/（webp + manifest.json）
+- frontend/public/data/ 和 frontend/public/assets/ 是同步产物，不提交仓库
 - build 后进入 frontend/dist/
 
 ## 4. 静态路由策略
@@ -46,6 +47,7 @@ npm run test:ui
 | T05 | index.html 不使用根路径资源 | 不含 `src="/assets/"`、`href="/assets/"`、`src="/data/"`、`href="/data/"` |
 | T06 | 构建 JS/HTML 不含硬编码绝对数据路径 | 不含 `"/data/latest/"`、`"/assets/china.json"` 等绝对路径；允许相对路径 |
 | T07 | dist 含 JS 和 CSS 资源 | assets/ 目录下至少各有一个 .js 和 .css 文件 |
+| T08 | city covers 可选检查 | 如果 dist/assets/city-covers/ 存在则检查 manifest.json + 至少一个 webp；不存在则 SKIP |
 
 ## 6. 与旧版 dashboard.html 的关系
 - React 静态部署不删除 dashboard.html

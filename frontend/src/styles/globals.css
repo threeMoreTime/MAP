@@ -203,6 +203,12 @@ select:focus {
   transition: transform 700ms ease;
 }
 
+.city-cover-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .city-card:hover .city-cover-art {
   transform: scale(1.10);
 }

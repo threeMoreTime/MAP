@@ -93,6 +93,7 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 | 4.4 | UI 细节打磨 + 响应式优化 | 已完成 |
 | 4.5 | 城市资源页 Masonry 瀑布流与卡片精细还原 | 已完成 |
 | 4.6 | 城市详情页 /city/:id（点击导航、统计卡片、趋势图、资源预览、数据说明） | 已完成 |
+| 4.7 | 城市卡片封面图片本地化（Wikimedia Commons、webp、manifest 溯源） | 已完成 |
 
 ## 6. 验收命令
 
@@ -176,6 +177,19 @@ build: {
   }
 }
 ```
+
+### 6.6 Phase 4.7 城市卡片封面图片
+
+Phase 4.7 完成城市卡片封面图片本地化与前端集成：
+
+- **图片采集**：`scrapers/scrape_city_covers.py` 从 Wikimedia Commons / Wikidata 采集 CC 协议城市天际线图片
+- **图片处理**：转换为 webp（800px 宽，quality 80），保存至 `assets/city-covers/`
+- **溯源 manifest**：`manifest.json` 记录每张图片的 source_url、license、author、attribution
+- **前端集成**：CitiesPage 使用 CSS `backgroundImage: url(...) + gradient` 叠加策略，图片 404 时静默回退到渐变色
+- **数据同步**：`sync-data.cjs` 增加 city-covers 目录同步
+- **构建检查**：`check-static-build.cjs` 增加 T08 可选检查
+- **文件大小**：46/50 城市有封面图片，总计约 2.5MB
+- **4 个 fallback 城市**（成都、重庆、高雄、台北）使用 CSS 渐变回退
 
 ## 7. 回滚方案
 

@@ -114,6 +114,25 @@ check('T07', 'js/css assets exist', () => {
   return true;
 });
 
+// T08: city covers (optional)
+const cityCoversDistDir = path.join(assetsDir, 'city-covers');
+if (dirExists(cityCoversDistDir)) {
+  check('T08', 'city covers present', () => {
+    const manifestPath = path.join(cityCoversDistDir, 'manifest.json');
+    if (!fileExists(manifestPath)) {
+      throw new Error('manifest.json missing in city-covers/');
+    }
+    const entries = fs.readdirSync(cityCoversDistDir);
+    const hasWebp = entries.some((e) => e.endsWith('.webp'));
+    if (!hasWebp) {
+      throw new Error('No .webp file in city-covers/');
+    }
+    return true;
+  });
+} else {
+  results.push({ id: 'T08', description: 'city covers optional', passed: true, reason: 'skipped - no covers directory' });
+}
+
 // Output results
 let allPassed = true;
 for (const r of results) {

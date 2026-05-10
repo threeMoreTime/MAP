@@ -196,6 +196,24 @@
 - [x] `npm run test:ui` 通过（18 PASS / 0 FAIL / 1 MANUAL）
 - [x] `python scripts/run_acceptance.py` 16/16 PASS
 
+**Phase 4.7：城市卡片封面图片本地化（已完成）**
+- [x] 创建 `scrapers/scrape_city_covers.py`（Wikimedia Commons/Wikidata 采集脚本）
+- [x] 支持 --limit / --city / --force 参数
+- [x] 仅接受 CC0/CC BY/CC BY-SA 许可证图片
+- [x] 转换为 webp（800px 宽，quality 80）
+- [x] `assets/city-covers/manifest.json` 记录完整溯源（source_url, license, author, attribution）
+- [x] `frontend/scripts/sync-data.cjs` 增加 city-covers 同步
+- [x] CitiesPage 使用 CSS backgroundImage 叠加（图片 + 渐变回退）
+- [x] `check-static-build.cjs` 增加 T08 可选检查
+- [x] `.gitignore` 排除 `frontend/public/assets/city-covers/`
+- [x] `docs/CITY_COVER_IMAGES.md` 文档
+- [x] 46/50 城市有封面图片（4 个 fallback 城市：成都、重庆、高雄、台北）
+- [x] 总计约 2.5MB（远低于 15MB 限制）
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `npm run test:ui` 通过
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
 ---
 
 ## Phase 5：Dashboard 数据外置

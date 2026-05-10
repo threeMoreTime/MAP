@@ -25,4 +25,24 @@ for (const task of tasks) {
   }
 }
 
+// Sync city cover images
+const cityCoversSrc = path.join(ROOT, 'assets', 'city-covers');
+const cityCoversDest = path.join(PUBLIC, 'assets', 'city-covers');
+
+if (fs.existsSync(cityCoversSrc)) {
+  fs.mkdirSync(cityCoversDest, { recursive: true });
+
+  const coverFiles = fs.readdirSync(cityCoversSrc).filter(
+    f => f.endsWith('.webp') || f === 'manifest.json'
+  );
+
+  for (const f of coverFiles) {
+    fs.copyFileSync(path.join(cityCoversSrc, f), path.join(cityCoversDest, f));
+  }
+
+  console.log(`Synced ${coverFiles.length} city-cover files: ${cityCoversSrc} -> ${cityCoversDest}`);
+} else {
+  console.log('WARNING: assets/city-covers/ not found, skipping city cover sync');
+}
+
 console.log('Data sync complete.');
