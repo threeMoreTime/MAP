@@ -224,6 +224,18 @@
 - [x] 呼和浩特仍为 fallback（无合适横向 CC 图片）
 - [x] 最终 49/50 城市有封面图片
 
+**Phase 4.7.2：封面图渲染验证与 fallback 修正（已完成）**
+- [x] 确认 CSS 层级结构正确（图片 → radial → overlay → 信息浮层）
+- [x] 确认 radial 层和 overlay 不会遮住图片
+- [x] CitiesPage 改为 manifest-aware 逻辑（仅 downloaded 城市生成封面 URL）
+- [x] 封面层增加 data-city / data-has-cover 属性
+- [x] 新增 T20 验收测试（manifest-aware：49/50 real covers + 1 fallback）
+- [x] 手动浏览器验证各城市封面图显示正常
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `npm run test:ui` 通过（19 PASS / 0 FAIL / 1 MANUAL）
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
 ---
 
 ## Phase 5：Dashboard 数据外置

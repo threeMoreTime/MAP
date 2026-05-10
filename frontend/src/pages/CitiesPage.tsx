@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetroData } from '../hooks/useMetroData';
 import { useDashboardFilters, hasValidDailyRidership } from '../hooks/useDashboardFilters';
@@ -27,10 +28,6 @@ function getCoverGradient(city: string): string {
   return `linear-gradient(135deg, ${c1} 0%, ${c2} 60%, rgba(0,0,0,0.3) 100%)`;
 }
 
-function getCityCoverUrl(city: string): string {
-  return withBaseUrl('assets/city-covers/' + city + '.webp');
-}
-
 function getCoverRadial(city: string): string {
   const idx = city.charCodeAt(0) % 5;
   const positions = ['30% 30%', '70% 30%', '50% 50%', '30% 70%', '70% 70%'];
@@ -41,7 +38,7 @@ function isTallCard(index: number): boolean {
   return index % 5 === 0 || index % 7 === 0;
 }
 
-function CityCard({ city, index }: { city: MergedCity; index: number }) {
+function CityCard({ city, index, coverUrl }: { city: MergedCity; index: number; coverUrl: string | undefined }) {
   const hasDaily = hasValidDailyRidership(city);
   const tall = isTallCard(index);
   const navigate = useNavigate();
@@ -53,6 +50,10 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
       handleClick();
     }
   };
+
+  const backgroundImage = coverUrl
+    ? `url(${coverUrl}), ${getCoverGradient(city.city)}`
+    : getCoverGradient(city.city);
 
   return (
     <div
@@ -67,9 +68,9 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
       <div className={`city-card-cover${tall ? ' city-card-cover--tall' : ''}`}>
         <div
           className="city-cover-art city-cover-image"
-          style={{
-            backgroundImage: `url(${getCityCoverUrl(city.city)}), ${getCoverGradient(city.city)})`,
-          }}
+          data-city={city.city}
+          data-has-cover={coverUrl ? 'true' : 'false'}
+          style={{ backgroundImage }}
         />
         <div
           className="city-cover-art"
@@ -184,6 +185,27 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
 export default function CitiesPage() {
   const { merged, loading, error } = useMetroData();
   const { keyword, setKeyword, cityFilter, setCityFilter, allFilteredCities } = useDashboardFilters(merged);
+  const [coverMap, setCoverMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(withBaseUrl('assets/city-covers/manifest.json'))
+      .then(res => res.ok ? res.json() : Promise.reject(new Error(`status ${res.status}`)))
+      .then(data => {
+        if (cancelled) return;
+        const map: Record<string, string> = {};
+        for (const item of (data.items || [])) {
+          if (item.status === 'downloaded' && item.file) {
+            map[item.city] = withBaseUrl(`assets/city-covers/${item.file}`);
+          }
+        }
+        setCoverMap(map);
+      })
+      .catch(err => {
+        if (!cancelled) console.warn('Failed to load cover manifest:', err);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   if (loading) return <div className="state-message state-message--loading">加载数据中...</div>;
   if (error) return <div className="state-message state-message--error">加载失败：{error}</div>;
@@ -259,7 +281,7 @@ export default function CitiesPage() {
       {allFilteredCities.length > 0 ? (
         <div className="city-masonry">
           {allFilteredCities.map((c, i) => (
-            <CityCard key={c.city} city={c} index={i} />
+            <CityCard key={c.city} city={c} index={i} coverUrl={coverMap[c.city]} />
           ))}
         </div>
       ) : (

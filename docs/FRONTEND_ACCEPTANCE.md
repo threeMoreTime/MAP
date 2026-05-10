@@ -13,7 +13,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # 浏览器自动化验收（T01-T19）
+npm run test:ui       # 浏览器自动化验收（T01-T20）
 ```
 
 > `npm run test:ui` 会先执行 `npm run build`，再启动 Vite preview 服务器运行浏览器验收。
@@ -33,7 +33,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T19）
 | `/#/city/:id` | 城市详情 | 面包屑 + 统计卡片 + 趋势图 + 资源预览 + 数据说明 |
 | `/#/about` | 数据说明 | 数据来源、字段说明、更新机制、已知限制、免责声明 |
 
-## 验收测试项（T01-T19）
+## 验收测试项（T01-T20）
 
 | 编号 | 测试项 | 状态类型 | 说明 |
 |------|--------|----------|------|
@@ -56,6 +56,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T19）
 | T17 | Cities 点击导航 | PASS/FAIL | 搜索"厦门"并点击卡片，URL 变为 #/city/xiamen |
 | T18 | 不存在城市处理 | PASS/FAIL | /#/city/not-exist 显示"未找到城市"，无 JS 错误 |
 | T19 | 城市详情页移动端 | PASS/FAIL | 375px /#/city/xiamen scrollWidth <= innerWidth + 1 |
+| T20 | 城市封面图资源加载 | PASS/FAIL | manifest-aware 检查：50 张卡片中 49 张 data-has-cover="true"、1 张 "false"（hohhot）；真实 cover fetch 返回 200 + image/*；hohhot backgroundImage 不含 hohhot.webp |
 
 ### 状态类型说明
 
@@ -84,13 +85,13 @@ npm run test:ui       # 浏览器自动化验收（T01-T19）
 |------|---------------|-----------------|
 | 入口 | `cd frontend && npm run test:ui` | `python scripts/run_acceptance.py` |
 | 目标 | React 前端（Vite 构建） | dashboard.html 单文件 |
-| 测试项 | T01-T19（19 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
+| 测试项 | T01-T20（20 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
 | 共存 | 两者独立运行，互不影响 | 两者独立运行，互不影响 |
 
 ## 验收结果汇总格式
 
 ```
-Total: 19  PASS: 17  FAIL: 0  MANUAL: 1  SKIP: 0
+Total: 20  PASS: 19  FAIL: 0  MANUAL: 1  SKIP: 0
 ```
 
 - FAIL > 0 时退出码为 1

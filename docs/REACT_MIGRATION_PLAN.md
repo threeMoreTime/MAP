@@ -201,6 +201,20 @@ Phase 4.7.1 对 8 个 fallback/error 城市做了更谨慎的候选筛选：
 - 支持 `--dry-run` 模式便于人工审核
 - 补全结果：7/8 城市成功补全，呼和浩特仍为 fallback
 
+### 6.8 Phase 4.7.2 封面图渲染验证与 fallback 修正
+
+Phase 4.7.2 验证并确认城市卡片封面图在前端的实际渲染效果，并修正验收误判问题：
+
+- 确认 CSS 层级结构正确：图片层 → radial 装饰层 → overlay 遮罩 → 信息浮层
+- 确认 radial 层透明度极低（rgba 0.06），不影响图片可见性
+- 确认 overlay 为底部渐变遮罩，不会完全遮住图片
+- 新增 T20 验收测试：检查 city-covers 资源加载和 backgroundImage 引用
+- **修正验收误判**：CitiesPage 改为 manifest-aware 逻辑，仅 `status=downloaded` 城市生成封面 URL
+- 封面层增加 `data-city` 和 `data-has-cover` data 属性，便于验收脚本精确判断
+- T20 修正为检查 49/50 real covers + 1 fallback (hohhot)，并验证 content-type 为 image/*
+- 验收结果：Total 20, PASS 19, MANUAL 1
+- 手动浏览器检查确认各城市封面图正常显示
+
 ## 7. 回滚方案
 
 - React 前端完全独立于 `frontend/` 目录

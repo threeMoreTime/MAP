@@ -515,6 +515,93 @@ async function runTests(baseUrl) {
 
   record('T19', '375px /#/city/xiamen 无横向溢出', t19pass,
     t19pass ? 'OK' : `scrollWidth=${t19.scrollWidth}, innerWidth=${t19.innerWidth}`);
+
+  // T20: CitiesPage 城市封面图资源加载（manifest-aware）
+  await page.setViewport({ width: 1280, height: 800 });
+  await gotoHash(BASE, '#/cities');
+  await wait(2000);
+
+  const t20data = await page.evaluate(() => {
+    const cards = document.querySelectorAll('.city-cover-image');
+    let withCover = 0;
+    let withoutCover = 0;
+    let sampleCoverUrl = null;
+    const hohhotEl = document.querySelector('.city-cover-image[data-city="hohhot"]');
+
+    cards.forEach(el => {
+      const hasCover = el.getAttribute('data-has-cover') === 'true';
+      if (hasCover) {
+        withCover++;
+        if (!sampleCoverUrl) {
+          const bg = el.style.backgroundImage || '';
+          const match = bg.match(/url\(["']?([^"')]+)["']?\)/);
+          if (match) sampleCoverUrl = match[1];
+        }
+      } else {
+        withoutCover++;
+      }
+    });
+
+    return {
+      total: cards.length,
+      withCover,
+      withoutCover,
+      sampleCoverUrl,
+      hohhotHasCover: hohhotEl ? hohhotEl.getAttribute('data-has-cover') : 'element-not-found',
+      hohhotBg: hohhotEl ? (hohhotEl.style.backgroundImage || '') : '',
+    };
+  });
+
+  // Fetch a real cover image to verify content-type (not SPA fallback)
+  let t20fetchDetail = '';
+  let t20fetchOk = false;
+  if (t20data.sampleCoverUrl) {
+    let imgUrl = t20data.sampleCoverUrl;
+    if (imgUrl.startsWith('/')) imgUrl = `${BASE}${imgUrl}`;
+    else if (!imgUrl.startsWith('http')) imgUrl = `${BASE}/${imgUrl}`;
+    try {
+      const resp = await page.evaluate(async (url) => {
+        const r = await fetch(url);
+        const ct = r.headers.get('content-type') || '';
+        return { status: r.status, contentType: ct };
+      }, imgUrl);
+      if (resp.status === 200 && /image\//.test(resp.contentType)) {
+        t20fetchOk = true;
+        t20fetchDetail = `content-type=${resp.contentType}`;
+      } else {
+        t20fetchDetail = `status=${resp.status}, content-type=${resp.contentType} (expected image/*)`;
+      }
+    } catch (e) {
+      t20fetchDetail = `fetch error: ${e.message || String(e)}`;
+    }
+  }
+
+  // hohhot check
+  const hohhotOk = t20data.hohhotHasCover === 'false' && !t20data.hohhotBg.includes('hohhot.webp');
+
+  let t20pass = false;
+  let t20detail = '';
+  if (t20data.total !== 50) {
+    t20pass = false;
+    t20detail = `total cards=${t20data.total}, expected 50`;
+  } else if (t20data.withCover !== 49) {
+    t20pass = false;
+    t20detail = `withCover=${t20data.withCover}, expected 49 (total=${t20data.total})`;
+  } else if (t20data.withoutCover !== 1) {
+    t20pass = false;
+    t20detail = `withoutCover=${t20data.withoutCover}, expected 1`;
+  } else if (!t20fetchOk) {
+    t20pass = false;
+    t20detail = `sample cover fetch failed: ${t20fetchDetail}`;
+  } else if (!hohhotOk) {
+    t20pass = false;
+    t20detail = `hohhot check failed: hasCover=${t20data.hohhotHasCover}, bg includes hohhot.webp=${t20data.hohhotBg.includes('hohhot.webp')}`;
+  } else {
+    t20pass = true;
+    t20detail = `${t20data.withCover}/${t20data.total} real cover images, ${t20data.withoutCover} fallback (hohhot), sampled image ${t20fetchDetail}`;
+  }
+
+  record('T20', '城市封面图资源加载（manifest-aware）', t20pass, t20detail);
 }
 
 // === 主流程 ===
