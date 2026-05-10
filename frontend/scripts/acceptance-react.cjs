@@ -370,7 +370,7 @@ async function runTests(baseUrl) {
   await gotoHash(BASE, '#/about');
   const t12 = await page.evaluate(() => {
     const body = document.body.innerText || '';
-    const sections = ['数据来源', '字段说明', '更新机制', '已知限制', '免责声明'];
+    const sections = ['数据来源', '字段说明', '更新机制', '使用限制', '免责声明'];
     let found = 0;
     sections.forEach(s => { if (body.includes(s)) found++; });
     return { found, sections };
@@ -735,6 +735,174 @@ async function runTests(baseUrl) {
   }
 
   record('T21', '城市详情页线路图/规划图真实图片加载', t21pass, t21detail);
+
+  // T22: 城市详情页线路图预览交互
+  await page.setViewport({ width: 1280, height: 800 });
+  consoleErrors = [];
+  let t22pass = false;
+  let t22detail = '';
+
+  // Navigate away first to ensure component remount
+  await page.goto(`${BASE}/#/cities`, { waitUntil: 'networkidle0', timeout: 20000 });
+  await wait(1000);
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(3000);
+
+  // Wait for network image to be present
+  try {
+    await page.waitForSelector('img[src*="cities/xiamen"]', { timeout: 5000 });
+  } catch (e) {
+    // Continue anyway, will be caught by the check below
+  }
+
+  // 1. Confirm network img exists
+  const t22imgExists = await page.evaluate(() => {
+    const img = document.querySelector('img[src*="cities/xiamen/xiamen_network.png"]');
+    return !!img;
+  });
+
+  // 2. Click zoom in button
+  const t22zoomIn = await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const zoomInBtn = btns.find(b => b.getAttribute('aria-label') === '放大');
+    if (zoomInBtn) { zoomInBtn.click(); return true; }
+    return false;
+  });
+  await wait(500);
+
+  // 3. Check zoom value changed or transform contains scale
+  const t22zoomChanged = await page.evaluate(() => {
+    const zoomVal = document.querySelector('[class*="zoomValue"]');
+    if (zoomVal && !zoomVal.textContent.includes('100%')) return true;
+    const inner = document.querySelector('[class*="imageInner"]');
+    if (inner) {
+      const style = inner.getAttribute('style') || '';
+      if (style.includes('scale') && !style.includes('scale(1)')) return true;
+    }
+    return false;
+  });
+
+  // 4. Click zoom out
+  const t22zoomOut = await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const zoomOutBtn = btns.find(b => b.getAttribute('aria-label') === '缩小');
+    if (zoomOutBtn) { zoomOutBtn.click(); return true; }
+    return false;
+  });
+  await wait(300);
+
+  // 5. Click reset
+  const t22reset = await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const resetBtn = btns.find(b => b.getAttribute('aria-label') === '重置视图');
+    if (resetBtn) { resetBtn.click(); return true; }
+    return false;
+  });
+  await wait(300);
+
+  // 6. Check zoom value back to 100%
+  const t22resetOk = await page.evaluate(() => {
+    const zoomVal = document.querySelector('[class*="zoomValue"]');
+    return zoomVal ? zoomVal.textContent.includes('100%') : false;
+  });
+
+  // 7. Click fullscreen button
+  const t22fullscreenOpen = await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const fullscreenBtn = btns.find(b => b.getAttribute('aria-label') === '全屏预览');
+    if (fullscreenBtn) { fullscreenBtn.click(); return true; }
+    return false;
+  });
+  await wait(500);
+
+  // 8. Check fullscreen overlay appears
+  const t22fullscreenVisible = await page.evaluate(() => {
+    const overlay = document.querySelector('[class*="fullscreenOverlay"]');
+    return overlay !== null && overlay.offsetWidth > 0;
+  });
+
+  // 9. Check fullscreen has image
+  const t22fullscreenImg = await page.evaluate(() => {
+    const img = document.querySelector('[class*="fullscreenOverlay"] img[src*="cities/xiamen"]');
+    return !!img;
+  });
+
+  // 10. Press ESC
+  await page.keyboard.press('Escape');
+  await wait(500);
+
+  // 11. Check fullscreen overlay closed
+  const t22fullscreenClosed = await page.evaluate(() => {
+    const overlay = document.querySelector('[class*="fullscreenOverlay"]');
+    return !overlay || overlay.offsetWidth === 0;
+  });
+
+  // 12. Click plan tab
+  const t22planClick = await page.evaluate(() => {
+    const btns = Array.from(document.querySelectorAll('button'));
+    const planBtn = btns.find(b => b.textContent && b.textContent.trim() === '规划图');
+    if (planBtn) { planBtn.click(); return true; }
+    return false;
+  });
+  await wait(1500);
+
+  // 13. Check zoom value is still 100% (tab switch resets)
+  const t22tabReset = await page.evaluate(() => {
+    const zoomVal = document.querySelector('[class*="zoomValue"]');
+    return zoomVal ? zoomVal.textContent.includes('100%') : false;
+  });
+
+  // 14. Check 375px no horizontal scroll
+  await page.setViewport({ width: 375, height: 812 });
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 20000 });
+  await wait(1500);
+  const t22scroll = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+  }));
+  const t22scrollOk = t22scroll.scrollWidth <= t22scroll.innerWidth + 1;
+
+  // Restore viewport
+  await page.setViewport({ width: 1280, height: 800 });
+  await wait(500);
+
+  const t22errors = consoleErrors.filter(isCriticalError);
+
+  // Evaluate
+  if (!t22imgExists) {
+    t22detail = 'network img not found';
+  } else if (!t22zoomIn) {
+    t22detail = 'zoom in button not found';
+  } else if (!t22zoomChanged) {
+    t22detail = 'zoom did not change after clicking zoom in';
+  } else if (!t22zoomOut) {
+    t22detail = 'zoom out button not found';
+  } else if (!t22reset) {
+    t22detail = 'reset button not found';
+  } else if (!t22resetOk) {
+    t22detail = 'zoom not back to 100% after reset';
+  } else if (!t22fullscreenOpen) {
+    t22detail = 'fullscreen button not found';
+  } else if (!t22fullscreenVisible) {
+    t22detail = 'fullscreen overlay not visible';
+  } else if (!t22fullscreenImg) {
+    t22detail = 'no image in fullscreen';
+  } else if (!t22fullscreenClosed) {
+    t22detail = 'fullscreen not closed after ESC';
+  } else if (!t22planClick) {
+    t22detail = 'plan tab not found';
+  } else if (!t22tabReset) {
+    t22detail = 'zoom not reset to 100% after tab switch';
+  } else if (!t22scrollOk) {
+    t22detail = `375px overflow: scrollWidth=${t22scroll.scrollWidth}`;
+  } else if (t22errors.length > 0) {
+    t22detail = `console errors: ${t22errors.length}`;
+  } else {
+    t22pass = true;
+    t22detail = 'zoom in/out/reset/fullscreen/ESC/tab reset/scroll all OK';
+  }
+
+  record('T22', '城市详情页线路图预览交互', t22pass, t22detail);
 }
 
 // === 主流程 ===

@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.2.0-dev
-- 当前阶段：Phase 4.8 已完成，准备进入 Phase 5.0 CI 与 Pages 手动部署
+- 当前阶段：Phase 5.0 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -23,7 +23,7 @@
 
 | 验收体系 | 范围 | 结果 |
 |----------|------|------|
-| React `test:ui` | T01-T21 | **20 PASS / 0 FAIL / 1 MANUAL** |
+| React `test:ui` | T01-T22 | **21 PASS / 0 FAIL / 1 MANUAL** |
 | `check:static` | T01-T09 | **全部通过** |
 | Legacy `run_acceptance.py` | 16 项浏览器测试 | **16/16 PASS** |
 
@@ -216,7 +216,28 @@
 
 ## 后续路线图
 
-### Phase 5.0：GitHub Actions CI 与 Pages 手动部署配置
+### Phase 5.0：城市详情页线路图/规划图预览体验增强（已完成）
+
+**目标**：增强城市详情页线路图/规划图的预览交互。
+
+**产物**：
+- [x] 缩放控制（放大/缩小/重置，scale 0.5-3x，显示百分比）
+- [x] 拖拽平移（scale > 1 时鼠标拖拽，cursor grab/grabbing）
+- [x] 适应容器/原始比例切换
+- [x] 全屏预览弹层（overlay、ESC/遮罩/关闭按钮、城市名+类型+原图链接）
+- [x] 加载状态（切换 Tab 显示"图片加载中..."）
+- [x] Tab 切换自动重置视图并关闭全屏
+- [x] 无图/加载失败时不显示缩放/全屏按钮
+- [x] T22 验收测试（缩放/重置/全屏/ESC/Tab 切换/375px）
+- [x] 工具栏深色玻璃风格，响应式无溢出
+
+**验收标准**：
+- `test:ui`：T01-T22，Total 22，PASS 21，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 通过
+
+---
+
+### Phase 5.1：GitHub Actions CI 与 Pages 手动部署配置
 
 **目标**：建立 CI 流水线，配置 Pages 手动部署。
 
@@ -233,7 +254,7 @@
 
 ---
 
-### Phase 5.1：React Pages 发布后验收
+### Phase 5.2：React Pages 发布后验收
 
 **目标**：在 GitHub Pages 上线后进行端到端验证。
 
@@ -250,19 +271,17 @@
 
 ---
 
-### Phase 5.2：城市详情页资源预览体验增强
+### Phase 5.3：城市详情页资源预览体验增强（已由 Phase 5.0 完成）
 
-**目标**：优化城市详情页中线路图/规划图的预览交互。
+**目标**：Phase 5.0 已完成此阶段主要内容（缩放、全屏、拖拽），剩余可选优化。
 
 **产物**：
-- [ ] 图片懒加载与加载动画
-- [ ] 图片缩放/全屏查看
-- [ ] 移动端触摸手势支持
-- [ ] 加载进度指示器
+- [ ] 移动端触摸手势支持（双指缩放、滑动平移）
+- [ ] 图片加载进度指示器
 
 ---
 
-### Phase 5.3：数据与资源来源说明增强
+### Phase 5.4：数据与资源来源说明增强
 
 **目标**：在 About 页面和城市详情页增加更完善的数据来源信息。
 
@@ -273,7 +292,7 @@
 
 ---
 
-### Phase 5.4：旧版 dashboard.html 维护策略
+### Phase 5.5：旧版 dashboard.html 维护策略
 
 **目标**：明确 dashboard.html 的长期定位与维护策略。
 

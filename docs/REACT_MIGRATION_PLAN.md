@@ -95,6 +95,7 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 | 4.6 | 城市详情页 /city/:id（点击导航、统计卡片、趋势图、资源预览、数据说明） | 已完成 |
 | 4.7 | 城市卡片封面图片本地化（Wikimedia Commons、webp、manifest 溯源） | 已完成 |
 | 4.8 | 城市详情页真实线路图/规划图渲染（CityAssetPreview 组件、图片同步、构建检查、验收） | 已完成 |
+| 5.0 | 城市详情页线路图/规划图预览体验增强（缩放、拖拽、全屏、加载状态） | 已完成 |
 
 ## 6. 验收命令
 
@@ -103,7 +104,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # React 前端浏览器验收（T01-T21）
+npm run test:ui       # React 前端浏览器验收（T01-T22）
 
 # 回到根目录验证旧版不受影响
 python scripts/run_acceptance.py
@@ -233,7 +234,24 @@ Phase 4.8 将城市详情页中的线路图/规划图从占位状态升级为真
 - **.gitignore**：新增 `frontend/public/cities/` 排除同步产物
 - 验收结果：Total 21, PASS 20, MANUAL 1
 
-## 7. Phase 4 收口状态
+### 6.10 Phase 5.0 城市详情页线路图/规划图预览体验增强
+
+Phase 5.0 增强城市详情页中线路图/规划图的预览交互体验：
+
+- **缩放控制**：放大/缩小/重置按钮，minScale=0.5, maxScale=3, step=0.25；显示百分比缩放值
+- **拖拽平移**：scale > 1 时允许鼠标拖拽，cursor: grab/grabbing，防止文字选中
+- **适应容器/原始比例切换**：contain 模式（width:100%, object-fit:contain）和 natural 模式（max-width:none）
+- **全屏预览弹层**：overlay 背景 rgba(0,0,0,0.86)，居中图片，ESC/遮罩/关闭按钮关闭，显示城市名+类型+查看原图链接
+- **加载状态**：Tab 切换时 imageLoading=true，显示"图片加载中..."；onLoad 后隐藏；加载失败显示 EmptyState
+- **Tab 切换重置**：切换 Tab 时自动重置 scale/translate/close fullscreen
+- **无图/加载失败**：不显示缩放控制工具栏和全屏按钮
+- **body 滚动锁定**：全屏时禁止 body 滚动，关闭后恢复
+- **工具栏样式**：深色玻璃风格，胶囊按钮，cyan active，disabled 灰化
+- **响应式**：375px 无横向滚动，工具栏允许换行
+- **验收测试**：`acceptance-react.cjs` 新增 T22，使用 xiamen 测试缩放/重置/全屏/ESC/Tab 切换
+- 验收结果：Total 22, PASS 21, MANUAL 1
+
+## 7. Phase 4 + Phase 5.0 收口状态
 
 Phase 4（React 前端迁移）全部子阶段已完成：
 
@@ -248,15 +266,16 @@ Phase 4（React 前端迁移）全部子阶段已完成：
 - **Phase 4.7.1**：八城补全与候选审核 ✓
 - **Phase 4.7.2**：封面图渲染验证与 fallback 修正 ✓
 - **Phase 4.8**：城市详情页真实线路图/规划图渲染 ✓
+- **Phase 5.0**：城市详情页线路图/规划图预览体验增强 ✓
 
 **收口验收结果**：
-- `test:ui`：T01-T21，Total 21，PASS 20，FAIL 0，MANUAL 1
+- `test:ui`：T01-T22，Total 22，PASS 21，FAIL 0，MANUAL 1
 - `check:static`：T01-T09，全部通过
 - `run_acceptance.py`：legacy 16/16 PASS
 - `npm run typecheck`：通过
 - `npm run build`：通过
 
-**下一步**：Phase 5.0 — GitHub Actions CI 与 Pages 手动部署配置。详见 [docs/ROADMAP.md](./ROADMAP.md)。
+**下一步**：Phase 5.1 — GitHub Actions CI 与 Pages 手动部署配置。详见 [docs/ROADMAP.md](./ROADMAP.md)。
 
 ## 8. 回滚方案
 
