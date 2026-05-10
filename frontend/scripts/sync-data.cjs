@@ -45,4 +45,44 @@ if (fs.existsSync(cityCoversSrc)) {
   console.log('WARNING: assets/city-covers/ not found, skipping city cover sync');
 }
 
+// Sync city network/plan map images
+const cityAssetsIndexPath = path.join(ROOT, 'data', 'latest', 'city_assets_index.json');
+if (fs.existsSync(cityAssetsIndexPath)) {
+  const indexData = JSON.parse(fs.readFileSync(cityAssetsIndexPath, 'utf-8'));
+  let copiedNetwork = 0;
+  let copiedPlan = 0;
+  let missing = 0;
+
+  for (const item of indexData.items) {
+    if (item.has_network_map && item.network_map_path) {
+      const src = path.join(ROOT, item.network_map_path);
+      const dest = path.join(PUBLIC, item.network_map_path);
+      if (fs.existsSync(src)) {
+        fs.mkdirSync(path.dirname(dest), { recursive: true });
+        fs.copyFileSync(src, dest);
+        copiedNetwork++;
+      } else {
+        console.log(`WARNING: network map missing: ${item.network_map_path}`);
+        missing++;
+      }
+    }
+    if (item.has_plan_map && item.plan_map_path) {
+      const src = path.join(ROOT, item.plan_map_path);
+      const dest = path.join(PUBLIC, item.plan_map_path);
+      if (fs.existsSync(src)) {
+        fs.mkdirSync(path.dirname(dest), { recursive: true });
+        fs.copyFileSync(src, dest);
+        copiedPlan++;
+      } else {
+        console.log(`WARNING: plan map missing: ${item.plan_map_path}`);
+        missing++;
+      }
+    }
+  }
+
+  console.log(`Synced city maps: ${copiedNetwork} network, ${copiedPlan} plan, ${missing} missing`);
+} else {
+  console.log('WARNING: city_assets_index.json not found, skipping city map sync');
+}
+
 console.log('Data sync complete.');

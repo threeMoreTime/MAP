@@ -133,6 +133,44 @@ if (dirExists(cityCoversDistDir)) {
   results.push({ id: 'T08', description: 'city covers optional', passed: true, reason: 'skipped - no covers directory' });
 }
 
+// T09: metro map assets exist
+check('T09', 'metro map assets exist', () => {
+  const citiesDir = path.join(distDir, 'cities');
+  if (!dirExists(citiesDir)) {
+    throw new Error('dist/cities/ directory missing');
+  }
+
+  const indexPath = path.join(dataDir, 'city_assets_index.json');
+  if (!fileExists(indexPath)) {
+    throw new Error('city_assets_index.json missing');
+  }
+
+  const indexData = JSON.parse(readFileContent(indexPath));
+  const missing = [];
+
+  for (const item of indexData.items) {
+    if (item.has_network_map && item.network_map_path) {
+      const fp = path.join(distDir, item.network_map_path);
+      if (!fileExists(fp)) {
+        missing.push(item.network_map_path);
+      }
+    }
+    if (item.has_plan_map && item.plan_map_path) {
+      const fp = path.join(distDir, item.plan_map_path);
+      if (!fileExists(fp)) {
+        missing.push(item.plan_map_path);
+      }
+    }
+  }
+
+  if (missing.length > 0) {
+    const preview = missing.slice(0, 10).join(', ');
+    throw new Error(`${missing.length} missing map file(s): ${preview}`);
+  }
+
+  return true;
+});
+
 // Output results
 let allPassed = true;
 for (const r of results) {

@@ -236,6 +236,21 @@
 - [x] `npm run test:ui` 通过（19 PASS / 0 FAIL / 1 MANUAL）
 - [x] `python scripts/run_acceptance.py` 16/16 PASS
 
+**Phase 4.8：城市详情页真实线路图/规划图渲染（已完成）**
+- [x] `sync-data.cjs` 新增 cities 目录线路图/规划图同步
+- [x] 新建 CityAssetPreview 独立组件（CSS Module 样式）
+- [x] 图片使用 `<img>` 标签真实渲染，`withBaseUrl()` 处理路径
+- [x] "查看原图"链接在新窗口打开原始图片
+- [x] onError 错误处理，Tab 切换重置 imageError
+- [x] 无图状态显示 EmptyState 组件
+- [x] `check-static-build.cjs` 新增 T09 必须检查项
+- [x] `acceptance-react.cjs` 新增 T21 验收测试（xiamen 线路图+规划图）
+- [x] `.gitignore` 新增 `frontend/public/cities/`
+- [x] `npm run typecheck` 通过
+- [x] `npm run build` 通过
+- [x] `npm run test:ui` 通过（20 PASS / 0 FAIL / 1 MANUAL）
+- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
 ---
 
 ## Phase 5：Dashboard 数据外置

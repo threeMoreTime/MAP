@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useMetroData } from '../hooks/useMetroData';
 import type { MergedCity } from '../hooks/useMetroData';
 import CityTrendAreaChart from '../components/charts/CityTrendAreaChart';
+import CityAssetPreview from '../components/city/CityAssetPreview';
 import EmptyState from '../components/common/EmptyState';
 
 function formatDaily(d: MergedCity): string {
@@ -22,54 +23,6 @@ function MetricCard({ label, value, unit }: { label: string; value: string; unit
     <div className="city-metric-card">
       <div className="city-metric-card-value">{value}{unit && <span className="city-metric-card-unit">{unit}</span>}</div>
       <div className="city-metric-card-label">{label}</div>
-    </div>
-  );
-}
-
-function CityAssetPreview({ city }: { city: MergedCity }) {
-  const defaultTab = city.has_network_map ? 'network' : city.has_plan_map ? 'plan' : 'network';
-  const [activeTab, setActiveTab] = useState<'network' | 'plan'>(defaultTab);
-
-  const tabs = [
-    { key: 'network' as const, label: '线路图', has: city.has_network_map },
-    { key: 'plan' as const, label: '规划图', has: city.has_plan_map },
-  ];
-
-  const currentHas = activeTab === 'network' ? city.has_network_map : city.has_plan_map;
-  const currentLabel = activeTab === 'network' ? '线路图' : '规划图';
-
-  return (
-    <div className="city-asset-preview">
-      <div className="city-asset-tabs">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            className={`city-asset-tab${activeTab === t.key ? ' active' : ''}`}
-            onClick={() => setActiveTab(t.key)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-      <div className="city-asset-content">
-        {currentHas ? (
-          <div className="city-asset-placeholder">
-            <div className="city-asset-placeholder-icon">{activeTab === 'network' ? '🗺' : '📐'}</div>
-            <div className="city-asset-placeholder-title">高清{currentLabel}资源整理中</div>
-            <div className="city-asset-placeholder-desc">
-              {currentLabel}资源来源于 MetroMan 资源页面，正在整理中
-            </div>
-          </div>
-        ) : (
-          <div className="city-asset-placeholder">
-            <div className="city-asset-placeholder-icon" style={{ opacity: 0.4 }}>📁</div>
-            <div className="city-asset-placeholder-title">
-              {currentLabel}资源正在收集整理中
-            </div>
-            <div className="city-asset-placeholder-desc">暂无{currentLabel}或规划图资源</div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

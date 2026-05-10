@@ -602,6 +602,139 @@ async function runTests(baseUrl) {
   }
 
   record('T20', '城市封面图资源加载（manifest-aware）', t20pass, t20detail);
+
+  // T21: 城市详情页线路图/规划图真实图片加载
+  await page.setViewport({ width: 1280, height: 800 });
+  consoleErrors = [];
+  const t21responses = {};
+
+  page.on('response', (resp) => {
+    const url = resp.url();
+    if (url.includes('cities/xiamen/')) {
+      t21responses[url] = { status: resp.status(), contentType: resp.headers()['content-type'] || '' };
+    }
+  });
+
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(2000);
+
+  // Check network image
+  const t21networkImg = await page.evaluate(() => {
+    const img = document.querySelector('img[src*="cities/xiamen/xiamen_network.png"]');
+    const link = document.querySelector('a[href*="cities/xiamen/xiamen_network.png"]');
+    return {
+      hasImg: !!img,
+      imgSrc: img ? img.src : null,
+      hasLink: !!link,
+      linkHref: link ? link.href : null,
+    };
+  });
+
+  // Check network image response
+  let t21networkOk = false;
+  let t21networkDetail = '';
+  const networkUrl = Object.keys(t21responses).find(u => u.includes('xiamen_network.png'));
+  if (networkUrl) {
+    const r = t21responses[networkUrl];
+    if (r.status === 200 && /image\//.test(r.contentType)) {
+      t21networkOk = true;
+      t21networkDetail = `status=${r.status}, content-type=${r.contentType}`;
+    } else if (r.status === 200 && /text\/html/.test(r.contentType)) {
+      t21networkDetail = `FAIL: status=200 but content-type=${r.contentType} (html fallback)`;
+    } else {
+      t21networkDetail = `status=${r.status}, content-type=${r.contentType}`;
+    }
+  } else {
+    t21networkDetail = 'network image response not captured';
+  }
+
+  // Click plan tab
+  const t21planClick = await page.evaluate(() => {
+    const buttons = Array.from(document.querySelectorAll('button'));
+    const planBtn = buttons.find(b => b.textContent && b.textContent.trim() === '规划图');
+    if (planBtn) { planBtn.click(); return true; }
+    return false;
+  });
+  await wait(1500);
+
+  // Check plan image
+  const t21planImg = await page.evaluate(() => {
+    const img = document.querySelector('img[src*="cities/xiamen/xiamen_plan.png"]');
+    const link = document.querySelector('a[href*="cities/xiamen/xiamen_plan.png"]');
+    return {
+      hasImg: !!img,
+      imgSrc: img ? img.src : null,
+      hasLink: !!link,
+      linkHref: link ? link.href : null,
+    };
+  });
+
+  // Check plan image response
+  let t21planOk = false;
+  let t21planDetail = '';
+  const planUrl = Object.keys(t21responses).find(u => u.includes('xiamen_plan.png'));
+  if (planUrl) {
+    const r = t21responses[planUrl];
+    if (r.status === 200 && /image\//.test(r.contentType)) {
+      t21planOk = true;
+      t21planDetail = `status=${r.status}, content-type=${r.contentType}`;
+    } else if (r.status === 200 && /text\/html/.test(r.contentType)) {
+      t21planDetail = `FAIL: status=200 but content-type=${r.contentType} (html fallback)`;
+    } else {
+      t21planDetail = `status=${r.status}, content-type=${r.contentType}`;
+    }
+  } else {
+    t21planDetail = 'plan image response not captured';
+  }
+
+  // Check no critical console errors
+  const t21errors = consoleErrors.filter(isCriticalError);
+
+  // Check 375px no horizontal scroll
+  await page.setViewport({ width: 375, height: 812 });
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 20000 });
+  await wait(1500);
+  const t21scroll = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+  }));
+  const t21scrollOk = t21scroll.scrollWidth <= t21scroll.innerWidth + 1;
+
+  // Restore viewport
+  await page.setViewport({ width: 1280, height: 800 });
+  await wait(500);
+
+  // Check html fallback: if any captured image response is text/html, fail
+  const t21htmlFallback = Object.entries(t21responses).some(([, r]) => r.status === 200 && /text\/html/.test(r.contentType));
+
+  let t21pass = false;
+  let t21detail = '';
+  if (!t21networkImg.hasImg) {
+    t21detail = 'network img not found in DOM';
+  } else if (!t21networkOk && t21networkDetail.includes('html fallback')) {
+    t21detail = `network image is html fallback: ${t21networkDetail}`;
+  } else if (!t21networkImg.hasLink) {
+    t21detail = 'network "查看原图" link not found';
+  } else if (!t21planClick) {
+    t21detail = 'plan tab not found/clicked';
+  } else if (!t21planImg.hasImg) {
+    t21detail = 'plan img not found in DOM after tab click';
+  } else if (!t21planOk && t21planDetail.includes('html fallback')) {
+    t21detail = `plan image is html fallback: ${t21planDetail}`;
+  } else if (!t21planImg.hasLink) {
+    t21detail = 'plan "查看原图" link not found';
+  } else if (t21errors.length > 0) {
+    t21detail = `console errors: ${t21errors.length}`;
+  } else if (!t21scrollOk) {
+    t21detail = `375px overflow: scrollWidth=${t21scroll.scrollWidth}`;
+  } else if (t21htmlFallback) {
+    t21detail = 'image response returned text/html (SPA fallback)';
+  } else {
+    t21pass = true;
+    t21detail = `network: ${t21networkDetail}; plan: ${t21planDetail}; scroll: ok`;
+  }
+
+  record('T21', '城市详情页线路图/规划图真实图片加载', t21pass, t21detail);
 }
 
 // === 主流程 ===

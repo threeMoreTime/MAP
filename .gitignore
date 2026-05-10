@@ -8,4 +8,5 @@ frontend/tsconfig.tsbuildinfo
 frontend/public/data/
 frontend/public/assets/china.json
 frontend/public/assets/city-covers/
+frontend/public/cities/
 参考图*.png

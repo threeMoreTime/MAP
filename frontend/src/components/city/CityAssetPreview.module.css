@@ -1,0 +1,123 @@
+.wrapper {
+  background: linear-gradient(135deg, rgba(8, 22, 48, 0.75), rgba(12, 30, 58, 0.6));
+  border: 1px solid rgba(0, 150, 220, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+/* Tab bar */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(6, 18, 38, 0.5);
+  border-bottom: 1px solid rgba(100, 116, 139, 0.12);
+}
+
+.tab {
+  padding: 6px 20px;
+  font-size: 13px;
+  color: rgba(148, 163, 184, 1); /* slate-400 */
+  background: rgba(15, 30, 56, 0.6);
+  border: 1px solid rgba(100, 116, 139, 0.15);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-family: inherit;
+}
+
+.tab:hover {
+  color: #e2e8f0;
+  background: rgba(30, 50, 80, 0.6);
+}
+
+.tabActive {
+  color: rgba(34, 211, 238, 1); /* cyan-400 */
+  background: rgba(34, 211, 238, 0.1);
+  border-color: rgba(34, 211, 238, 0.25);
+}
+
+/* Content area */
+.content {
+  padding: 16px;
+}
+
+.imageArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(4, 10, 24, 0.6);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  max-height: 720px;
+  object-fit: contain;
+  display: block;
+}
+
+.viewOriginal {
+  display: inline-block;
+  margin: 12px 0;
+  padding: 5px 16px;
+  font-size: 12px;
+  color: rgba(34, 211, 238, 0.9);
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 16px;
+  text-decoration: none;
+  transition: all 200ms ease;
+}
+
+.viewOriginal:hover {
+  background: rgba(34, 211, 238, 0.18);
+  border-color: rgba(34, 211, 238, 0.35);
+  color: rgba(34, 211, 238, 1);
+}
+
+/* Empty state container */
+.empty {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty > div {
+  width: 100%;
+}
+
+/* Responsive: tablet */
+@media (max-width: 1024px) {
+  .image {
+    max-height: 600px;
+  }
+}
+
+/* Responsive: mobile */
+@media (max-width: 640px) {
+  .tabs {
+    padding: 6px 8px;
+    gap: 3px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .content {
+    padding: 12px 8px;
+  }
+
+  .image {
+    max-height: 420px;
+  }
+}
