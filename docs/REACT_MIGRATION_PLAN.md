@@ -1,6 +1,6 @@
 # React 前端迁移计划
 
-> 版本：v1.1.0 | 日期：2026-05-09
+> 版本：v1.2.0-dev | 日期：2026-05-10
 
 ## 1. 为什么要迁移到 React
 
@@ -103,7 +103,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # React 前端浏览器验收（T01-T19）
+npm run test:ui       # React 前端浏览器验收（T01-T21）
 
 # 回到根目录验证旧版不受影响
 python scripts/run_acceptance.py
@@ -233,7 +233,32 @@ Phase 4.8 将城市详情页中的线路图/规划图从占位状态升级为真
 - **.gitignore**：新增 `frontend/public/cities/` 排除同步产物
 - 验收结果：Total 21, PASS 20, MANUAL 1
 
-## 7. 回滚方案
+## 7. Phase 4 收口状态
+
+Phase 4（React 前端迁移）全部子阶段已完成：
+
+- **Phase 4.1**：脚手架与三页 UI 骨架 + 数据加载层 ✓
+- **Phase 4.2**：ECharts 五类图表迁移 + 城市详情面板 ✓
+- **Phase 4.3**：浏览器验收脚本 + 构建优化 + 交互稳定性 ✓
+- **Phase 4.3.1**：验收脚本依赖与端口处理修复 ✓
+- **Phase 4.4**：UI 细节打磨 + 响应式优化 ✓
+- **Phase 4.5**：城市资源页 Masonry 瀑布流与卡片精细还原 ✓
+- **Phase 4.6**：城市详情页 /city/:id ✓
+- **Phase 4.7**：城市卡片封面图片本地化 ✓
+- **Phase 4.7.1**：八城补全与候选审核 ✓
+- **Phase 4.7.2**：封面图渲染验证与 fallback 修正 ✓
+- **Phase 4.8**：城市详情页真实线路图/规划图渲染 ✓
+
+**收口验收结果**：
+- `test:ui`：T01-T21，Total 21，PASS 20，FAIL 0，MANUAL 1
+- `check:static`：T01-T09，全部通过
+- `run_acceptance.py`：legacy 16/16 PASS
+- `npm run typecheck`：通过
+- `npm run build`：通过
+
+**下一步**：Phase 5.0 — GitHub Actions CI 与 Pages 手动部署配置。详见 [docs/ROADMAP.md](./ROADMAP.md)。
+
+## 8. 回滚方案
 
 - React 前端完全独立于 `frontend/` 目录
 - 删除 `frontend/` 目录即可完全回退

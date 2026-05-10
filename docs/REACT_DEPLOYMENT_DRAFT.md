@@ -56,8 +56,23 @@ npm run test:ui
 - dashboard.html 仍可通过旧验收脚本验证
 - React Pages 发布失败时，可回退到旧版 dashboard.html
 
-## 7. 后续待办
-- 后续可在 GitHub Actions CI 中纳入 /#/city/:id 静态部署验收
-- 后续再新增 GitHub Actions CI
-- 后续再新增 workflow_dispatch 手动部署 Pages
+## 7. 当前构建资源清单
+
+构建后 `frontend/dist/` 包含以下静态资源：
+
+| 类别 | 文件 | 来源 |
+|------|------|------|
+| 入口 | `index.html` | Vite 构建产物 |
+| JS/CSS | `assets/*.js`, `assets/*.css` | 应用代码 + 依赖 |
+| 地图数据 | `assets/china.json` | 同步自 `assets/china.json` |
+| 城市封面 | `assets/city-covers/*.webp` + `manifest.json` | 同步自 `assets/city-covers/` |
+| JSON 数据 | `data/latest/metro_stats.json` 等 3 文件 | 同步自 `data/latest/` |
+| 线路图/规划图 | `cities/*/` PNG 文件 | 同步自 `cities/`（按 city_assets_index.json） |
+
+## 8. 后续待办
+
+- Phase 5.0：将本文档从 DRAFT 转正为正式部署文档
+- 新增 GitHub Actions CI workflow（PR 触发 typecheck + build + check:static）
+- 新增 `workflow_dispatch` 手动部署 Pages
 - 暂不自动部署到 GitHub Pages
+- 部署上线后在 `/#/city/:id` 路由上做端到端在线验收

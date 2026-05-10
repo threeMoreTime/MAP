@@ -2,21 +2,39 @@
 
 > 项目：全国城市地铁客流数据可视化大屏
 > 版本：v1.2.0-dev
-> 日期：2026-05-09
+> 日期：2026-05-10
 > 仓库：threeMoreTime/MAP
 
 ---
 
 ## 当前状态
 
-- 版本：v1.1.0
-- 当前阶段：Phase 3.5 - Dashboard 视觉重设计与结构重构（已完成）+ 目录结构优化（已完成）
-- 浏览器验收：16/16 PASS
-- 数据覆盖：全国主要城市地铁客流数据
+- 版本：v1.2.0-dev
+- 当前阶段：Phase 4.8 已完成，准备进入 Phase 5.0 CI 与 Pages 手动部署
+- 当前前端形态：
+  - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
+  - 新版：`frontend/` React + Vite + TypeScript
+- React 路由表：
+  - `/#/dashboard` — 数据总览大屏
+  - `/#/cities` — 城市资源总览
+  - `/#/city/:id` — 城市详情页
+  - `/#/about` — 数据说明
+- 当前验收矩阵：
+
+| 验收体系 | 范围 | 结果 |
+|----------|------|------|
+| React `test:ui` | T01-T21 | **20 PASS / 0 FAIL / 1 MANUAL** |
+| `check:static` | T01-T09 | **全部通过** |
+| Legacy `run_acceptance.py` | 16 项浏览器测试 | **16/16 PASS** |
+
+- 数据覆盖：50 城市索引、34 城市客流数据、49/50 封面图（hohhot fallback）、48 线路图、41 规划图
+- 资源同步：`scripts/sync-data.cjs` 自动将 `data/latest/`、`assets/china.json`、`assets/city-covers/`、`cities/` 图片同步到 `frontend/public/`
 
 ---
 
-## Phase 1：文档基线建设（已完成）
+## 已完成阶段
+
+### Phase 1：文档基线建设（已完成）
 
 **目标**：建立完整的项目文档体系，为后续迭代提供基线。
 
@@ -29,7 +47,7 @@
 
 ---
 
-## Phase 2：数据结构标准化（已完成）
+### Phase 2：数据结构标准化（已完成）
 
 **目标**：统一数据格式，建立数据校验机制。
 
@@ -43,7 +61,7 @@
 
 ---
 
-## Phase 3：自动化验收脚本（已完成）
+### Phase 3：自动化验收脚本（已完成）
 
 **目标**：将浏览器测试正式化，集成到开发流程。
 
@@ -55,7 +73,7 @@
 
 ---
 
-## Phase 3.5：Dashboard 视觉重设计与结构重构（已完成）
+### Phase 3.5：Dashboard 视觉重设计与结构重构（已完成）
 
 **目标**：参考 Readdy UI 设计，全面重构 Dashboard 的视觉风格和页面结构。
 
@@ -68,7 +86,7 @@
 
 ---
 
-## 目录结构优化（已完成）
+### 目录结构优化（已完成）
 
 **目标**：优化项目目录结构，将城市目录和脚本分类归整。
 
@@ -80,23 +98,11 @@
 
 ---
 
-## 目录结构优化（已完成）
-
-**目标**：优化项目目录结构，将城市目录和脚本分类归整。
-
-**产物**：
-- [x] 50 个城市目录收归至 `cities/`
-- [x] 爬虫脚本整理至 `scrapers/`
-- [x] 生成产物输出至 `output/`
-- [x] 更新所有脚本和文档中的路径引用
-
----
-
-## Phase 4：React 前端迁移（进行中）
+## Phase 4：React 前端迁移（已完成）
 
 **目标**：将单文件 dashboard.html 迁移为 React + TypeScript + Vite 前端项目。
 
-**Phase 4.1：脚手架与 UI 骨架（已完成）**
+### Phase 4.1：脚手架与 UI 骨架（已完成）
 - [x] 创建 `frontend/` React 项目（Vite + React + TypeScript）
 - [x] 实现 HashRouter 三页路由（/dashboard, /cities, /about）
 - [x] 数据同步脚本 `scripts/sync-data.cjs`
@@ -107,7 +113,7 @@
 - [x] 全局深蓝主题样式
 - [x] `npm run typecheck` 和 `npm run build` 通过
 
-**Phase 4.2：ECharts 图表迁移（已完成）**
+### Phase 4.2：ECharts 图表迁移（已完成）
 - [x] MetroMapChart 地图散点迁移（GeoJSON 本地优先 + 远程 fallback + 降级列表）
 - [x] RankChart 排行榜迁移（支持四项指标切换、topN 筛选）
 - [x] TrendChart 趋势图迁移（统一年份轴 + null 对齐）
@@ -119,40 +125,21 @@
 - [x] MergedCity 补充 lines_under_construction, peak_ridership_wan, peak_ridership_date 字段
 - [x] 响应式布局（chart-map-row, chart-grid-2col, 移动端单列）
 - [x] chartUtils.ts 共享颜色、样式常量
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
-**Phase 4.3：浏览器验收 + 构建优化 + 交互稳定性（已完成）**
+### Phase 4.3：浏览器验收 + 构建优化 + 交互稳定性（已完成）
 - [x] 创建 `frontend/scripts/acceptance-react.cjs` 浏览器验收脚本（T01-T15）
 - [x] 新增 `npm run test:ui` 命令
 - [x] ECharts manualChunks 构建优化（echarts + vendor 分包）
 - [x] 创建 `docs/FRONTEND_ACCEPTANCE.md` 验收文档
 - [x] 更新 `docs/REACT_MIGRATION_PLAN.md` Phase 4.3 状态
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `npm run test:ui` 通过
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
-**Phase 4.3.1：验收脚本依赖与端口处理修复（已完成）**
+### Phase 4.3.1：验收脚本依赖与端口处理修复（已完成）
 - [x] `puppeteer-core` 加入 `frontend/devDependencies`，验收脚本自洽
 - [x] Preview 服务器改用 `--strictPort`，端口递增 4173-4177
 - [x] T10 地图点击详情从自动 PASS 改为 MANUAL 状态
 - [x] 验收结果区分 PASS / FAIL / MANUAL / SKIP 四种状态
-- [x] 更新验收文档和迁移计划
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `npm run test:ui` 通过（T10 为 MANUAL）
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
-**验收标准**：
-- `dashboard.html` 不受影响，保留为稳定基线
-- `npm run typecheck` 通过
-- `npm run build` 通过
-- 三页路由可正常访问
-- 旧版 `python scripts/run_acceptance.py` 继续通过
-
-**Phase 4.4：React 前端 UI 细节打磨与响应式优化（已完成）**
+### Phase 4.4：React 前端 UI 细节打磨与响应式优化（已完成）
 - [x] 全局样式统一（CSS 变量、card-glass 基类、focus 状态）
 - [x] Dashboard Hero 区轻量状态标签、StatCard grid 布局
 - [x] FilterToolbar 统一 filter-input 样式和 aria-label
@@ -161,12 +148,8 @@
 - [x] Footer 4 列布局移动端折叠
 - [x] 响应式断点统一（1200 / 900 / 600px）
 - [x] 375px 移动端无横向溢出
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `npm run test:ui` 通过（14 PASS / 0 FAIL / 1 MANUAL）
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
-**Phase 4.5：城市资源页 Masonry 瀑布流与卡片精细还原（已完成）**
+### Phase 4.5：城市资源页 Masonry 瀑布流与卡片精细还原（已完成）
 - [x] CSS columns Masonry 瀑布流布局（1/2/3/4 列响应式）
 - [x] 城市卡片封面区 CSS 渐变 + radial-gradient、tall 交错高度
 - [x] 封面底部渐变遮罩、城市名/线路信息浮层、数据可用性徽章
@@ -175,13 +158,8 @@
 - [x] Hover 动效：卡片上浮 + 边框高亮 + 封面缩放 + 箭头浮现
 - [x] 毛玻璃搜索筛选栏（搜索图标、清空按钮、胶囊标签组、图例）
 - [x] 空状态 glass-card（图标 + 标题 + 提示）
-- [x] theme.css 补充语义颜色变量（navy/cyan/emerald/amber/slate）
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `npm run test:ui` 通过（14 PASS / 0 FAIL / 1 MANUAL）
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
-**Phase 4.6：城市详情页 /city/:id（已完成）**
+### Phase 4.6：城市详情页 /city/:id（已完成）
 - [x] 新增 /city/:id 路由（CityDetailPage）
 - [x] CitiesPage 城市卡片点击导航（useNavigate + aria-label + 键盘支持）
 - [x] 面包屑导航（返回按钮 + 城市名）
@@ -191,105 +169,122 @@
 - [x] 数据说明手风琴（可折叠 + 无数据警告）
 - [x] 城市不存在 404 状态
 - [x] EmptyState 通用空状态组件
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `npm run test:ui` 通过（18 PASS / 0 FAIL / 1 MANUAL）
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
-**Phase 4.7：城市卡片封面图片本地化（已完成）**
+### Phase 4.7：城市卡片封面图片本地化（已完成）
 - [x] 创建 `scrapers/scrape_city_covers.py`（Wikimedia Commons/Wikidata 采集脚本）
-- [x] 支持 --limit / --city / --force 参数
 - [x] 仅接受 CC0/CC BY/CC BY-SA 许可证图片
 - [x] 转换为 webp（800px 宽，quality 80）
 - [x] `assets/city-covers/manifest.json` 记录完整溯源（source_url, license, author, attribution）
 - [x] `frontend/scripts/sync-data.cjs` 增加 city-covers 同步
 - [x] CitiesPage 使用 CSS backgroundImage 叠加（图片 + 渐变回退）
-- [x] `check-static-build.cjs` 增加 T08 可选检查
-- [x] `.gitignore` 排除 `frontend/public/assets/city-covers/`
-- [x] `docs/CITY_COVER_IMAGES.md` 文档
-- [x] 46/50 城市有封面图片（4 个 fallback 城市：成都、重庆、高雄、台北）
-- [x] 总计约 2.5MB（远低于 15MB 限制）
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `npm run test:ui` 通过
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
-**Phase 4.7.1：八城补全与候选审核（已完成）**
+### Phase 4.7.1：八城补全与候选审核（已完成）
 - [x] 增加精确搜索关键词（每个城市定制）
-- [x] 增加错误地名过滤（福州排除 Taipei、昆明排除 Kunming Lake、徐州排除 Zhengzhou）
-- [x] 增加宽高比过滤（`width/height >= 1.2`）
-- [x] 增加候选重试机制（最佳候选下载失败时自动尝试下一个）
+- [x] 增加错误地名过滤和宽高比过滤
+- [x] 增加候选重试机制
 - [x] 支持 `--dry-run` 模式便于人工审核
-- [x] 7/8 城市成功补全（成都、重庆、高雄、台北、福州、昆明、徐州）
-- [x] 呼和浩特仍为 fallback（无合适横向 CC 图片）
+- [x] 7/8 城市成功补全，呼和浩特仍为 fallback
 - [x] 最终 49/50 城市有封面图片
 
-**Phase 4.7.2：封面图渲染验证与 fallback 修正（已完成）**
-- [x] 确认 CSS 层级结构正确（图片 → radial → overlay → 信息浮层）
-- [x] 确认 radial 层和 overlay 不会遮住图片
+### Phase 4.7.2：封面图渲染验证与 fallback 修正（已完成）
 - [x] CitiesPage 改为 manifest-aware 逻辑（仅 downloaded 城市生成封面 URL）
 - [x] 封面层增加 data-city / data-has-cover 属性
 - [x] 新增 T20 验收测试（manifest-aware：49/50 real covers + 1 fallback）
-- [x] 手动浏览器验证各城市封面图显示正常
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `npm run test:ui` 通过（19 PASS / 0 FAIL / 1 MANUAL）
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
 
-**Phase 4.8：城市详情页真实线路图/规划图渲染（已完成）**
+### Phase 4.8：城市详情页真实线路图/规划图渲染（已完成）
 - [x] `sync-data.cjs` 新增 cities 目录线路图/规划图同步
 - [x] 新建 CityAssetPreview 独立组件（CSS Module 样式）
 - [x] 图片使用 `<img>` 标签真实渲染，`withBaseUrl()` 处理路径
-- [x] "查看原图"链接在新窗口打开原始图片
-- [x] onError 错误处理，Tab 切换重置 imageError
-- [x] 无图状态显示 EmptyState 组件
 - [x] `check-static-build.cjs` 新增 T09 必须检查项
 - [x] `acceptance-react.cjs` 新增 T21 验收测试（xiamen 线路图+规划图）
 - [x] `.gitignore` 新增 `frontend/public/cities/`
-- [x] `npm run typecheck` 通过
-- [x] `npm run build` 通过
-- [x] `npm run test:ui` 通过（20 PASS / 0 FAIL / 1 MANUAL）
-- [x] `python scripts/run_acceptance.py` 16/16 PASS
+
+### Phase 4 成果总览
+
+| 维度 | 内容 |
+|------|------|
+| 页面 | Dashboard、Cities、City Detail（/city/:id）、About |
+| 图表 | 地图散点、排行榜、趋势图、客流强度、里程排行（共 5 类） |
+| 城市卡片 | 50 城卡片、Masonry 瀑布流、49/50 封面图、数据标签 |
+| 城市详情 | 6 统计卡片、趋势面积图、真实线路图/规划图、数据说明手风琴 |
+| 资源同步 | JSON 数据 + GeoJSON + 封面图 + 线路图/规划图（4 类） |
+| 静态路径 | HashRouter + withBaseUrl，兼容 GitHub Pages 子路径 |
+| 构建优化 | ECharts + vendor 分包，check:static T01-T09 |
+| 验收 | test:ui T01-T21（20 PASS / 1 MANUAL） |
 
 ---
 
-## Phase 5：Dashboard 数据外置
+## 后续路线图
 
-**目标**：将嵌入在 HTML 中的 DATA 对象分离为独立 JSON 文件。
+### Phase 5.0：GitHub Actions CI 与 Pages 手动部署配置
 
-**产物**：
-- [ ] 独立的城市数据 JSON 文件（`data/metro_data.json`）
-- [ ] 修改 dashboard.html 通过 fetch 加载外部数据
-- [ ] 数据加载失败的降级处理（友好提示）
-- [ ] 加载性能优化（缓存、压缩）
-
-**验收标准**：
-- dashboard.html 中不再包含硬编码 DATA 对象
-- 页面可正常加载外部 JSON 数据
-- 网络异常时显示友好的错误提示
-- 页面加载性能不低于当前水平
-
----
-
-## Phase 5：GitHub Pages 发布
-
-**目标**：通过 GitHub Pages 提供在线访问。
+**目标**：建立 CI 流水线，配置 Pages 手动部署。
 
 **产物**：
-- [ ] GitHub Pages 配置（从 main 分支的根目录发布）
+- [ ] GitHub Actions workflow：PR 触发 typecheck + build + check:static
+- [ ] `workflow_dispatch` 手动触发 Pages 部署
+- [ ] README 更新在线访问链接（部署后）
 - [ ] 自定义 404 页面
-- [ ] 在线 Demo 地址可正常访问
-- [ ] README 中添加在线访问链接
 
 **验收标准**：
-- `https://threemoretime.github.io/MAP/dashboard.html` 可正常访问
-- 地图、图表、搜索等所有功能正常
-- 移动端访问布局正常
-- 页面加载时间 < 5 秒
+- PR 提交自动触发 CI 检查
+- 手动触发可成功部署到 GitHub Pages
+- `https://threemoretime.github.io/MAP/` 可正常访问
 
 ---
 
-## Phase 6：增量更新与定期采集
+### Phase 5.1：React Pages 发布后验收
+
+**目标**：在 GitHub Pages 上线后进行端到端验证。
+
+**产物**：
+- [ ] 在线环境四页路由验证
+- [ ] 静态资源加载验证（JSON 数据、GeoJSON、封面图、线路图/规划图）
+- [ ] 移动端在线验证
+- [ ] 旧版 `dashboard.html` 在线验证
+
+**验收标准**：
+- 四页路由均可正常访问
+- 所有静态资源 200 OK
+- 移动端布局正常
+
+---
+
+### Phase 5.2：城市详情页资源预览体验增强
+
+**目标**：优化城市详情页中线路图/规划图的预览交互。
+
+**产物**：
+- [ ] 图片懒加载与加载动画
+- [ ] 图片缩放/全屏查看
+- [ ] 移动端触摸手势支持
+- [ ] 加载进度指示器
+
+---
+
+### Phase 5.3：数据与资源来源说明增强
+
+**目标**：在 About 页面和城市详情页增加更完善的数据来源信息。
+
+**产物**：
+- [ ] About 页面补充资源来源说明（线路图/规划图来源 MetroMan.cn）
+- [ ] 城市详情页显示数据更新日期
+- [ ] 封面图来源与署名信息展示
+
+---
+
+### Phase 5.4：旧版 dashboard.html 维护策略
+
+**目标**：明确 dashboard.html 的长期定位与维护策略。
+
+**产物**：
+- [ ] 明确 dashboard.html 为 frozen baseline，仅做数据更新
+- [ ] 评估是否保留 dashboard.html 或在 React 版稳定后归档
+- [ ] 更新 RELEASE_PROCESS.md 反映双前端发布流程
+
+---
+
+### Phase 6：增量更新与定期采集
 
 **目标**：实现数据自动采集和定期更新。
 
@@ -307,36 +302,15 @@
 
 ---
 
-## Phase 7：城市详情页增强
+### Phase 7：数据质量与覆盖率提升
 
-**目标**：为每个城市生成独立的详情页面。
+**目标**：提升数据质量和城市资源覆盖率。
 
 **产物**：
-- [ ] 城市详情页模板（单城市 HTML）
-- [ ] 详情页生成脚本 `generate_city_pages.py`
-- [ ] 详情页包含：客流趋势图、线路信息、历史对比
-- [ ] Dashboard 中城市气泡点击跳转到详情页
-
-**验收标准**：
-- 每个有数据的城市均有独立的详情页
-- 详情页数据与 Dashboard 一致
-- 详情页在移动端可正常浏览
-- 详情页之间可通过导航切换
-
----
-
-## 时间线（预估）
-
-| 阶段 | 内容 | 预估工期 | 依赖 |
-|------|------|----------|------|
-| Phase 1 | 文档基线建设 | 已完成 | 无 |
-| Phase 2 | 数据结构标准化 | 已完成 | Phase 1 |
-| Phase 3 | 自动化验收脚本 | 已完成 | Phase 1 |
-| 目录优化 | 项目结构重组 | 已完成 | Phase 2, 3 |
-| Phase 4 | 数据外置 | 3 天 | Phase 2 |
-| Phase 5 | GitHub Pages 发布 | 1 天 | Phase 4 |
-| Phase 6 | 增量更新与定期采集 | 1 周 | Phase 3, 5 |
-| Phase 7 | 城市详情页增强 | 2 周 | Phase 4, 5 |
+- [ ] 补全缺失城市的线路图/规划图
+- [ ] 封面图覆盖率提升（目标 50/50）
+- [ ] 数据交叉验证与异常值标注
+- [ ] 客流数据年度更新机制
 
 ---
 

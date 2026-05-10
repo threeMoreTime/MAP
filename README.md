@@ -156,9 +156,9 @@ npm run test:acceptance    # 全部验收
 | 规划图覆盖   | 41 城           |
 
 
-## React 前端（Phase 4 实验性）
+## React 前端（Phase 4 已完成）
 
-基于 React + TypeScript + Vite 的新版前端正在开发中，提供三页路由、城市总览等增强功能：
+基于 React + TypeScript + Vite 的新版前端已完成 Phase 4 全部迁移，提供四页路由、城市详情、封面图、真实线路图/规划图等增强功能：
 
 ```bash
 cd frontend
@@ -166,14 +166,17 @@ npm install        # 安装依赖（自动同步数据）
 npm run dev        # 启动开发服务器
 npm run build      # 生产构建
 npm run preview    # 预览构建结果
+npm run check:static  # 静态构建检查（T01-T09）
+npm run test:ui    # React 前端浏览器验收（T01-T21）
 ```
 
-三页路由：
+四页路由：
 - `/#/` 或 `/#/dashboard` — 数据大屏
 - `/#/cities` — 城市总览
+- `/#/city/:id` — 城市详情（如 `/#/city/xiamen`）
 - `/#/about` — 数据说明
 
-> `dashboard.html` 仍作为稳定基线保留，React 版为实验性功能。
+> `dashboard.html` 为旧版稳定基线（frozen baseline），仍可通过旧版验收脚本验证。React 版为当前主力前端。
 
 ## 更多文档
 
