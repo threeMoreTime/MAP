@@ -903,6 +903,95 @@ async function runTests(baseUrl) {
   }
 
   record('T22', '城市详情页线路图预览交互', t22pass, t22detail);
+
+  // T23: 城市详情页数据来源与署名展示
+  await page.setViewport({ width: 1280, height: 800 });
+  consoleErrors = [];
+  let t23pass = false;
+  let t23detail = '';
+
+  // 1. Visit /#/city/xiamen
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(2000);
+
+  const t23xiamen = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    const hasTitle = body.includes('数据来源与署名');
+    const hasMetroDB = body.includes('MetroDB');
+    const hasWikimedia = body.includes('Wikimedia');
+    const hasLicense = body.includes('license') || body.includes('CC') || body.includes('Public');
+    const hasAuthor = body.includes('author') || body.includes('作者');
+    const hasSourceLink = body.includes('查看来源');
+    const hasNetworkMap = body.includes('线路图');
+    const hasPlanMap = body.includes('规划图');
+
+    // Check at least one source_url link exists with href non-empty and target=_blank
+    const sourceLinks = Array.from(document.querySelectorAll('a[target="_blank"]'));
+    const validSourceLink = sourceLinks.some(a => {
+      const href = a.getAttribute('href') || '';
+      return a.textContent.includes('查看来源') && href.length > 0;
+    });
+
+    return {
+      hasTitle, hasMetroDB, hasWikimedia, hasLicense, hasAuthor,
+      hasSourceLink, hasNetworkMap, hasPlanMap, validSourceLink,
+    };
+  });
+
+  const t23contentOk = t23xiamen.hasTitle && t23xiamen.hasMetroDB &&
+    (t23xiamen.hasWikimedia || t23xiamen.hasLicense) &&
+    t23xiamen.hasSourceLink && t23xiamen.hasNetworkMap && t23xiamen.hasPlanMap &&
+    t23xiamen.validSourceLink;
+
+  // 2. Visit /#/city/hohhot — check cover fallback
+  await page.goto(`${BASE}/#/city/hohhot`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(2000);
+
+  const t23hohhot = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    const hasFallback = body.includes('暂无合规封面图') || body.includes('CSS 渐变');
+    const hasTitle = body.includes('数据来源与署名');
+    return { hasFallback, hasTitle };
+  });
+
+  // 3. Check 375px no horizontal scroll
+  await page.setViewport({ width: 375, height: 812 });
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 20000 });
+  await wait(1500);
+  const t23scroll = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+  }));
+  const t23scrollOk = t23scroll.scrollWidth <= t23scroll.innerWidth + 1;
+
+  // Restore viewport
+  await page.setViewport({ width: 1280, height: 800 });
+  await wait(500);
+
+  // 4. Console errors
+  const t23errors = consoleErrors.filter(isCriticalError);
+
+  if (!t23contentOk) {
+    const missing = [];
+    if (!t23xiamen.hasTitle) missing.push('title');
+    if (!t23xiamen.hasMetroDB) missing.push('MetroDB');
+    if (!t23xiamen.hasSourceLink) missing.push('查看来源');
+    if (!t23xiamen.validSourceLink) missing.push('source_url link');
+    if (!t23xiamen.hasNetworkMap) missing.push('线路图');
+    if (!t23xiamen.hasPlanMap) missing.push('规划图');
+    t23detail = `xiamen missing: ${missing.join(', ')}`;
+  } else if (!t23hohhot.hasTitle || !t23hohhot.hasFallback) {
+    t23detail = `hohhot: title=${t23hohhot.hasTitle}, fallback=${t23hohhot.hasFallback}`;
+  } else if (!t23scrollOk) {
+    t23detail = `375px overflow: scrollWidth=${t23scroll.scrollWidth}`;
+  } else if (t23errors.length > 0) {
+    t23detail = `console errors: ${t23errors.length}`;
+  } else {
+    t23pass = true;
+    t23detail = 'xiamen full attribution, hohhot fallback, 375px ok';
+  }
+
+  record('T23', '城市详情页数据来源与署名展示', t23pass, t23detail);
 }
 
 // === 主流程 ===

@@ -133,6 +133,17 @@ const backgroundImage = coverUrl
 - CC BY / CC BY-SA 图片需要署名；CC BY-SA 图片的再分发需要遵守相同协议条款。
 - 不得删除 manifest 中的来源与协议字段。
 
+## 9.1 城市详情页署名展示
+
+Phase 5.2 在城市详情页新增 `CitySourceInfo` 组件，展示城市封面图的完整署名信息：
+
+- **组件位置**：资源预览（CityAssetPreview）下方、数据说明（CityDataNote）上方
+- **manifest 读取**：运行时通过 `fetch(withBaseUrl('assets/city-covers/manifest.json'))` 动态加载
+- **downloaded 城市**：显示来源链接（查看来源）、作者、许可协议、署名信息
+- **fallback 城市**（如呼和浩特）：显示"暂无合规封面图"和 CSS 渐变回退说明
+- **manifest 加载失败**：显示"封面图署名信息暂不可用"
+- 除封面图署名外，还展示客流统计来源（MetroDB.org）、线路图/规划图资源状态和使用限制
+
 ## 10. 构建检查
 
 `frontend/scripts/check-static-build.cjs` T08 检查项：

@@ -13,7 +13,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # 浏览器自动化验收（T01-T22）
+npm run test:ui       # 浏览器自动化验收（T01-T23）
 ```
 
 > `npm run test:ui` 会先执行 `npm run build`，再启动 Vite preview 服务器运行浏览器验收。
@@ -33,7 +33,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T22）
 | `/#/city/:id` | 城市详情 | 面包屑 + 统计卡片 + 趋势图 + 真实线路图/规划图 + 数据说明 |
 | `/#/about` | 数据说明 | 数据来源、字段说明、更新机制、已知限制、免责声明 |
 
-## 验收测试项（T01-T22）
+## 验收测试项（T01-T23）
 
 | 编号 | 测试项 | 状态类型 | 说明 |
 |------|--------|----------|------|
@@ -59,6 +59,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T22）
 | T20 | 城市封面图资源加载 | PASS/FAIL | manifest-aware 检查：50 张卡片中 49 张 data-has-cover="true"、1 张 "false"（hohhot）；真实 cover fetch 返回 200 + image/*；hohhot backgroundImage 不含 hohhot.webp |
 | T21 | 城市详情页线路图/规划图 | PASS/FAIL | 测试城市 xiamen：network img 存在且 fetch 200+image/*、查看原图链接存在；点击规划图 Tab 后 plan img 存在且 fetch 200+image/*、链接更新；无 console error；375px 无横向滚动；图片返回 text/html 即使 status=200 也 FAIL |
 | T22 | 城市详情页线路图预览交互 | PASS/FAIL | 测试城市 xiamen：线路图 img 存在；点击放大按钮后缩放值变化或 transform 包含 scale；点击缩小按钮成功；点击重置后缩放值回到 100%；点击全屏预览按钮后 overlay 出现且含图片；按 ESC 后 overlay 关闭；切换规划图 Tab 后缩放值仍为 100%；375px 无横向滚动 |
+| T23 | 城市详情页数据来源与署名展示 | PASS/FAIL | 访问 /#/city/xiamen 检查"数据来源与署名"标题、MetroDB、Wikimedia/license/CC、查看来源链接(target=_blank, href 非空)、线路图/规划图；访问 /#/city/hohhot 检查封面图 fallback；375px 无横向滚动；控制台无关键错误 |
 
 ### 状态类型说明
 
@@ -87,13 +88,13 @@ npm run test:ui       # 浏览器自动化验收（T01-T22）
 |------|---------------|-----------------|
 | 入口 | `cd frontend && npm run test:ui` | `python scripts/run_acceptance.py` |
 | 目标 | React 前端（Vite 构建） | dashboard.html 单文件 |
-| 测试项 | T01-T22（22 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
+| 测试项 | T01-T23（23 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
 | 共存 | 两者独立运行，互不影响 | 两者独立运行，互不影响 |
 
 ## 验收结果汇总格式
 
 ```
-Total: 22  PASS: 21  FAIL: 0  MANUAL: 1  SKIP: 0
+Total: 23  PASS: 22  FAIL: 0  MANUAL: 1  SKIP: 0
 ```
 
 - FAIL > 0 时退出码为 1

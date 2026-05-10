@@ -4,6 +4,7 @@ import { useMetroData } from '../hooks/useMetroData';
 import type { MergedCity } from '../hooks/useMetroData';
 import CityTrendAreaChart from '../components/charts/CityTrendAreaChart';
 import CityAssetPreview from '../components/city/CityAssetPreview';
+import CitySourceInfo from '../components/city/CitySourceInfo';
 import EmptyState from '../components/common/EmptyState';
 
 function formatDaily(d: MergedCity): string {
@@ -135,6 +136,9 @@ export default function CityDetailPage() {
         <h3>资源预览</h3>
       </div>
       <CityAssetPreview city={city} />
+
+      {/* Source Info & Attribution */}
+      <CitySourceInfo city={city} />
 
       {/* Data Note Accordion */}
       <CityDataNote city={city} />

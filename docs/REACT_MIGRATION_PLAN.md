@@ -96,6 +96,7 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 | 4.7 | 城市卡片封面图片本地化（Wikimedia Commons、webp、manifest 溯源） | 已完成 |
 | 4.8 | 城市详情页真实线路图/规划图渲染（CityAssetPreview 组件、图片同步、构建检查、验收） | 已完成 |
 | 5.0 | 城市详情页线路图/规划图预览体验增强（缩放、拖拽、全屏、加载状态） | 已完成 |
+| 5.2 | 城市详情页数据来源与图片署名展示（CitySourceInfo 组件） | 已完成 |
 
 ## 6. 验收命令
 
@@ -104,7 +105,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # React 前端浏览器验收（T01-T22）
+npm run test:ui       # React 前端浏览器验收（T01-T23）
 
 # 回到根目录验证旧版不受影响
 python scripts/run_acceptance.py
@@ -251,7 +252,20 @@ Phase 5.0 增强城市详情页中线路图/规划图的预览交互体验：
 - **验收测试**：`acceptance-react.cjs` 新增 T22，使用 xiamen 测试缩放/重置/全屏/ESC/Tab 切换
 - 验收结果：Total 22, PASS 21, MANUAL 1
 
-## 7. Phase 4 + Phase 5.0 收口状态
+### 6.11 Phase 5.2 城市详情页数据来源与图片署名展示
+
+Phase 5.2 在城市详情页新增"数据来源与署名"信息区块：
+
+- **CitySourceInfo 组件**：新建独立组件，使用 CSS Module 样式
+- **封面 manifest 读取**：useState + useEffect 读取 `assets/city-covers/manifest.json`，失败时显示 fallback 文案
+- **4 个信息区块**：客流统计来源（MetroDB.org）、线路图/规划图资源状态、城市封面图署名（来源/作者/许可/署名/来源链接）、使用限制
+- **状态标签**：已收录/有数据=emerald、暂无/fallback=amber、来源/license=cyan
+- **响应式布局**：桌面 3 列、平板 2 列、移动端单列，375px 无横向滚动
+- **封面 fallback 城市**（如 hohhot）：显示"暂无合规封面图"和 CSS 渐变说明
+- **验收测试**：`acceptance-react.cjs` 新增 T23，使用 xiamen 和 hohhot 验证
+- 验收结果：Total 23, PASS 22, MANUAL 1
+
+## 7. Phase 4 + Phase 5.0 + Phase 5.2 收口状态
 
 Phase 4（React 前端迁移）全部子阶段已完成：
 
@@ -267,9 +281,10 @@ Phase 4（React 前端迁移）全部子阶段已完成：
 - **Phase 4.7.2**：封面图渲染验证与 fallback 修正 ✓
 - **Phase 4.8**：城市详情页真实线路图/规划图渲染 ✓
 - **Phase 5.0**：城市详情页线路图/规划图预览体验增强 ✓
+- **Phase 5.2**：城市详情页数据来源与图片署名展示 ✓
 
 **收口验收结果**：
-- `test:ui`：T01-T22，Total 22，PASS 21，FAIL 0，MANUAL 1
+- `test:ui`：T01-T23，Total 23，PASS 22，FAIL 0，MANUAL 1
 - `check:static`：T01-T09，全部通过
 - `run_acceptance.py`：legacy 16/16 PASS
 - `npm run typecheck`：通过

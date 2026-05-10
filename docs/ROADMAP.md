@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.2.0-dev
-- 当前阶段：Phase 5.0 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
+- 当前阶段：Phase 5.2 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -23,7 +23,7 @@
 
 | 验收体系 | 范围 | 结果 |
 |----------|------|------|
-| React `test:ui` | T01-T22 | **21 PASS / 0 FAIL / 1 MANUAL** |
+| React `test:ui` | T01-T23 | **22 PASS / 0 FAIL / 1 MANUAL** |
 | `check:static` | T01-T09 | **全部通过** |
 | Legacy `run_acceptance.py` | 16 项浏览器测试 | **16/16 PASS** |
 
@@ -237,6 +237,26 @@
 
 ---
 
+### Phase 5.2：城市详情页数据来源与图片署名展示（已完成）
+
+**目标**：在城市详情页增加"数据来源与署名"信息展示，包含客流统计来源、线路图/规划图资源状态、城市封面图署名和使用限制。
+
+**产物**：
+- [x] CitySourceInfo 组件（CSS Module 样式、深蓝科技风 glass-card）
+- [x] 客流统计来源区块（MetroDB.org 公开页面）
+- [x] 线路图/规划图资源状态区块（已收录/暂无）
+- [x] 城市封面图署名区块（来源、作者、许可、署名、来源链接）
+- [x] 封面 fallback 城市显示说明（如 hohhot）
+- [x] 使用限制区块（免责声明）
+- [x] 响应式布局（桌面 3 列、移动端单列）
+- [x] T23 验收测试（xiamen 完整署名、hohhot fallback、375px 无溢出）
+
+**验收标准**：
+- `test:ui`：T01-T23，Total 23，PASS 22，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 通过
+
+---
+
 ### Phase 5.1：GitHub Actions CI 与 Pages 手动部署配置
 
 **目标**：建立 CI 流水线，配置 Pages 手动部署。
@@ -254,7 +274,7 @@
 
 ---
 
-### Phase 5.2：React Pages 发布后验收
+### Phase 5.3：React Pages 发布后验收
 
 **目标**：在 GitHub Pages 上线后进行端到端验证。
 
@@ -271,7 +291,7 @@
 
 ---
 
-### Phase 5.3：城市详情页资源预览体验增强（已由 Phase 5.0 完成）
+### Phase 5.4：城市详情页资源预览体验增强（已由 Phase 5.0 完成）
 
 **目标**：Phase 5.0 已完成此阶段主要内容（缩放、全屏、拖拽），剩余可选优化。
 
@@ -281,7 +301,7 @@
 
 ---
 
-### Phase 5.4：数据与资源来源说明增强
+### Phase 5.5：数据与资源来源说明增强
 
 **目标**：在 About 页面和城市详情页增加更完善的数据来源信息。
 
@@ -292,7 +312,7 @@
 
 ---
 
-### Phase 5.5：旧版 dashboard.html 维护策略
+### Phase 5.6：旧版 dashboard.html 维护策略
 
 **目标**：明确 dashboard.html 的长期定位与维护策略。
 

@@ -1,0 +1,153 @@
+.wrapper {
+  margin-top: 24px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #e0f0ff);
+  margin: 0 0 16px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.06));
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--card-bg, rgba(6, 14, 30, 0.75));
+  border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.06));
+  border-radius: 12px;
+  padding: 18px;
+  backdrop-filter: blur(12px);
+}
+
+.cardSpan {
+  grid-column: 1 / -1;
+}
+
+.cardTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary, #8ab4f0);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.04));
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-primary, #e0f0ff);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+.field {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted, #5a7da0);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 56px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.badge-ok {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-warn {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.badge-info {
+  background: rgba(0, 212, 255, 0.12);
+  color: #00d4ff;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.link {
+  color: #00d4ff;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--text-muted, #5a7da0);
+  line-height: 1.6;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-glass, rgba(255, 255, 255, 0.04));
+}
+
+.limitList {
+  margin: 0;
+  padding: 0 0 0 18px;
+  list-style: disc;
+}
+
+.limitList li {
+  font-size: 12px;
+  color: var(--text-muted, #5a7da0);
+  line-height: 1.7;
+  margin-bottom: 4px;
+}
+
+.limitList li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 375px) {
+  .wrapper {
+    margin-top: 16px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .grid {
+    gap: 12px;
+  }
+}
