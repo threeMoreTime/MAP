@@ -188,8 +188,18 @@ Phase 4.7 完成城市卡片封面图片本地化与前端集成：
 - **前端集成**：CitiesPage 使用 CSS `backgroundImage: url(...) + gradient` 叠加策略，图片 404 时静默回退到渐变色
 - **数据同步**：`sync-data.cjs` 增加 city-covers 目录同步
 - **构建检查**：`check-static-build.cjs` 增加 T08 可选检查
-- **文件大小**：46/50 城市有封面图片，总计约 2.5MB
-- **4 个 fallback 城市**（成都、重庆、高雄、台北）使用 CSS 渐变回退
+- **文件大小**：49/50 城市有封面图片，总计约 2.5MB
+- **1 个 fallback 城市**（呼和浩特）使用 CSS 渐变回退
+
+### 6.7 Phase 4.7.1 八城补全
+
+Phase 4.7.1 对 8 个 fallback/error 城市做了更谨慎的候选筛选：
+
+- 增加精确搜索关键词和错误地名过滤（福州排除含 "Taipei" 的候选，昆明排除含 "Kunming Lake" 的候选，徐州排除含 "Zhengzhou" 的候选）
+- 增加宽高比过滤（`width/height >= 1.2`）
+- 增加候选重试机制（最佳候选下载失败时自动尝试下一个）
+- 支持 `--dry-run` 模式便于人工审核
+- 补全结果：7/8 城市成功补全，呼和浩特仍为 fallback
 
 ## 7. 回滚方案
 

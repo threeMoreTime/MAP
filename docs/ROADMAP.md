@@ -214,6 +214,16 @@
 - [x] `npm run test:ui` 通过
 - [x] `python scripts/run_acceptance.py` 16/16 PASS
 
+**Phase 4.7.1：八城补全与候选审核（已完成）**
+- [x] 增加精确搜索关键词（每个城市定制）
+- [x] 增加错误地名过滤（福州排除 Taipei、昆明排除 Kunming Lake、徐州排除 Zhengzhou）
+- [x] 增加宽高比过滤（`width/height >= 1.2`）
+- [x] 增加候选重试机制（最佳候选下载失败时自动尝试下一个）
+- [x] 支持 `--dry-run` 模式便于人工审核
+- [x] 7/8 城市成功补全（成都、重庆、高雄、台北、福州、昆明、徐州）
+- [x] 呼和浩特仍为 fallback（无合适横向 CC 图片）
+- [x] 最终 49/50 城市有封面图片
+
 ---
 
 ## Phase 5：Dashboard 数据外置

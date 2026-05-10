@@ -130,3 +130,22 @@ CitiesPage 城市卡片封面使用 CSS `background-image` 叠加策略：
 `frontend/scripts/check-static-build.cjs` T08 检查项：
 - 如果 `dist/assets/city-covers/` 存在：检查 manifest.json 和至少一个 .webp 文件
 - 如果不存在：输出 SKIP 信息，不失败构建（可选检查）
+
+## Phase 4.7.1 八城补全策略
+
+Phase 4.7.1 针对以下 8 个 fallback/error 城市做了更谨慎的候选筛选：
+
+- 成都 (chengdu)、重庆 (chongqing)、高雄 (kaohsiung)、台北 (taipei)
+- 福州 (fuzhou)、昆明 (kunming)、徐州 (xuzhou)、呼和浩特 (hohhot)
+
+**增强措施：**
+- 为每个城市配置精确搜索关键词（如 `Fuzhou Fujian skyline`、`Kunming Yunnan skyline`）
+- 增加错误地名过滤：福州排除含 "Fuzhoushan"/"Taipei" 的候选，昆明排除含 "Kunming Lake"/"Summer Palace" 的候选，徐州排除含 "Zhengzhou"/"HSR" 的候选
+- 增加宽高比过滤：`width/height >= 1.2`，拒绝竖向图片
+- 增加候选重试：如果最佳候选下载失败（如文件过大），自动尝试下一个候选
+- 支持 `--dry-run` 模式：输出候选列表但不下载，便于人工审核
+
+**补全结果：**
+- 7/8 城市成功补全
+- 呼和浩特 (hohhot) 仍为 fallback：Wikimedia Commons 无合适的横向、有 license 的城市风景图片
+- 找不到合规图片时继续 fallback，不使用版权不清晰或错误城市的图片

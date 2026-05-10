@@ -59,6 +59,71 @@ EXCLUDE_PATTERNS = re.compile(
     re.IGNORECASE
 )
 
+MIN_ASPECT_RATIO = 1.2
+
+CITY_KEYWORDS = {
+    'chengdu': {
+        'search': [
+            'Chengdu skyline', 'Chengdu cityscape', '成都 天府广场',
+            '成都 skyline', 'Chengdu financial city', 'Chengdu downtown',
+            'Chengdu Tianfu Square',
+        ],
+        'forbidden': [],
+    },
+    'chongqing': {
+        'search': [
+            'Chongqing skyline', 'Chongqing cityscape', '重庆 渝中 半岛',
+            'Chongqing Yuzhong skyline', 'Chongqing Hongyadong',
+            'Chongqing Jiefangbei skyline',
+        ],
+        'forbidden': [],
+    },
+    'kaohsiung': {
+        'search': [
+            'Kaohsiung skyline', 'Kaohsiung cityscape', '高雄 skyline',
+            'Kaohsiung 85 Sky Tower', 'Kaohsiung harbor skyline',
+        ],
+        'forbidden': [],
+    },
+    'taipei': {
+        'search': [
+            'Taipei skyline', 'Taipei cityscape', '台北 skyline',
+            'Taipei 101 skyline', 'Taipei Xinyi skyline',
+        ],
+        'forbidden': [],
+    },
+    'fuzhou': {
+        'search': [
+            'Fuzhou Fujian skyline', 'Fuzhou China skyline',
+            '福州 福建 天际线', 'Fuzhou cityscape Fujian',
+            'Fuzhou Min River skyline',
+        ],
+        'forbidden': ['fuzhoushan', 'taipei', 'taiwan'],
+    },
+    'kunming': {
+        'search': [
+            'Kunming Yunnan skyline', 'Kunming cityscape Yunnan',
+            '昆明 云南 天际线', 'Kunming downtown Yunnan',
+        ],
+        'forbidden': ['kunming lake', 'summer palace', 'beijing', '颐和园', '昆明湖'],
+    },
+    'xuzhou': {
+        'search': [
+            'Xuzhou skyline', 'Xuzhou cityscape',
+            '徐州 城市 天际线', 'Xuzhou Jiangsu skyline',
+            'Xuzhou downtown', '徐州 云龙湖',
+        ],
+        'forbidden': ['zhengzhou', '郑州', 'ZDF', 'HSR', 'high-speed rail'],
+    },
+    'hohhot': {
+        'search': [
+            'Hohhot skyline', 'Hohhot cityscape',
+            '呼和浩特 天际线', 'Hohhot Inner Mongolia cityscape',
+        ],
+        'forbidden': [],
+    },
+}
+
 ACCEPTABLE_LICENSES = {
     'cc0', 'public domain', 'cc by 2.0', 'cc by 2.5', 'cc by 3.0',
     'cc by 4.0', 'cc by-sa 2.0', 'cc by-sa 2.5', 'cc by-sa 3.0',
@@ -221,19 +286,26 @@ def wikidata_get_image(qid):
     return None
 
 
-def find_best_image(city_cn, city_en):
+def find_best_image(city_cn, city_en, dry_run=False):
     city_slug = city_en if city_en else city_cn
 
-    search_queries = [
-        f'{city_cn} 天际线',
-        f'{city_cn} skyline',
-        f'{city_cn} 城市风光',
-        f'{city_cn} cityscape',
-        f'{city_slug} skyline',
-        f'{city_cn} 夜景 城市',
-        f'{city_slug} cityscape night',
-        f'{city_cn} 地标 建筑',
-    ]
+    city_config = CITY_KEYWORDS.get(city_slug, None)
+
+    if city_config:
+        search_queries = city_config['search']
+        forbidden_kw = [kw.lower() for kw in city_config.get('forbidden', [])]
+    else:
+        search_queries = [
+            f'{city_cn} 天际线',
+            f'{city_cn} skyline',
+            f'{city_cn} 城市风光',
+            f'{city_cn} cityscape',
+            f'{city_slug} skyline',
+            f'{city_cn} 夜景 城市',
+            f'{city_slug} cityscape night',
+            f'{city_cn} 地标 建筑',
+        ]
+        forbidden_kw = []
 
     candidates = []
     seen_files = set()
@@ -249,6 +321,12 @@ def find_best_image(city_cn, city_en):
             if is_excluded_filename(filename, r.get('snippet', '')):
                 continue
 
+            combined_text = (filename + ' ' + r.get('snippet', '')).lower()
+            if any(fk in combined_text for fk in forbidden_kw):
+                if dry_run:
+                    print(f"    [FORBIDDEN] {filename} (matched forbidden keyword)")
+                continue
+
             ext_lower = filename.lower()
             if not (ext_lower.endswith('.jpg') or ext_lower.endswith('.jpeg')
                     or ext_lower.endswith('.png') or ext_lower.endswith('.webp')):
@@ -259,19 +337,27 @@ def find_best_image(city_cn, city_en):
                 continue
 
             if info['width'] < 800:
+                if dry_run:
+                    print(f"    [REJECTED] {filename} (width {info['width']} < 800)")
                 continue
 
             if info['width'] > 0 and info['height'] > 0:
                 ratio = info['width'] / info['height']
-                if ratio < 1.0:
+                if ratio < MIN_ASPECT_RATIO:
+                    if dry_run:
+                        print(f"    [REJECTED] {filename} (aspect {ratio:.2f} < {MIN_ASPECT_RATIO})")
                     continue
                 if ratio > 5.0:
                     continue
 
             if not info['license'] or not info['artist']:
+                if dry_run:
+                    print(f"    [REJECTED] {filename} (missing license or author)")
                 continue
 
             if not is_acceptable_license(info['license']):
+                if dry_run:
+                    print(f"    [REJECTED] {filename} (license: {info['license']})")
                 continue
 
             score = 0
@@ -304,6 +390,12 @@ def find_best_image(city_cn, city_en):
 
             score += min(len(info['artist']), 20)
 
+            if dry_run:
+                print(f"    [ACCEPTED #{len(candidates)+1}] {filename}")
+                print(f"      Score: {score} | {info['width']}x{info['height']} | License: {info['license']}")
+                print(f"      Author: {info['artist'][:60]}")
+                print(f"      URL: {info.get('description_url', '')[:80]}")
+
             candidates.append({
                 'filename': filename,
                 'score': score,
@@ -315,17 +407,33 @@ def find_best_image(city_cn, city_en):
     candidates.sort(key=lambda x: x['score'], reverse=True)
 
     if candidates:
-        best = candidates[0]
-        return best['filename'], best['info']
+        if dry_run:
+            best = candidates[0]
+            return best['filename'], best['info']
+        # Return all candidates for process_city to try in order
+        return candidates
 
     qid = wikidata_search_city(city_cn, city_slug)
     if qid:
         wd_filename = wikidata_get_image(qid)
         if wd_filename and not is_excluded_filename(wd_filename):
-            info = get_image_info(wd_filename)
-            if info and info['url'] and info['width'] >= 800 and info['license'] and info['artist']:
-                if is_acceptable_license(info['license']):
-                    return wd_filename, info
+            combined_text = wd_filename.lower()
+            if any(fk in combined_text for fk in forbidden_kw):
+                if dry_run:
+                    print(f"    [FORBIDDEN-WD] {wd_filename}")
+            else:
+                info = get_image_info(wd_filename)
+                if info and info['url'] and info['width'] >= 800 and info['license'] and info['artist']:
+                    if info['width'] > 0 and info['height'] > 0:
+                        ratio = info['width'] / info['height']
+                        if ratio < MIN_ASPECT_RATIO:
+                            if dry_run:
+                                print(f"    [REJECTED-WD] {wd_filename} (aspect {ratio:.2f})")
+                            return None, None
+                    if is_acceptable_license(info['license']):
+                        if dry_run:
+                            print(f"    [ACCEPTED-WD] {wd_filename}")
+                        return [{'filename': wd_filename, 'score': 0, 'info': info}]
 
     return None, None
 
@@ -369,60 +477,91 @@ def download_and_convert(url, output_path):
         return None, None
 
 
-def process_city(city_item, force=False):
+def process_city(city_item, force=False, dry_run=False):
     city = city_item['city']
     city_cn = city_item['city_cn']
     city_en = city
 
     output_file = OUTPUT_DIR / f"{city}.webp"
 
-    if not force and output_file.exists():
+    if not force and not dry_run and output_file.exists():
         print(f"  [SKIP] {city_cn} ({city}) - already exists")
         return None
 
     print(f"  [{city_cn}] Searching for cover image...")
 
-    filename, info = find_best_image(city_cn, city_en)
+    result = find_best_image(city_cn, city_en, dry_run=dry_run)
 
-    if not filename or not info:
-        print(f"  [FALLBACK] {city_cn} - no suitable licensed image found")
-        return {
-            'city': city,
-            'city_cn': city_cn,
-            'file': None,
-            'status': 'fallback',
-            'reason': 'no suitable licensed image found',
-        }
+    if dry_run:
+        if isinstance(result, list) and result:
+            best = result[0]
+            info = best['info']
+            print(f"  [BEST] {best['filename']}")
+            print(f"    Source: {info.get('description_url', '')}")
+            print(f"    Size: {info['width']}x{info['height']}")
+            print(f"    License: {info['license']}")
+            print(f"    Author: {info['artist'][:80]}")
+            return {
+                'city': city, 'city_cn': city_cn,
+                'status': 'candidate', 'filename': best['filename'],
+                'source_url': info.get('description_url', ''),
+                'license': info['license'],
+                'author': info.get('artist', ''),
+                'width': info['width'], 'height': info['height'],
+            }
+        elif isinstance(result, tuple) and result[0]:
+            filename, info = result
+            print(f"  [BEST-WD] {filename}")
+            print(f"    Size: {info['width']}x{info['height']}")
+            return {
+                'city': city, 'city_cn': city_cn,
+                'status': 'candidate', 'filename': filename,
+            }
+        else:
+            print(f"  [NO-CANDIDATE] {city_cn} - no suitable licensed image found")
+            return {
+                'city': city, 'city_cn': city_cn,
+                'status': 'no-candidate',
+            }
 
-    print(f"  [DOWNLOAD] {city_cn} <- {filename}")
-    w, h = download_and_convert(info['url'], output_file)
+    # Non-dry-run: try candidates in order
+    candidates = result
+    if isinstance(result, tuple):
+        # Single result from Wikidata fallback
+        filename, info = result
+        if filename and info:
+            candidates = [{'filename': filename, 'info': info}]
+        else:
+            candidates = []
 
-    if w is None:
-        return {
-            'city': city,
-            'city_cn': city_cn,
-            'file': None,
-            'status': 'error',
-            'reason': 'download or conversion failed',
-        }
+    if candidates and isinstance(candidates, list):
+        for candidate in candidates:
+            filename = candidate['filename']
+            info = candidate['info']
+            print(f"  [TRY] {city_cn} <- {filename} ({info['width']}x{info['height']})")
+            w, h = download_and_convert(info['url'], output_file)
+            if w is not None:
+                file_size = os.path.getsize(output_file)
+                print(f"  [OK] {city_cn} saved: {w}x{h}, {file_size // 1024}KB")
+                attribution = info.get('attribution', '') or info.get('artist', '')
+                return {
+                    'city': city, 'city_cn': city_cn,
+                    'file': f"{city}.webp", 'status': 'downloaded',
+                    'source_url': info.get('description_url', ''),
+                    'image_url': info.get('url', ''),
+                    'license': info.get('license', ''),
+                    'author': info.get('artist', ''),
+                    'attribution': attribution,
+                    'width': w, 'height': h,
+                }
+            print(f"  [SKIP] {filename} download/conversion failed, trying next...")
 
-    file_size = os.path.getsize(output_file)
-    print(f"  [OK] {city_cn} saved: {w}x{h}, {file_size // 1024}KB")
-
-    attribution = info.get('attribution', '') or info.get('artist', '')
-
+    # All candidates failed or no candidates found
+    print(f"  [FALLBACK] {city_cn} - no suitable licensed image downloadable")
     return {
-        'city': city,
-        'city_cn': city_cn,
-        'file': f"{city}.webp",
-        'status': 'downloaded',
-        'source_url': info.get('description_url', ''),
-        'image_url': info.get('url', ''),
-        'license': info.get('license', ''),
-        'author': info.get('artist', ''),
-        'attribution': attribution,
-        'width': w,
-        'height': h,
+        'city': city, 'city_cn': city_cn,
+        'file': None, 'status': 'error',
+        'reason': 'all candidates too large or download failed',
     }
 
 
@@ -431,6 +570,7 @@ def main():
     parser.add_argument('--limit', type=int, default=0, help='Only process first N cities')
     parser.add_argument('--city', type=str, default='', help='Only process specific city slug')
     parser.add_argument('--force', action='store_true', help='Re-download even if webp exists')
+    parser.add_argument('--dry-run', action='store_true', help='Show candidates without downloading')
     args = parser.parse_args()
 
     if not INDEX_PATH.exists():
@@ -478,7 +618,7 @@ def main():
             continue
 
         print(f"\n[{i+1}/{len(cities)}] Processing {city_cn} ({city})...")
-        result = process_city(city_item, force=args.force)
+        result = process_city(city_item, force=args.force, dry_run=args.dry_run)
 
         if result is None:
             if city in existing_map:
@@ -516,6 +656,13 @@ def main():
     for city in existing_map:
         if city not in {item['city'] for item in manifest_items}:
             manifest_items.append(existing_map[city])
+
+    if args.dry_run:
+        print(f"\n{'='*50}")
+        print(f"Dry-run complete!")
+        print(f"  Candidates found: {sum(1 for r in manifest_items if isinstance(r, dict) and r.get('status') == 'candidate')}")
+        print(f"  No candidates: {sum(1 for r in manifest_items if isinstance(r, dict) and r.get('status') == 'no-candidate')}")
+        return
 
     manifest = {
         'generated_at': datetime.now(timezone.utc).isoformat(),

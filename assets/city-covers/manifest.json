@@ -1,7 +1,85 @@
 {
-  "generated_at": "2026-05-09T17:04:35.320522+00:00",
+  "generated_at": "2026-05-10T08:39:49.033215+00:00",
   "source": "wikimedia-commons",
   "items": [
+    {
+      "city": "xuzhou",
+      "city_cn": "徐州",
+      "file": "xuzhou.webp",
+      "status": "downloaded",
+      "source_url": "https://commons.wikimedia.org/wiki/File:%E5%BE%90%E5%B7%9E%E4%BA%91%E9%BE%99%E6%B9%96_-_23545132430.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/%E5%BE%90%E5%B7%9E%E4%BA%91%E9%BE%99%E6%B9%96_-_23545132430.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "license": "CC BY-SA 2.0",
+      "author": "Mitch Altman",
+      "attribution": "Mitch Altman",
+      "width": 800,
+      "height": 531
+    },
+    {
+      "city": "kunming",
+      "city_cn": "昆明",
+      "file": "kunming.webp",
+      "status": "downloaded",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Kunming_07.JPG",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Kunming_07.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "license": "Public domain",
+      "author": "Brücke-Osteuropa",
+      "attribution": "Brücke-Osteuropa",
+      "width": 800,
+      "height": 450
+    },
+    {
+      "city": "taipei",
+      "city_cn": "台北",
+      "file": "taipei.webp",
+      "status": "downloaded",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Taipei_skyline_2014.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Taipei_skyline_2014.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "license": "CC BY 2.0",
+      "author": "Andrew Van Ova",
+      "attribution": "Andrew Van Ova",
+      "width": 800,
+      "height": 533
+    },
+    {
+      "city": "chongqing",
+      "city_cn": "重庆",
+      "file": "chongqing.webp",
+      "status": "downloaded",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Cityscapes_of_Chongqing_004.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/0/01/Cityscapes_of_Chongqing_004.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "license": "CC BY 2.0",
+      "author": "Clark Gregor from New York, NY, United States",
+      "attribution": "Clark Gregor from New York, NY, United States",
+      "width": 800,
+      "height": 600
+    },
+    {
+      "city": "kaohsiung",
+      "city_cn": "高雄",
+      "file": "kaohsiung.webp",
+      "status": "downloaded",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Kaohsiung_cityscape_skyline_2015.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Kaohsiung_cityscape_skyline_2015.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "license": "CC BY-SA 2.0",
+      "author": "Chi-Hung Lin from Chiayi, Taiwan",
+      "attribution": "Chi-Hung Lin from Chiayi, Taiwan",
+      "width": 800,
+      "height": 533
+    },
+    {
+      "city": "chengdu",
+      "city_cn": "成都",
+      "file": "chengdu.webp",
+      "status": "downloaded",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Central_Chengdu_skyline_at_dawn_-_Flickr.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Central_Chengdu_skyline_at_dawn_-_Flickr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+      "license": "CC BY 2.0",
+      "author": "Pierre Marshall",
+      "attribution": "Pierre Marshall",
+      "width": 800,
+      "height": 600
+    },
     {
       "city": "beijing",
       "city_cn": "北京",
@@ -55,20 +133,6 @@
       "height": 600
     },
     {
-      "city": "chengdu",
-      "city_cn": "成都",
-      "file": null,
-      "status": "error",
-      "reason": "download or conversion failed"
-    },
-    {
-      "city": "chongqing",
-      "city_cn": "重庆",
-      "file": null,
-      "status": "error",
-      "reason": "download or conversion failed"
-    },
-    {
       "city": "dalian",
       "city_cn": "大连",
       "file": "dalian.webp",
@@ -110,9 +174,15 @@
     {
       "city": "fuzhou",
       "city_cn": "福州",
-      "file": null,
-      "status": "fallback",
-      "reason": "candidate image is of Taipei, not Fuzhou"
+      "file": "fuzhou.webp",
+      "status": "downloaded",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Fuzhou_skyline_2.jpg",
+      "image_url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Fuzhou_skyline_2.jpg",
+      "license": "CC BY-SA 4.0",
+      "author": "Listwiseafford",
+      "attribution": "Listwiseafford",
+      "width": 800,
+      "height": 500
     },
     {
       "city": "guangzhou",
@@ -224,20 +294,6 @@
       "attribution": "MNXANL",
       "width": 800,
       "height": 531
-    },
-    {
-      "city": "kaohsiung",
-      "city_cn": "高雄",
-      "file": null,
-      "status": "error",
-      "reason": "download or conversion failed"
-    },
-    {
-      "city": "kunming",
-      "city_cn": "昆明",
-      "file": null,
-      "status": "fallback",
-      "reason": "candidate image is of Kunming Lake (Beijing), not Kunming city (Yunnan)"
     },
     {
       "city": "lanzhou",
@@ -448,13 +504,6 @@
       "height": 334
     },
     {
-      "city": "taipei",
-      "city_cn": "台北",
-      "file": null,
-      "status": "error",
-      "reason": "download or conversion failed"
-    },
-    {
       "city": "taiyuan",
       "city_cn": "太原",
       "file": "taiyuan.webp",
@@ -583,13 +632,6 @@
       "attribution": "Danielinblue",
       "width": 800,
       "height": 600
-    },
-    {
-      "city": "xuzhou",
-      "city_cn": "徐州",
-      "file": null,
-      "status": "fallback",
-      "reason": "candidate image is of Zhengzhoudong Railway Station, not Xuzhou"
     },
     {
       "city": "zhengzhou",
