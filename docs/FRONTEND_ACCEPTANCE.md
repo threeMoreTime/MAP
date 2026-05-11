@@ -13,7 +13,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # 浏览器自动化验收（T01-T24）
+npm run test:ui       # 浏览器自动化验收（T01-T25）
 ```
 
 > `npm run test:ui` 会先执行 `npm run build`，再启动 Vite preview 服务器运行浏览器验收。
@@ -33,7 +33,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T24）
 | `/#/city/:id` | 城市详情 | 面包屑 + Hero + 指标卡片 + 线路图查看器 + 资源面板 + 趋势图 + 来源署名 |
 | `/#/about` | 数据说明 | 数据来源、字段说明、更新机制、已知限制、免责声明 |
 
-## 验收测试项（T01-T24）
+## 验收测试项（T01-T25）
 
 | 编号 | 测试项 | 状态类型 | 说明 |
 |------|--------|----------|------|
@@ -61,6 +61,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T24）
 | T22 | 城市详情页线路图查看器交互 | PASS/FAIL | 测试城市 xiamen：线路图 img 存在；工具栏固定在图片容器左上角（offset < 50px）；鼠标滚轮缩放以当前查看器中心为缩放中心（data-wheel-zoom-origin="center"）；左键单击放大仍以点击位置为中心；左键拖拽 translate 变化（不要求 scale > 1）；重置按钮 zoom 回到 100%；全屏 overlay 出现且含图片；全屏工具栏在左上角；全屏中滚轮缩放 transform 变化；全屏中拖拽 transform 变化；ESC 关闭全屏；Tab 切换后 zoom 重置 100%；375px 无横向滚动 |
 | T23 | 城市详情页数据来源与署名展示 | PASS/FAIL | 访问 /#/city/xiamen 检查"数据来源与署名"标题、MetroDB、Wikimedia/license/CC、查看来源链接(target=_blank, href 非空)、线路图/规划图；访问 /#/city/hohhot 检查封面图 fallback；375px 无横向滚动；控制台无关键错误 |
 | T24 | 城市详情页新版布局结构 | PASS/FAIL | 访问 /#/city/xiamen 检查：Hero 标题"厦门地铁"、6 个指标卡片（data-testid="metrics-grid"）、"线路网络"标题、"资源状态"卡片、"使用提示"卡片、"当前资源信息"卡片、"年度客流趋势"、"数据来源"区域、"数据说明"、查看器工具栏仍存在、375px 无横向滚动 |
+|| T25 | 城市详情页响应式与边界城市状态 | PASS/FAIL | 1) 1440x810 访问 /#/city/xiamen：metrics-grid 6 个卡片、resource panel 存在、无横向滚动；2) /#/city/hohhot：显示"部分资源缺失"、规划图空状态、无横向滚动；3) /#/city/foshan：不崩溃、空状态清晰、无横向滚动；4) 375x812 访问 /#/city/xiamen：无横向滚动、metrics-grid 存在、resource panel 存在、toolbar 存在 |
 
 ### 状态类型说明
 
@@ -95,7 +96,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T24）
 ## 验收结果汇总格式
 
 ```
-Total: 24  PASS: 23  FAIL: 0  MANUAL: 1  SKIP: 0
+Total: 25  PASS: 24  FAIL: 0  MANUAL: 1  SKIP: 0
 ```
 
 - FAIL > 0 时退出码为 1

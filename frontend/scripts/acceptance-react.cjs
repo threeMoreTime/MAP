@@ -1237,6 +1237,137 @@ async function runTests(baseUrl) {
   }
 
   record('T24', '城市详情页新版布局结构', t24pass, t24detail);
+
+  // T25: 城市详情页响应式与边界城市状态
+  await page.setViewport({ width: 1440, height: 810 });
+  consoleErrors = [];
+  let t25pass = false;
+  let t25detail = '';
+
+  // 1. Visit /#/city/xiamen at 1440x810
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(2000);
+
+  const t25xiamen = await page.evaluate(() => {
+    const metricsGrid = document.querySelector('[data-testid="metrics-grid"]');
+    const metricsCards = metricsGrid ? metricsGrid.querySelectorAll(':scope > div') : [];
+    const resourcePanel = document.querySelector('[data-testid="resource-status"]');
+    const usageTips = document.querySelector('[data-testid="usage-tips"]');
+    const currentResource = document.querySelector('[data-testid="current-resource-info"]');
+    return {
+      metricsCardCount: metricsCards.length,
+      hasResourcePanel: !!resourcePanel,
+      hasUsageTips: !!usageTips,
+      hasCurrentResource: !!currentResource,
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    };
+  });
+
+  const t25xiamenScrollOk = t25xiamen.scrollWidth <= t25xiamen.innerWidth + 1;
+
+  // 2. Visit /#/city/hohhot
+  await page.goto(`${BASE}/#/city/hohhot`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(2000);
+
+  const t25hohhot = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    const hasPartialStatus = body.includes('部分资源缺失');
+    // Check plan map empty state
+    const planBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent && b.textContent.trim() === '规划图');
+    return {
+      hasPartialStatus,
+      hasPlanBtn: !!planBtn,
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    };
+  });
+
+  const t25hohhotScrollOk = t25hohhot.scrollWidth <= t25hohhot.innerWidth + 1;
+
+  // Click plan tab to verify empty state
+  if (t25hohhot.hasPlanBtn) {
+    await page.evaluate(() => {
+      const btns = Array.from(document.querySelectorAll('button'));
+      const planBtn = btns.find(b => b.textContent && b.textContent.trim() === '规划图');
+      if (planBtn) planBtn.click();
+    });
+    await wait(1000);
+  }
+
+  const t25hohhotPlanEmpty = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    return body.includes('资源正在收集整理中') || body.includes('暂无');
+  });
+
+  // 3. Visit /#/city/foshan
+  await page.goto(`${BASE}/#/city/foshan`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(2000);
+
+  const t25foshan = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    const hasFoshan = body.includes('佛山');
+    const hasEmptyState = body.includes('资源正在收集整理中') || body.includes('暂无');
+    return {
+      hasFoshan,
+      hasEmptyState,
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    };
+  });
+
+  const t25foshanScrollOk = t25foshan.scrollWidth <= t25foshan.innerWidth + 1;
+  const t25foshanErrors = consoleErrors.filter(isCriticalError);
+
+  // 4. Set viewport 375x812, visit /#/city/xiamen
+  await page.setViewport({ width: 375, height: 812 });
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 20000 });
+  await wait(1500);
+
+  const t25mobile = await page.evaluate(() => {
+    const metricsGrid = document.querySelector('[data-testid="metrics-grid"]');
+    const resourcePanel = document.querySelector('[data-testid="resource-status"]');
+    const toolbar = document.querySelector('[class*="toolbar"]');
+    return {
+      hasMetricsGrid: !!metricsGrid,
+      hasResourcePanel: !!resourcePanel,
+      hasToolbar: !!toolbar,
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    };
+  });
+
+  const t25mobileScrollOk = t25mobile.scrollWidth <= t25mobile.innerWidth + 1;
+
+  // Restore viewport
+  await page.setViewport({ width: 1280, height: 800 });
+  await wait(500);
+
+  // Evaluate
+  const t25missing = [];
+  if (t25xiamen.metricsCardCount !== 6) t25missing.push(`metricsCards=${t25xiamen.metricsCardCount}/6`);
+  if (!t25xiamen.hasResourcePanel) t25missing.push('resource-panel');
+  if (!t25xiamenScrollOk) t25missing.push(`xiamen-1440-scroll: ${t25xiamen.scrollWidth}`);
+  if (!t25hohhot.hasPartialStatus) t25missing.push('hohhot-partial-status');
+  if (!t25hohhotPlanEmpty) t25missing.push('hohhot-plan-empty');
+  if (!t25hohhotScrollOk) t25missing.push(`hohhot-scroll: ${t25hohhot.scrollWidth}`);
+  if (!t25foshan.hasFoshan) t25missing.push('foshan-content');
+  if (!t25foshan.hasEmptyState) t25missing.push('foshan-empty');
+  if (!t25foshanScrollOk) t25missing.push(`foshan-scroll: ${t25foshan.scrollWidth}`);
+  if (t25foshanErrors.length > 0) t25missing.push(`foshan-errors=${t25foshanErrors.length}`);
+  if (!t25mobile.hasMetricsGrid) t25missing.push('mobile-metrics');
+  if (!t25mobile.hasResourcePanel) t25missing.push('mobile-resource');
+  if (!t25mobile.hasToolbar) t25missing.push('mobile-toolbar');
+  if (!t25mobileScrollOk) t25missing.push(`mobile-scroll: ${t25mobile.scrollWidth}`);
+
+  if (t25missing.length > 0) {
+    t25detail = `missing: ${t25missing.join(', ')}`;
+  } else {
+    t25pass = true;
+    t25detail = 'xiamen(6 cards/panel/scroll)/hohhot(partial/plan-empty)/foshan(content/empty)/375px(metrics/panel/toolbar/scroll) all OK';
+  }
+
+  record('T25', '城市详情页响应式与边界城市状态', t25pass, t25detail);
 }
 
 // === 主流程 ===

@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.2.0-dev
-- 当前阶段：Phase 5.4 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
+- 当前阶段：Phase 5.5 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -23,7 +23,7 @@
 
 | 验收体系 | 范围 | 结果 |
 |----------|------|------|
-| React `test:ui` | T01-T24 | **23 PASS / 0 FAIL / 1 MANUAL** |
+| React `test:ui` | T01-T25 | **24 PASS / 0 FAIL / 1 MANUAL** |
 | `check:static` | T01-T09 | **全部通过** |
 | Legacy `run_acceptance.py` | 16 项浏览器测试 | **16/16 PASS** |
 
@@ -350,12 +350,31 @@
 - [x] 375px 无横向滚动
 
 **验收标准**：
-- `test:ui`：T01-T24，Total 24，PASS 23，FAIL 0，MANUAL 1
+- `test:ui`：T01-T25，Total 25，PASS 24，FAIL 0，MANUAL 1
 - `npm run typecheck` 和 `npm run build` 通过
 
 ---
 
-### Phase 5.5：数据与资源来源说明增强
+### Phase 5.5：城市详情页视觉验收与响应式细节收口（已完成）
+
+**目标**：对城市详情页进行视觉验收和响应式细节收口。
+
+**产物**：
+- [x] 使用浏览器工具在 1440x810 和 375x812 视口检查 xiamen/beijing/hohhot/foshan 四城市
+- [x] 查看器高度微调（PC 620px、平板 520px、移动端 380px）
+- [x] Hero padding 收紧（32px/36px）
+- [x] CitySourceInfo 紧凑化（减小 padding/gap/font-size）
+- [x] 数据说明卡片添加 max-width: 800px
+- [x] T25 验收测试（xiamen 完整资源/hohhot 部分缺失/foshan 全缺失/375px 移动端）
+- [x] 375px 无横向滚动
+
+**验收标准**：
+- `test:ui`：T01-T25，Total 25，PASS 24，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 通过
+
+---
+
+### Phase 5.6：数据与资源来源说明增强
 
 **目标**：在 About 页面和城市详情页增加更完善的数据来源信息。
 
@@ -366,7 +385,7 @@
 
 ---
 
-### Phase 5.6：旧版 dashboard.html 维护策略
+### Phase 5.7：旧版 dashboard.html 维护策略
 
 **目标**：明确 dashboard.html 的长期定位与维护策略。
 

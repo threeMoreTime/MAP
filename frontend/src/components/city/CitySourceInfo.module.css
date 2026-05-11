@@ -3,18 +3,18 @@
 }
 
 .title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary, #e0f0ff);
-  margin: 0 0 12px 0;
-  padding-bottom: 8px;
+  color: var(--text-primary, #e0f4ff);
+  margin: 0 0 10px 0;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.06));
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 @media (min-width: 900px) {
@@ -33,7 +33,7 @@
   background: var(--card-bg, rgba(6, 14, 30, 0.75));
   border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.06));
   border-radius: 10px;
-  padding: 14px;
+  padding: 12px;
   backdrop-filter: blur(12px);
 }
 
@@ -42,11 +42,11 @@
 }
 
 .cardTitle {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary, #8ab4f0);
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--border-glass, rgba(255, 255, 255, 0.04));
 }
 
@@ -54,8 +54,8 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
-  margin-bottom: 8px;
-  font-size: 13px;
+  margin-bottom: 6px;
+  font-size: 12px;
   color: var(--text-primary, #e0f0ff);
   line-height: 1.5;
   word-break: break-word;
@@ -113,11 +113,11 @@
 }
 
 .note {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted, #5a7da0);
   line-height: 1.6;
-  margin-top: 8px;
-  padding-top: 8px;
+  margin-top: 6px;
+  padding-top: 6px;
   border-top: 1px solid var(--border-glass, rgba(255, 255, 255, 0.04));
 }
 
@@ -128,10 +128,10 @@
 }
 
 .limitList li {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted, #5a7da0);
-  line-height: 1.7;
-  margin-bottom: 4px;
+  line-height: 1.6;
+  margin-bottom: 3px;
 }
 
 .limitList li:last-child {
