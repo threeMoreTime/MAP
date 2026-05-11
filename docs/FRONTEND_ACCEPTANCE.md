@@ -1,6 +1,6 @@
 # React 前端验收文档
 
-> 版本：v1.2.0-dev | 日期：2026-05-10
+> 版本：v1.2.0-dev | 日期：2026-05-12
 
 ## 验收目标
 
@@ -13,7 +13,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # 浏览器自动化验收（T01-T23）
+npm run test:ui       # 浏览器自动化验收（T01-T24）
 ```
 
 > `npm run test:ui` 会先执行 `npm run build`，再启动 Vite preview 服务器运行浏览器验收。
@@ -30,10 +30,10 @@ npm run test:ui       # 浏览器自动化验收（T01-T23）
 |------|------|------|
 | `/#/dashboard` | 数据总览 | Hero 区域 + 统计卡片 + 筛选工具栏 + 6 个图表区域 |
 | `/#/cities` | 城市资源总览 | 城市卡片网格 + 搜索 + 筛选标签 |
-| `/#/city/:id` | 城市详情 | 面包屑 + 统计卡片 + 趋势图 + 真实线路图/规划图 + 数据说明 |
+| `/#/city/:id` | 城市详情 | 面包屑 + Hero + 指标卡片 + 线路图查看器 + 资源面板 + 趋势图 + 来源署名 |
 | `/#/about` | 数据说明 | 数据来源、字段说明、更新机制、已知限制、免责声明 |
 
-## 验收测试项（T01-T23）
+## 验收测试项（T01-T24）
 
 | 编号 | 测试项 | 状态类型 | 说明 |
 |------|--------|----------|------|
@@ -60,6 +60,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T23）
 | T21 | 城市详情页线路图/规划图 | PASS/FAIL | 测试城市 xiamen：network img 存在且 fetch 200+image/*、查看原图链接存在；点击规划图 Tab 后 plan img 存在且 fetch 200+image/*、链接更新；无 console error；375px 无横向滚动；图片返回 text/html 即使 status=200 也 FAIL |
 | T22 | 城市详情页线路图查看器交互 | PASS/FAIL | 测试城市 xiamen：线路图 img 存在；工具栏固定在图片容器左上角（offset < 50px）；鼠标滚轮缩放以当前查看器中心为缩放中心（data-wheel-zoom-origin="center"）；左键单击放大仍以点击位置为中心；左键拖拽 translate 变化（不要求 scale > 1）；重置按钮 zoom 回到 100%；全屏 overlay 出现且含图片；全屏工具栏在左上角；全屏中滚轮缩放 transform 变化；全屏中拖拽 transform 变化；ESC 关闭全屏；Tab 切换后 zoom 重置 100%；375px 无横向滚动 |
 | T23 | 城市详情页数据来源与署名展示 | PASS/FAIL | 访问 /#/city/xiamen 检查"数据来源与署名"标题、MetroDB、Wikimedia/license/CC、查看来源链接(target=_blank, href 非空)、线路图/规划图；访问 /#/city/hohhot 检查封面图 fallback；375px 无横向滚动；控制台无关键错误 |
+| T24 | 城市详情页新版布局结构 | PASS/FAIL | 访问 /#/city/xiamen 检查：Hero 标题"厦门地铁"、6 个指标卡片（data-testid="metrics-grid"）、"线路网络"标题、"资源状态"卡片、"使用提示"卡片、"当前资源信息"卡片、"年度客流趋势"、"数据来源"区域、"数据说明"、查看器工具栏仍存在、375px 无横向滚动 |
 
 ### 状态类型说明
 
@@ -88,13 +89,13 @@ npm run test:ui       # 浏览器自动化验收（T01-T23）
 |------|---------------|-----------------|
 | 入口 | `cd frontend && npm run test:ui` | `python scripts/run_acceptance.py` |
 | 目标 | React 前端（Vite 构建） | dashboard.html 单文件 |
-| 测试项 | T01-T23（23 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
+| 测试项 | T01-T24（24 项，含 MANUAL） | 4 步串行（数据索引/校验/语法/浏览器 16 项） |
 | 共存 | 两者独立运行，互不影响 | 两者独立运行，互不影响 |
 
 ## 验收结果汇总格式
 
 ```
-Total: 23  PASS: 22  FAIL: 0  MANUAL: 1  SKIP: 0
+Total: 24  PASS: 23  FAIL: 0  MANUAL: 1  SKIP: 0
 ```
 
 - FAIL > 0 时退出码为 1

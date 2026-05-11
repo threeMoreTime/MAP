@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.2.0-dev
-- 当前阶段：Phase 5.3 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
+- 当前阶段：Phase 5.4 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -23,7 +23,7 @@
 
 | 验收体系 | 范围 | 结果 |
 |----------|------|------|
-| React `test:ui` | T01-T23 | **22 PASS / 0 FAIL / 1 MANUAL** |
+| React `test:ui` | T01-T24 | **23 PASS / 0 FAIL / 1 MANUAL** |
 | `check:static` | T01-T09 | **全部通过** |
 | Legacy `run_acceptance.py` | 16 项浏览器测试 | **16/16 PASS** |
 
@@ -331,13 +331,27 @@
 
 ---
 
-### Phase 5.4：城市详情页资源预览体验增强（已由 Phase 5.0 完成）
+### Phase 5.4：城市详情页视觉重构与信息架构优化（已完成）
 
-**目标**：Phase 5.0 已完成此阶段主要内容（缩放、全屏、拖拽），剩余可选优化。
+**目标**：对城市详情页进行全面视觉重构，采用深蓝科技风格，优化信息层级与页面布局。
 
 **产物**：
-- [ ] 移动端触摸手势支持（双指缩放、滑动平移）
-- [ ] 图片加载进度指示器
+- [x] Hero 区（纯 CSS 渐变背景、城市中英文名、描述文字、状态 pills）
+- [x] 6 指标卡片横向排列（glass-card 风格、彩色图标、缺失数据显示 "--"）
+- [x] 2 列主内容区（左侧线路图查看器 70%、右侧信息面板 30%）
+- [x] 右侧信息面板（资源状态、使用提示、当前资源信息 3 个卡片）
+- [x] 下方双列（年度客流趋势 + 数据来源与署名）
+- [x] CityAssetPreview 视觉微调（圆形工具栏按钮、浅色画布、Tab active 增强）
+- [x] CitySourceInfo 紧凑化（嵌入右侧面板单列布局）
+- [x] CSS Module（CityDetailPage.module.css）
+- [x] 动画效果（Hero fade-in、指标卡片 staggered、hover 上浮、prefers-reduced-motion）
+- [x] 50 城市描述文案与英文名映射
+- [x] T24 验收测试
+- [x] 375px 无横向滚动
+
+**验收标准**：
+- `test:ui`：T01-T24，Total 24，PASS 23，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 通过
 
 ---
 

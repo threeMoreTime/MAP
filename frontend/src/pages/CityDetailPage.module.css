@@ -1,0 +1,634 @@
+/* === City Detail Page — Phase 5.4 Visual Refactor === */
+
+.detailPage {
+  padding-top: 20px;
+  padding-bottom: 48px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* === Breadcrumb === */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--slate-400);
+  flex-wrap: wrap;
+}
+
+.breadcrumb a {
+  color: var(--cyan-400);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.breadcrumb a:hover {
+  color: #67e8f9;
+}
+
+.breadcrumbSep {
+  color: var(--slate-600);
+  user-select: none;
+}
+
+.breadcrumbCurrent {
+  color: var(--cyan-400);
+  font-weight: 500;
+}
+
+/* === Hero Section === */
+.hero {
+  position: relative;
+  background: linear-gradient(135deg, #0a1a35 0%, #0d2240 40%, #0f2b4a 70%, #071326 100%);
+  border: 1px solid rgba(34, 211, 238, 0.10);
+  border-radius: 16px;
+  padding: 36px 40px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  animation: heroFadeIn 500ms ease both;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: 20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 100, 200, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+}
+
+.heroTitle {
+  font-size: 32px;
+  font-weight: 800;
+  color: #e8f4ff;
+  letter-spacing: 2px;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.heroEn {
+  font-size: 14px;
+  color: var(--slate-400);
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+  font-weight: 400;
+}
+
+.heroDesc {
+  font-size: 13px;
+  color: var(--slate-300);
+  line-height: 1.6;
+  margin: 0 0 18px 0;
+  max-width: 600px;
+}
+
+.heroPills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  border: 1px solid;
+  transition: background 150ms ease;
+}
+
+.pillOperating {
+  background: rgba(16, 185, 129, 0.10);
+  color: var(--emerald-400);
+  border-color: rgba(16, 185, 129, 0.20);
+}
+
+.pillOperating:hover {
+  background: rgba(16, 185, 129, 0.18);
+}
+
+.pillLines {
+  background: rgba(34, 211, 238, 0.08);
+  color: var(--cyan-400);
+  border-color: rgba(34, 211, 238, 0.18);
+}
+
+.pillLines:hover {
+  background: rgba(34, 211, 238, 0.15);
+}
+
+.pillData {
+  background: rgba(100, 116, 139, 0.10);
+  color: var(--slate-300);
+  border-color: rgba(100, 116, 139, 0.18);
+}
+
+.pillData:hover {
+  background: rgba(100, 116, 139, 0.18);
+}
+
+.pillWarning {
+  background: rgba(245, 158, 11, 0.10);
+  color: var(--amber-400);
+  border-color: rgba(245, 158, 11, 0.20);
+}
+
+.pillWarning:hover {
+  background: rgba(245, 158, 11, 0.18);
+}
+
+/* === 6 Metrics Grid === */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.metricCard {
+  background: linear-gradient(135deg, rgba(15, 30, 54, 0.72), rgba(10, 25, 47, 0.65));
+  border: 1px solid rgba(34, 211, 238, 0.08);
+  border-radius: 12px;
+  padding: 16px 18px;
+  backdrop-filter: blur(8px);
+  transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  animation: metricFadeIn 400ms ease both;
+}
+
+.metricCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(34, 211, 238, 0.22);
+  box-shadow: 0 4px 16px rgba(34, 211, 238, 0.06);
+}
+
+.metricIcon {
+  font-size: 16px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.metricValue {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cyan-400);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.metricUnit {
+  font-size: 11px;
+  font-weight: 400;
+  margin-left: 3px;
+  color: var(--slate-500);
+}
+
+.metricLabel {
+  font-size: 11px;
+  color: var(--slate-400);
+  margin-top: 4px;
+}
+
+/* === Main Content — 2 Column Layout === */
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.mapSection {
+  min-width: 0;
+}
+
+.mapSectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+  letter-spacing: 1px;
+}
+
+.infoPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Info panel cards */
+.infoCard {
+  background: linear-gradient(135deg, rgba(15, 30, 54, 0.72), rgba(10, 25, 47, 0.65));
+  border: 1px solid rgba(34, 211, 238, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.infoCardTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slate-300);
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.12);
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--slate-400);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.infoRow:last-child {
+  margin-bottom: 0;
+}
+
+.infoField {
+  color: var(--slate-400);
+  flex-shrink: 0;
+}
+
+.infoValue {
+  color: var(--text-primary);
+  text-align: right;
+  word-break: break-all;
+}
+
+.statusOk {
+  color: var(--emerald-400);
+}
+
+.statusNo {
+  color: var(--amber-400);
+}
+
+/* Tips card */
+.tipItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--slate-400);
+  line-height: 1.6;
+}
+
+.tipItem:last-child {
+  margin-bottom: 0;
+}
+
+.tipKey {
+  flex-shrink: 0;
+  color: var(--cyan-400);
+  font-weight: 500;
+  min-width: 36px;
+}
+
+/* Current resource info card */
+.resourceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 5px 14px;
+  font-size: 12px;
+  color: var(--cyan-400);
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.18);
+  border-radius: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 150ms ease;
+  font-family: inherit;
+}
+
+.resourceLink:hover {
+  background: rgba(34, 211, 238, 0.15);
+  border-color: rgba(34, 211, 238, 0.30);
+}
+
+/* Overall status */
+.overallStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.overallOk {
+  color: var(--emerald-400);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+}
+
+.overallPartial {
+  color: var(--amber-400);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+/* === Bottom Section — 2 Column === */
+.bottomSection {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.trendSection {
+  min-width: 0;
+}
+
+.trendHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.trendTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.trendRange {
+  font-size: 12px;
+  color: var(--slate-500);
+}
+
+.sourceSection {
+  min-width: 0;
+}
+
+.sourceTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+  letter-spacing: 1px;
+}
+
+/* === Data Note === */
+.noteCard {
+  background: linear-gradient(135deg, rgba(15, 30, 54, 0.72), rgba(10, 25, 47, 0.65));
+  border: 1px solid rgba(34, 211, 238, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.noteToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  font-size: 14px;
+  color: var(--slate-300);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.noteToggle:hover {
+  color: var(--text-primary);
+}
+
+.noteArrow {
+  font-size: 12px;
+  transition: transform 200ms ease;
+  color: var(--slate-500);
+}
+
+.noteArrowOpen {
+  transform: rotate(180deg);
+}
+
+.noteContent {
+  padding: 0 18px 18px;
+}
+
+.noteContent ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.noteContent li {
+  font-size: 12px;
+  color: var(--slate-400);
+  line-height: 1.7;
+  padding-left: 12px;
+  position: relative;
+}
+
+.noteContent li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--slate-500);
+}
+
+.noteWarning {
+  margin-top: 12px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--amber-400);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: 8px;
+}
+
+/* === Animations === */
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes metricFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered animation for metric cards */
+.metricCard:nth-child(1) { animation-delay: 50ms; }
+.metricCard:nth-child(2) { animation-delay: 100ms; }
+.metricCard:nth-child(3) { animation-delay: 150ms; }
+.metricCard:nth-child(4) { animation-delay: 200ms; }
+.metricCard:nth-child(5) { animation-delay: 250ms; }
+.metricCard:nth-child(6) { animation-delay: 300ms; }
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  .hero,
+  .metricCard {
+    animation: none;
+  }
+
+  .metricCard:hover {
+    transform: none;
+  }
+}
+
+/* === Responsive: Tablet+ (768px+) === */
+@media (min-width: 768px) {
+  .metricsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .mainContent {
+    grid-template-columns: 7fr 3fr;
+  }
+
+  .bottomSection {
+    grid-template-columns: 6fr 4fr;
+  }
+}
+
+/* === Responsive: Desktop (1024px+) === */
+@media (min-width: 1024px) {
+  .metricsGrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* === Responsive: Mobile (max-width: 640px) === */
+@media (max-width: 640px) {
+  .detailPage {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .hero {
+    padding: 24px 20px;
+    border-radius: 12px;
+  }
+
+  .heroTitle {
+    font-size: 24px;
+  }
+
+  .heroEn {
+    font-size: 12px;
+  }
+
+  .heroDesc {
+    font-size: 12px;
+  }
+
+  .heroPills {
+    gap: 6px;
+  }
+
+  .pill {
+    font-size: 10px;
+    padding: 3px 10px;
+  }
+
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .metricCard {
+    padding: 12px 14px;
+  }
+
+  .metricValue {
+    font-size: 18px;
+  }
+
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .bottomSection {
+    grid-template-columns: 1fr;
+  }
+
+  .mapSectionTitle,
+  .trendTitle,
+  .sourceTitle {
+    font-size: 14px;
+  }
+}
+
+/* === Responsive: Small Mobile (max-width: 375px) === */
+@media (max-width: 375px) {
+  .detailPage {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .hero {
+    padding: 20px 16px;
+  }
+
+  .heroTitle {
+    font-size: 20px;
+  }
+
+  .metricCard {
+    padding: 10px 12px;
+  }
+
+  .metricValue {
+    font-size: 16px;
+  }
+
+  .infoCard {
+    padding: 12px;
+  }
+}

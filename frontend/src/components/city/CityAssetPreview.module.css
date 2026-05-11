@@ -1,16 +1,17 @@
 .wrapper {
-  background: linear-gradient(135deg, rgba(8, 22, 48, 0.75), rgba(12, 30, 58, 0.6));
-  border: 1px solid rgba(0, 150, 220, 0.08);
-  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(15, 30, 54, 0.72), rgba(10, 25, 47, 0.65));
+  border: 1px solid rgba(34, 211, 238, 0.10);
+  border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  backdrop-filter: blur(8px);
 }
 
 /* Tab bar */
 .tabs {
   display: flex;
-  gap: 4px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 10px 14px;
   background: rgba(6, 18, 38, 0.5);
   border-bottom: 1px solid rgba(100, 116, 139, 0.12);
 }
@@ -34,8 +35,9 @@
 
 .tabActive {
   color: rgba(34, 211, 238, 1);
-  background: rgba(34, 211, 238, 0.1);
-  border-color: rgba(34, 211, 238, 0.25);
+  background: rgba(34, 211, 238, 0.14);
+  border-color: rgba(34, 211, 238, 0.35);
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.08);
 }
 
 /* Content area */
@@ -46,7 +48,7 @@
 /* === Image area (map viewer style) === */
 .imageArea {
   position: relative;
-  background: #f3f4f6;
+  background: #eef2f7;
   border-radius: 8px;
   overflow: hidden;
   height: 680px;
@@ -66,28 +68,28 @@
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(6px);
-  border-radius: 6px;
-  padding: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-radius: 24px;
+  padding: 5px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .toolBtn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1;
-  color: #374151;
+  color: #475569;
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
+  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
   font-family: inherit;
   padding: 0;
 }
@@ -95,6 +97,7 @@
 .toolBtn:hover {
   background: rgba(0, 0, 0, 0.06);
   color: #111827;
+  transform: scale(1.04);
 }
 
 .toolBtn:active {
@@ -138,7 +141,7 @@
   color: #6b7280;
   font-size: 14px;
   z-index: 5;
-  background: #f3f4f6;
+  background: #eef2f7;
 }
 
 /* View original link */
@@ -170,7 +173,7 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #e5e7eb;
+  background: #eef2f7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,28 +193,28 @@
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(6px);
-  border-radius: 6px;
-  padding: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  border-radius: 28px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .fsToolBtn {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1;
-  color: #374151;
+  color: #475569;
   background: transparent;
   border: none;
-  border-radius: 4px;
+  border-radius: 50%;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
+  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
   font-family: inherit;
   padding: 0;
 }
@@ -219,6 +222,7 @@
 .fsToolBtn:hover {
   background: rgba(0, 0, 0, 0.06);
   color: #111827;
+  transform: scale(1.04);
 }
 
 .fsToolBtn:active {
@@ -431,5 +435,17 @@
     right: 12px;
     padding: 4px 10px;
     font-size: 11px;
+  }
+}
+
+/* === Reduced Motion === */
+@media (prefers-reduced-motion: reduce) {
+  .fullscreenOverlay {
+    animation: none;
+  }
+
+  .toolBtn:hover,
+  .fsToolBtn:hover {
+    transform: none;
   }
 }

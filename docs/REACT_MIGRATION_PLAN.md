@@ -98,6 +98,7 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 | 5.0 | 城市详情页线路图/规划图预览体验增强（缩放、拖拽、全屏、加载状态） | 已完成 |
 | 5.2 | 城市详情页数据来源与图片署名展示（CitySourceInfo 组件） | 已完成 |
 | 5.3 | 地铁线路图/规划图查看器交互重构（MetroMan 风格滚轮缩放、拖拽、左上角工具栏） | 已完成 |
+| 5.4 | 城市详情页视觉重构与信息架构优化（Hero 区、指标卡片、2 列布局、资源面板） | 已完成 |
 
 ## 6. 验收命令
 
@@ -106,7 +107,7 @@ cd frontend
 npm install
 npm run typecheck     # TypeScript 类型检查
 npm run build         # 生产构建
-npm run test:ui       # React 前端浏览器验收（T01-T23）
+npm run test:ui       # React 前端浏览器验收（T01-T24）
 
 # 回到根目录验证旧版不受影响
 python scripts/run_acceptance.py
@@ -283,9 +284,10 @@ Phase 4（React 前端迁移）全部子阶段已完成：
 - **Phase 4.8**：城市详情页真实线路图/规划图渲染 ✓
 - **Phase 5.0**：城市详情页线路图/规划图预览体验增强 ✓
 - **Phase 5.2**：城市详情页数据来源与图片署名展示 ✓
+- **Phase 5.4**：城市详情页视觉重构与信息架构优化 ✓
 
 **收口验收结果**：
-- `test:ui`：T01-T23，Total 23，PASS 22，FAIL 0，MANUAL 1
+- `test:ui`：T01-T24，Total 24，PASS 23，FAIL 0，MANUAL 1
 - `check:static`：T01-T09，全部通过
 - `run_acceptance.py`：legacy 16/16 PASS
 - `npm run typecheck`：通过
@@ -331,6 +333,27 @@ Phase 5.3.2 调整 CityAssetPreview 滚轮缩放的中心点：
 - **工具栏放大/缩小**：继续以视图中心缩放
 - **全屏模式**：与普通模式一致，滚轮缩放也以全屏视图中心缩放
 - **验收**：T22 增加 `data-wheel-zoom-origin="center"` 属性检查
+
+### 6.14 Phase 5.4 城市详情页视觉重构与信息架构优化
+
+Phase 5.4 对城市详情页进行全面视觉重构，采用深蓝科技风格，优化信息层级与页面布局：
+
+- **Hero 区**：纯 CSS 渐变背景，展示城市中文名、英文名、描述文字、状态 pills（运营中/线路数/站点数/客流状态）
+- **6 指标卡片**：横向 6 列排列，glass-card 风格，每个卡片带彩色图标 + 大数字 + 单位，缺失数据显示 "--"
+- **2 列主内容区**：左侧 70% 线路图/规划图查看器 + 右侧 30% 信息面板
+- **右侧信息面板**：3 个卡片（资源状态、使用提示、当前资源信息），带"查看资源详情"滚动链接
+- **下方双列**：左侧年度客流趋势图 + 右侧数据来源与署名（CitySourceInfo 组件）
+- **CityAssetPreview 视觉微调**：工具栏圆形按钮、浅色地图画布（#eef2f7）、Tab active 更明显
+- **CitySourceInfo 紧凑化**：嵌入右侧面板时使用单列紧凑布局
+- **CSS Module**：新增 `CityDetailPage.module.css`，使用 scoped styles
+- **动画效果**：Hero fade-in + translateY、指标卡片 staggered 动画、hover 上浮、尊重 prefers-reduced-motion
+- **响应式**：PC 充分利用横向空间、768px 起 2 列、375px 单列无横向滚动
+- **验收测试**：新增 T24，检查 Hero 标题、6 指标卡片、各区块标题、375px 无溢出
+- **城市描述**：50 城市固定中文描述文案 + 英文名映射
+
+**验收标准**：
+- `test:ui`：T01-T24，Total 24，PASS 23，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 通过
 
 ## 8. 回滚方案
 

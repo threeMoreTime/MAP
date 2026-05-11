@@ -1157,6 +1157,86 @@ async function runTests(baseUrl) {
   }
 
   record('T23', '城市详情页数据来源与署名展示', t23pass, t23detail);
+
+  // T24: 城市详情页新版布局结构
+  await page.setViewport({ width: 1280, height: 800 });
+  consoleErrors = [];
+  let t24pass = false;
+  let t24detail = '';
+
+  // 1. Visit /#/city/xiamen
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(2000);
+
+  const t24data = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    return {
+      // 2. Hero title
+      hasHeroTitle: body.includes('厦门地铁'),
+      // 3. 6 metric cards
+      hasMetricsGrid: !!document.querySelector('[data-testid="metrics-grid"]'),
+      metricsCardCount: document.querySelectorAll('[data-testid="metrics-grid"] > div').length,
+      // 4. "线路网络"
+      hasMapTitle: body.includes('线路网络'),
+      // 5. "资源状态"
+      hasResourceStatus: !!document.querySelector('[data-testid="resource-status"]'),
+      // 6. "使用提示"
+      hasUsageTips: !!document.querySelector('[data-testid="usage-tips"]'),
+      // 7. "当前资源信息"
+      hasCurrentResourceInfo: !!document.querySelector('[data-testid="current-resource-info"]'),
+      // 8. "年度客流趋势"
+      hasTrendTitle: body.includes('年度客流趋势'),
+      // 9. "数据来源"
+      hasDataSource: body.includes('数据来源'),
+      // 10. "数据说明"
+      hasDataNote: body.includes('数据说明'),
+      // 11. Toolbar still in top-left
+      hasToolbar: !!document.querySelector('[class*="toolbar"]'),
+    };
+  });
+
+  // 12. 375px no horizontal scroll
+  await page.setViewport({ width: 375, height: 812 });
+  await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 20000 });
+  await wait(1500);
+  const t24scroll = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+  }));
+  const t24scrollOk = t24scroll.scrollWidth <= t24scroll.innerWidth + 1;
+
+  // Restore viewport
+  await page.setViewport({ width: 1280, height: 800 });
+  await wait(500);
+
+  const t24errors = consoleErrors.filter(isCriticalError);
+
+  // Evaluate
+  const missing = [];
+  if (!t24data.hasHeroTitle) missing.push('Hero标题"厦门地铁"');
+  if (!t24data.hasMetricsGrid) missing.push('指标卡片网格');
+  if (t24data.metricsCardCount !== 6) missing.push(`指标卡片数=${t24data.metricsCardCount}/6`);
+  if (!t24data.hasMapTitle) missing.push('"线路网络"');
+  if (!t24data.hasResourceStatus) missing.push('"资源状态"');
+  if (!t24data.hasUsageTips) missing.push('"使用提示"');
+  if (!t24data.hasCurrentResourceInfo) missing.push('"当前资源信息"');
+  if (!t24data.hasTrendTitle) missing.push('"年度客流趋势"');
+  if (!t24data.hasDataSource) missing.push('"数据来源"');
+  if (!t24data.hasDataNote) missing.push('"数据说明"');
+  if (!t24data.hasToolbar) missing.push('工具栏');
+
+  if (missing.length > 0) {
+    t24detail = `缺少: ${missing.join(', ')}`;
+  } else if (!t24scrollOk) {
+    t24detail = `375px overflow: scrollWidth=${t24scroll.scrollWidth}`;
+  } else if (t24errors.length > 0) {
+    t24detail = `console errors: ${t24errors.length}`;
+  } else {
+    t24pass = true;
+    t24detail = `hero/metrics(6)/map/resource-status/tips/resource-info/trend/source/note/toolbar/375px all OK`;
+  }
+
+  record('T24', '城市详情页新版布局结构', t24pass, t24detail);
 }
 
 // === 主流程 ===
