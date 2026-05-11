@@ -296,7 +296,7 @@ Phase 4（React 前端迁移）全部子阶段已完成：
 Phase 5.3 重构 CityAssetPreview 组件的 PC 端图片查看器交互，使其接近 MetroMan 地铁图查看器体验：
 
 - **交互模型重构**：从按钮式缩放改为地图查看器式交互
-  - 滚轮缩放：鼠标滚轮控制缩放，缩放中心为鼠标当前位置（minScale=0.4, maxScale=5, wheelStep=0.12）
+  - 滚轮缩放：鼠标滚轮控制缩放，缩放中心为当前查看器容器中心（Phase 5.3.2 从鼠标位置改为视图中心）
   - 左键拖拽：鼠标左键按住即可拖拽，不要求 scale > 1（dragThreshold=4px）
   - 左键单击放大：移动距离 <= 4px 视为单击，图片放大一档（clickZoomStep=0.35）
   - 双击不绑定重置
@@ -321,6 +321,16 @@ Phase 5.3 重构 CityAssetPreview 组件的 PC 端图片查看器交互，使其
 - `npm run typecheck` 和 `npm run build` 通过
 
 **下一步**：Phase 5.1 — GitHub Actions CI 与 Pages 手动部署配置。详见 [docs/ROADMAP.md](./ROADMAP.md)。
+
+### 6.13 Phase 5.3.2 滚轮缩放中心调整
+
+Phase 5.3.2 调整 CityAssetPreview 滚轮缩放的中心点：
+
+- **滚轮缩放**：从鼠标位置中心改为查看器容器中心
+- **左键单击放大**：仍保留以点击位置为缩放中心
+- **工具栏放大/缩小**：继续以视图中心缩放
+- **全屏模式**：与普通模式一致，滚轮缩放也以全屏视图中心缩放
+- **验收**：T22 增加 `data-wheel-zoom-origin="center"` 属性检查
 
 ## 8. 回滚方案
 

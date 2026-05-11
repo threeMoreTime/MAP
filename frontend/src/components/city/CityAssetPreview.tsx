@@ -85,14 +85,14 @@ export default function CityAssetPreview({ city }: Props) {
     setIsFullscreen(false);
   }, []);
 
-  // === Shared wheel handler factory ===
+  // === Shared wheel handler factory (zoom at viewer center) ===
   const createWheelHandler = useCallback((container: HTMLElement) => (e: WheelEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     const rect = container.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
 
     setScale(prevScale => {
       const nextScale = Math.min(
@@ -101,8 +101,8 @@ export default function CityAssetPreview({ city }: Props) {
       );
       const scaleRatio = nextScale / prevScale;
 
-      setTranslateX(prevTx => mouseX - (mouseX - prevTx) * scaleRatio);
-      setTranslateY(prevTy => mouseY - (mouseY - prevTy) * scaleRatio);
+      setTranslateX(prevTx => centerX - (centerX - prevTx) * scaleRatio);
+      setTranslateY(prevTy => centerY - (centerY - prevTy) * scaleRatio);
 
       return nextScale;
     });
@@ -334,6 +334,7 @@ export default function CityAssetPreview({ city }: Props) {
           <div
             className={styles.imageArea}
             ref={viewportRef}
+            data-wheel-zoom-origin="center"
           >
             {imageLoading && (
               <div className={styles.loading}>图片加载中...</div>

@@ -778,10 +778,16 @@ async function runTests(baseUrl) {
     };
   });
 
-  // 3. Test wheel zoom
+  // 3. Test wheel zoom (center-based)
   const t22wheelZoom = await page.evaluate(async () => {
     const imageArea = document.querySelector('[class*="imageArea"]');
     if (!imageArea) return { ok: false, detail: 'imageArea not found' };
+
+    // Verify center-based zoom mode
+    const zoomOrigin = imageArea.getAttribute('data-wheel-zoom-origin');
+    if (zoomOrigin !== 'center') {
+      return { ok: false, detail: `data-wheel-zoom-origin="${zoomOrigin}", expected "center"` };
+    }
 
     // Record initial transform
     const transformEl = imageArea.querySelector('[class*="imageTransform"]');

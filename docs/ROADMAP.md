@@ -262,7 +262,7 @@
 **目标**：重构 CityAssetPreview 的 PC 端线路图/规划图查看器交互，使其接近 MetroMan 地铁图查看器体验。
 
 **产物**：
-- [x] 滚轮缩放（鼠标位置缩放中心、preventDefault、minScale=0.4、maxScale=5）
+- [x] 滚轮缩放（视图中心缩放、preventDefault、minScale=0.4、maxScale=5）
 - [x] 左键拖拽（不要求 scale > 1、dragThreshold=4px、cursor grab/grabbing）
 - [x] 左键单击放大（拖拽阈值区分、点击位置缩放中心、到 maxScale 不重置）
 - [x] 双击不绑定重置
@@ -280,6 +280,20 @@
 **验收标准**：
 - `test:ui`：T01-T23，Total 23，PASS 22，FAIL 0，MANUAL 1
 - `npm run typecheck` 和 `npm run build` 通过
+
+---
+
+### Phase 5.3.2：线路图查看器滚轮缩放中心调整（已完成）
+
+**目标**：将滚轮缩放从鼠标位置中心改为查看器容器中心。
+
+**产物**：
+- [x] 滚轮缩放使用容器中心点（centerX = width/2, centerY = height/2）
+- [x] 左键单击放大仍以点击位置为缩放中心（不变）
+- [x] 全屏模式滚轮缩放也使用全屏视图中心
+- [x] viewport 容器添加 `data-wheel-zoom-origin="center"` 属性
+- [x] T22 增加 center 模式属性检查
+- [x] 375px 无横向滚动
 
 ---
 
