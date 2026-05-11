@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.2.0-dev
-- 当前阶段：Phase 5.2 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
+- 当前阶段：Phase 5.3 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -250,6 +250,32 @@
 - [x] 使用限制区块（免责声明）
 - [x] 响应式布局（桌面 3 列、移动端单列）
 - [x] T23 验收测试（xiamen 完整署名、hohhot fallback、375px 无溢出）
+
+**验收标准**：
+- `test:ui`：T01-T23，Total 23，PASS 22，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 通过
+
+---
+
+### Phase 5.3：地铁线路图/规划图查看器交互重构（已完成）
+
+**目标**：重构 CityAssetPreview 的 PC 端线路图/规划图查看器交互，使其接近 MetroMan 地铁图查看器体验。
+
+**产物**：
+- [x] 滚轮缩放（鼠标位置缩放中心、preventDefault、minScale=0.4、maxScale=5）
+- [x] 左键拖拽（不要求 scale > 1、dragThreshold=4px、cursor grab/grabbing）
+- [x] 左键单击放大（拖拽阈值区分、点击位置缩放中心、到 maxScale 不重置）
+- [x] 双击不绑定重置
+- [x] 工具栏固定在图片容器左上角（position absolute、不参与 transform）
+- [x] 工具栏样式：小圆形按钮、浅灰半透明背景、轻微阴影
+- [x] 图片查看区域背景浅灰 #f3f4f6
+- [x] 全屏模式与普通模式共用交互逻辑
+- [x] 全屏工具栏固定在左上角
+- [x] 全屏背景浅灰 #e5e7eb
+- [x] Tab 切换关闭全屏并重置视图
+- [x] EmptyState 不显示查看器工具栏
+- [x] T22 验收测试增强（滚轮缩放、拖拽、单击放大、全屏内交互）
+- [x] 375px 无横向滚动
 
 **验收标准**：
 - `test:ui`：T01-T23，Total 23，PASS 22，FAIL 0，MANUAL 1

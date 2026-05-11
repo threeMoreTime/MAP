@@ -18,7 +18,7 @@
 .tab {
   padding: 6px 20px;
   font-size: 13px;
-  color: rgba(148, 163, 184, 1); /* slate-400 */
+  color: rgba(148, 163, 184, 1);
   background: rgba(15, 30, 56, 0.6);
   border: 1px solid rgba(100, 116, 139, 0.15);
   border-radius: 20px;
@@ -33,7 +33,7 @@
 }
 
 .tabActive {
-  color: rgba(34, 211, 238, 1); /* cyan-400 */
+  color: rgba(34, 211, 238, 1);
   background: rgba(34, 211, 238, 0.1);
   border-color: rgba(34, 211, 238, 0.25);
 }
@@ -43,138 +43,134 @@
   padding: 16px;
 }
 
-/* Toolbar */
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 12px;
-  margin-bottom: 12px;
-  background: rgba(6, 18, 38, 0.5);
-  border: 1px solid rgba(100, 116, 139, 0.12);
+/* === Image area (map viewer style) === */
+.imageArea {
+  position: relative;
+  background: #f3f4f6;
   border-radius: 8px;
-  backdrop-filter: blur(8px);
+  overflow: hidden;
+  height: 680px;
+  cursor: grab;
+  user-select: none;
 }
 
-.toolbarGroup {
+.imageArea:active {
+  cursor: grabbing;
+}
+
+/* Toolbar - fixed top-left, does NOT move with image */
+.toolbar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px);
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
-.toolButton {
-  padding: 4px 12px;
-  font-size: 12px;
-  color: rgba(148, 163, 184, 1);
-  background: rgba(15, 30, 56, 0.6);
-  border: 1px solid rgba(100, 116, 139, 0.15);
-  border-radius: 16px;
+.toolBtn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  color: #374151;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: background 150ms ease, color 150ms ease;
   font-family: inherit;
-  white-space: nowrap;
+  padding: 0;
 }
 
-.toolButton:hover:not(:disabled) {
-  color: #e2e8f0;
-  background: rgba(30, 50, 80, 0.6);
-  border-color: rgba(100, 116, 139, 0.25);
+.toolBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #111827;
 }
 
-.toolButton:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.toolButtonActive {
-  color: rgba(34, 211, 238, 1);
-  background: rgba(34, 211, 238, 0.1);
-  border-color: rgba(34, 211, 238, 0.25);
+.toolBtn:active {
+  background: rgba(0, 0, 0, 0.10);
 }
 
 .zoomValue {
-  font-size: 12px;
-  color: rgba(148, 163, 184, 0.9);
-  min-width: 36px;
+  font-size: 11px;
+  color: #6b7280;
+  min-width: 32px;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  padding: 0 4px;
 }
 
-/* Image area */
-.imageArea {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: rgba(4, 10, 24, 0.6);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.imageViewport {
+/* Image transform wrapper */
+.imageTransform {
   width: 100%;
-  position: relative;
-}
-
-.imageInner {
+  height: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
-  transition: transform 100ms ease-out;
-}
-
-.imageDragging {
-  cursor: grabbing !important;
+  justify-content: center;
+  will-change: transform;
 }
 
 .image {
   max-width: 100%;
-  height: auto;
-  max-height: 720px;
+  max-height: 100%;
   object-fit: contain;
   display: block;
-  transition: opacity 200ms ease;
+  pointer-events: none;
 }
 
 /* Loading state */
 .loading {
-  width: 100%;
-  min-height: 200px;
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(148, 163, 184, 0.7);
+  color: #6b7280;
   font-size: 14px;
-  background: rgba(4, 10, 24, 0.6);
-  border-radius: 8px;
+  z-index: 5;
+  background: #f3f4f6;
 }
 
+/* View original link */
 .viewOriginal {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 10;
   display: inline-block;
-  margin: 12px 0;
-  padding: 5px 16px;
+  padding: 4px 12px;
   font-size: 12px;
   color: rgba(34, 211, 238, 0.9);
-  background: rgba(34, 211, 238, 0.08);
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(34, 211, 238, 0.2);
   border-radius: 16px;
   text-decoration: none;
   transition: all 200ms ease;
+  backdrop-filter: blur(4px);
 }
 
 .viewOriginal:hover {
-  background: rgba(34, 211, 238, 0.18);
-  border-color: rgba(34, 211, 238, 0.35);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(34, 211, 238, 0.4);
   color: rgba(34, 211, 238, 1);
 }
 
-/* Fullscreen overlay */
+/* === Fullscreen overlay === */
 .fullscreenOverlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.86);
+  background: #e5e7eb;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -186,69 +182,155 @@
   to { opacity: 1; }
 }
 
-.fullscreenContent {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.fullscreenHeader {
+/* Fullscreen toolbar - fixed top-left */
+.fullscreenToolbar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
-  flex-shrink: 0;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border-radius: 6px;
+  padding: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
-.fullscreenTitle {
-  font-size: 16px;
-  color: rgba(226, 232, 240, 0.9);
-  font-weight: 500;
-}
-
-.fullscreenClose {
+.fsToolBtn {
   width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  color: rgba(148, 163, 184, 0.8);
-  background: rgba(30, 50, 80, 0.4);
-  border: 1px solid rgba(100, 116, 139, 0.2);
-  border-radius: 50%;
+  line-height: 1;
+  color: #374151;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: background 150ms ease, color 150ms ease;
   font-family: inherit;
+  padding: 0;
 }
 
-.fullscreenClose:hover {
-  color: #e2e8f0;
-  background: rgba(30, 50, 80, 0.6);
-  border-color: rgba(100, 116, 139, 0.35);
+.fsToolBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #111827;
 }
 
-.fullscreenImageWrap {
-  flex: 1;
+.fsToolBtn:active {
+  background: rgba(0, 0, 0, 0.10);
+}
+
+.fsZoomValue {
+  font-size: 12px;
+  color: #6b7280;
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding: 0 4px;
+}
+
+/* Fullscreen title */
+.fullscreenTitle {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 10;
+  font-size: 14px;
+  color: #4b5563;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px);
+  padding: 6px 14px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Fullscreen viewport */
+.fullscreenViewport {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+}
+
+.fullscreenViewport:active {
+  cursor: grabbing;
+}
+
+.fullscreenImageTransform {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  padding: 0 24px;
+  will-change: transform;
 }
 
 .fullscreenImage {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  display: block;
+  pointer-events: none;
 }
 
-.fullscreenFooter {
+/* Fullscreen close button */
+.fullscreenClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 16px 24px;
-  flex-shrink: 0;
+  font-size: 18px;
+  color: #374151;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(6px);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-family: inherit;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.fullscreenClose:hover {
+  background: rgba(255, 255, 255, 0.98);
+  color: #111827;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Fullscreen view original link */
+.fullscreenViewOriginal {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 10;
+  display: inline-block;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: rgba(34, 211, 238, 0.9);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 16px;
+  text-decoration: none;
+  transition: all 200ms ease;
+  backdrop-filter: blur(4px);
+}
+
+.fullscreenViewOriginal:hover {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(34, 211, 238, 0.4);
+  color: rgba(34, 211, 238, 1);
 }
 
 /* Empty state container */
@@ -263,14 +345,14 @@
   width: 100%;
 }
 
-/* Responsive: tablet */
+/* === Responsive: tablet === */
 @media (max-width: 1024px) {
-  .image {
-    max-height: 600px;
+  .imageArea {
+    height: 560px;
   }
 }
 
-/* Responsive: mobile */
+/* === Responsive: mobile === */
 @media (max-width: 640px) {
   .tabs {
     padding: 6px 8px;
@@ -288,38 +370,66 @@
     padding: 12px 8px;
   }
 
+  .imageArea {
+    height: 400px;
+  }
+
   .toolbar {
-    padding: 6px 8px;
-    gap: 6px;
+    top: 8px;
+    left: 8px;
+    gap: 2px;
+    padding: 3px;
   }
 
-  .toolbarGroup {
-    gap: 4px;
-  }
-
-  .toolButton {
-    padding: 4px 8px;
-    font-size: 11px;
-  }
-
-  .zoomValue {
-    font-size: 11px;
-    min-width: 30px;
-  }
-
-  .image {
-    max-height: 420px;
-  }
-
-  .fullscreenHeader {
-    padding: 12px 16px;
-  }
-
-  .fullscreenTitle {
+  .toolBtn {
+    width: 28px;
+    height: 28px;
     font-size: 14px;
   }
 
-  .fullscreenImageWrap {
-    padding: 0 12px;
+  .zoomValue {
+    font-size: 10px;
+    min-width: 28px;
+  }
+
+  .viewOriginal {
+    bottom: 8px;
+    right: 8px;
+    padding: 3px 10px;
+    font-size: 11px;
+  }
+
+  .fullscreenToolbar {
+    top: 12px;
+    left: 12px;
+    gap: 3px;
+  }
+
+  .fsToolBtn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .fullscreenTitle {
+    bottom: 12px;
+    left: 12px;
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .fullscreenClose {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .fullscreenViewOriginal {
+    bottom: 12px;
+    right: 12px;
+    padding: 4px 10px;
+    font-size: 11px;
   }
 }

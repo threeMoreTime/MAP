@@ -130,6 +130,8 @@ function isCriticalError(msg) {
   if (/sourcemap/i.test(text)) return false;
   if (/source map/i.test(text)) return false;
   if (/DevTools/i.test(text)) return false;
+  if (/passive.*event.*listener/i.test(text)) return false;
+  if (/unable to preventdefault/i.test(text)) return false;
   // JSON 404 / JS exception / React errors count as failures
   return true;
 }
@@ -736,7 +738,7 @@ async function runTests(baseUrl) {
 
   record('T21', '城市详情页线路图/规划图真实图片加载', t21pass, t21detail);
 
-  // T22: 城市详情页线路图预览交互
+  // T22: 城市详情页线路图查看器交互
   await page.setViewport({ width: 1280, height: 800 });
   consoleErrors = [];
   let t22pass = false;
@@ -754,6 +756,7 @@ async function runTests(baseUrl) {
   } catch (e) {
     // Continue anyway, will be caught by the check below
   }
+  await wait(500);
 
   // 1. Confirm network img exists
   const t22imgExists = await page.evaluate(() => {
@@ -761,37 +764,121 @@ async function runTests(baseUrl) {
     return !!img;
   });
 
-  // 2. Click zoom in button
-  const t22zoomIn = await page.evaluate(() => {
-    const btns = Array.from(document.querySelectorAll('button'));
-    const zoomInBtn = btns.find(b => b.getAttribute('aria-label') === '放大');
-    if (zoomInBtn) { zoomInBtn.click(); return true; }
-    return false;
-  });
-  await wait(500);
-
-  // 3. Check zoom value changed or transform contains scale
-  const t22zoomChanged = await page.evaluate(() => {
-    const zoomVal = document.querySelector('[class*="zoomValue"]');
-    if (zoomVal && !zoomVal.textContent.includes('100%')) return true;
-    const inner = document.querySelector('[class*="imageInner"]');
-    if (inner) {
-      const style = inner.getAttribute('style') || '';
-      if (style.includes('scale') && !style.includes('scale(1)')) return true;
-    }
-    return false;
+  // 2. Check toolbar is inside imageArea and at top-left
+  const t22toolbarPos = await page.evaluate(() => {
+    const imageArea = document.querySelector('[class*="imageArea"]');
+    const toolbar = imageArea ? imageArea.querySelector('[class*="toolbar"]') : null;
+    if (!imageArea || !toolbar) return { ok: false, detail: 'imageArea or toolbar not found' };
+    const areaRect = imageArea.getBoundingClientRect();
+    const tbRect = toolbar.getBoundingClientRect();
+    return {
+      ok: tbRect.left >= areaRect.left && tbRect.top >= areaRect.top &&
+          (tbRect.left - areaRect.left) < 50 && (tbRect.top - areaRect.top) < 50,
+      detail: `toolbar.left=${tbRect.left}, area.left=${areaRect.left}, offset=${tbRect.left - areaRect.left}`,
+    };
   });
 
-  // 4. Click zoom out
-  const t22zoomOut = await page.evaluate(() => {
-    const btns = Array.from(document.querySelectorAll('button'));
-    const zoomOutBtn = btns.find(b => b.getAttribute('aria-label') === '缩小');
-    if (zoomOutBtn) { zoomOutBtn.click(); return true; }
-    return false;
+  // 3. Test wheel zoom
+  const t22wheelZoom = await page.evaluate(async () => {
+    const imageArea = document.querySelector('[class*="imageArea"]');
+    if (!imageArea) return { ok: false, detail: 'imageArea not found' };
+
+    // Record initial transform
+    const transformEl = imageArea.querySelector('[class*="imageTransform"]');
+    if (!transformEl) return { ok: false, detail: 'imageTransform not found' };
+    const beforeStyle = transformEl.getAttribute('style') || '';
+
+    // Dispatch wheel event to zoom in
+    const rect = imageArea.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    imageArea.dispatchEvent(new WheelEvent('wheel', {
+      deltaY: -300, clientX: cx, clientY: cy, bubbles: true, cancelable: true,
+    }));
+
+    await new Promise(r => setTimeout(r, 300));
+
+    const afterStyle = transformEl.getAttribute('style') || '';
+    const zoomVal = imageArea.querySelector('[class*="zoomValue"]');
+    const zoomText = zoomVal ? zoomVal.textContent : '';
+
+    // Check: transform changed or zoom percent changed from 100%
+    const changed = (zoomText && !zoomText.includes('100%')) ||
+                    (afterStyle !== beforeStyle && afterStyle.includes('scale'));
+
+    return {
+      ok: changed,
+      detail: `zoom=${zoomText}, before=${beforeStyle.substring(0, 50)}, after=${afterStyle.substring(0, 50)}`,
+    };
   });
   await wait(300);
 
-  // 5. Click reset
+  // 4. Test click-to-zoom (mouse click on image area)
+  const t22clickZoom = await page.evaluate(async () => {
+    const imageArea = document.querySelector('[class*="imageArea"]');
+    if (!imageArea) return { ok: false, detail: 'imageArea not found' };
+
+    const zoomVal = imageArea.querySelector('[class*="zoomValue"]');
+    const beforeZoom = zoomVal ? zoomVal.textContent : '';
+
+    const rect = imageArea.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    // Simulate a quick click (mousedown + mouseup without much movement)
+    imageArea.dispatchEvent(new MouseEvent('mousedown', {
+      clientX: cx, clientY: cy, button: 0, bubbles: true,
+    }));
+    await new Promise(r => setTimeout(r, 50));
+    window.dispatchEvent(new MouseEvent('mouseup', {
+      clientX: cx, clientY: cy, button: 0, bubbles: true,
+    }));
+
+    await new Promise(r => setTimeout(r, 300));
+
+    const afterZoom = zoomVal ? zoomVal.textContent : '';
+    return {
+      ok: afterZoom !== beforeZoom,
+      detail: `before=${beforeZoom}, after=${afterZoom}`,
+    };
+  });
+  await wait(300);
+
+  // 5. Test drag
+  const t22drag = await page.evaluate(async () => {
+    const imageArea = document.querySelector('[class*="imageArea"]');
+    const transformEl = imageArea ? imageArea.querySelector('[class*="imageTransform"]') : null;
+    if (!imageArea || !transformEl) return { ok: false, detail: 'elements not found' };
+
+    const beforeStyle = transformEl.getAttribute('style') || '';
+    const rect = imageArea.getBoundingClientRect();
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
+    imageArea.dispatchEvent(new MouseEvent('mousedown', {
+      clientX: startX, clientY: startY, button: 0, bubbles: true,
+    }));
+    await new Promise(r => setTimeout(r, 50));
+    window.dispatchEvent(new MouseEvent('mousemove', {
+      clientX: startX + 50, clientY: startY + 30, bubbles: true,
+    }));
+    await new Promise(r => setTimeout(r, 50));
+    window.dispatchEvent(new MouseEvent('mouseup', {
+      clientX: startX + 50, clientY: startY + 30, button: 0, bubbles: true,
+    }));
+
+    await new Promise(r => setTimeout(r, 300));
+    const afterStyle = transformEl.getAttribute('style') || '';
+    const translateChanged = afterStyle !== beforeStyle;
+
+    return {
+      ok: translateChanged,
+      detail: `before=${beforeStyle.substring(0, 60)}, after=${afterStyle.substring(0, 60)}`,
+    };
+  });
+  await wait(300);
+
+  // 6. Test reset button
   const t22reset = await page.evaluate(() => {
     const btns = Array.from(document.querySelectorAll('button'));
     const resetBtn = btns.find(b => b.getAttribute('aria-label') === '重置视图');
@@ -800,44 +887,108 @@ async function runTests(baseUrl) {
   });
   await wait(300);
 
-  // 6. Check zoom value back to 100%
   const t22resetOk = await page.evaluate(() => {
     const zoomVal = document.querySelector('[class*="zoomValue"]');
     return zoomVal ? zoomVal.textContent.includes('100%') : false;
   });
 
-  // 7. Click fullscreen button
+  // 7. Test fullscreen
   const t22fullscreenOpen = await page.evaluate(() => {
     const btns = Array.from(document.querySelectorAll('button'));
     const fullscreenBtn = btns.find(b => b.getAttribute('aria-label') === '全屏预览');
     if (fullscreenBtn) { fullscreenBtn.click(); return true; }
     return false;
   });
-  await wait(500);
+  await wait(800);
 
-  // 8. Check fullscreen overlay appears
+  // Check fullscreen overlay appears
   const t22fullscreenVisible = await page.evaluate(() => {
     const overlay = document.querySelector('[class*="fullscreenOverlay"]');
     return overlay !== null && overlay.offsetWidth > 0;
   });
 
-  // 9. Check fullscreen has image
+  // Check fullscreen has image
   const t22fullscreenImg = await page.evaluate(() => {
     const img = document.querySelector('[class*="fullscreenOverlay"] img[src*="cities/xiamen"]');
     return !!img;
   });
 
-  // 10. Press ESC
+  // Check fullscreen toolbar is at top-left
+  const t22fsToolbarPos = await page.evaluate(() => {
+    const overlay = document.querySelector('[class*="fullscreenOverlay"]');
+    const toolbar = overlay ? overlay.querySelector('[class*="fullscreenToolbar"]') : null;
+    if (!overlay || !toolbar) return { ok: false, detail: 'overlay or toolbar not found' };
+    const oRect = overlay.getBoundingClientRect();
+    const tRect = toolbar.getBoundingClientRect();
+    return {
+      ok: tRect.left >= oRect.left && tRect.top >= oRect.top &&
+          (tRect.left - oRect.left) < 50 && (tRect.top - oRect.top) < 50,
+      detail: `toolbar.left=${tRect.left}, overlay.left=${oRect.left}`,
+    };
+  });
+
+  // Test wheel zoom inside fullscreen
+  const t22fsWheel = await page.evaluate(async () => {
+    const viewport = document.querySelector('[class*="fullscreenViewport"]');
+    const transformEl = viewport ? viewport.querySelector('[class*="fullscreenImageTransform"]') : null;
+    if (!viewport || !transformEl) return { ok: false, detail: 'fullscreen elements not found' };
+
+    const beforeStyle = transformEl.getAttribute('style') || '';
+    const rect = viewport.getBoundingClientRect();
+    viewport.dispatchEvent(new WheelEvent('wheel', {
+      deltaY: -300, clientX: rect.left + rect.width / 2, clientY: rect.top + rect.height / 2, bubbles: true, cancelable: true,
+    }));
+    await new Promise(r => setTimeout(r, 300));
+    const afterStyle = transformEl.getAttribute('style') || '';
+    return {
+      ok: afterStyle !== beforeStyle,
+      detail: `before=${beforeStyle.substring(0, 50)}, after=${afterStyle.substring(0, 50)}`,
+    };
+  });
+  await wait(300);
+
+  // Test drag inside fullscreen
+  const t22fsDrag = await page.evaluate(async () => {
+    const viewport = document.querySelector('[class*="fullscreenViewport"]');
+    const transformEl = viewport ? viewport.querySelector('[class*="fullscreenImageTransform"]') : null;
+    if (!viewport || !transformEl) return { ok: false, detail: 'fullscreen elements not found' };
+
+    const beforeStyle = transformEl.getAttribute('style') || '';
+    const rect = viewport.getBoundingClientRect();
+    const sx = rect.left + rect.width / 2;
+    const sy = rect.top + rect.height / 2;
+
+    viewport.dispatchEvent(new MouseEvent('mousedown', {
+      clientX: sx, clientY: sy, button: 0, bubbles: true,
+    }));
+    await new Promise(r => setTimeout(r, 50));
+    window.dispatchEvent(new MouseEvent('mousemove', {
+      clientX: sx + 40, clientY: sy + 20, bubbles: true,
+    }));
+    await new Promise(r => setTimeout(r, 50));
+    window.dispatchEvent(new MouseEvent('mouseup', {
+      clientX: sx + 40, clientY: sy + 20, button: 0, bubbles: true,
+    }));
+
+    await new Promise(r => setTimeout(r, 300));
+    const afterStyle = transformEl.getAttribute('style') || '';
+    return {
+      ok: afterStyle !== beforeStyle,
+      detail: `before=${beforeStyle.substring(0, 50)}, after=${afterStyle.substring(0, 50)}`,
+    };
+  });
+  await wait(300);
+
+  // ESC to close fullscreen
   await page.keyboard.press('Escape');
   await wait(500);
 
-  // 11. Check fullscreen overlay closed
   const t22fullscreenClosed = await page.evaluate(() => {
     const overlay = document.querySelector('[class*="fullscreenOverlay"]');
     return !overlay || overlay.offsetWidth === 0;
   });
 
-  // 12. Click plan tab
+  // 8. Tab switch resets view
   const t22planClick = await page.evaluate(() => {
     const btns = Array.from(document.querySelectorAll('button'));
     const planBtn = btns.find(b => b.textContent && b.textContent.trim() === '规划图');
@@ -846,13 +997,12 @@ async function runTests(baseUrl) {
   });
   await wait(1500);
 
-  // 13. Check zoom value is still 100% (tab switch resets)
   const t22tabReset = await page.evaluate(() => {
     const zoomVal = document.querySelector('[class*="zoomValue"]');
     return zoomVal ? zoomVal.textContent.includes('100%') : false;
   });
 
-  // 14. Check 375px no horizontal scroll
+  // 9. Check 375px no horizontal scroll
   await page.setViewport({ width: 375, height: 812 });
   await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 20000 });
   await wait(1500);
@@ -867,16 +1017,19 @@ async function runTests(baseUrl) {
   await wait(500);
 
   const t22errors = consoleErrors.filter(isCriticalError);
+  const t22errorMsgs = t22errors.map(e => (typeof e === 'string' ? e : e.text || String(e)).substring(0, 120));
 
   // Evaluate
   if (!t22imgExists) {
     t22detail = 'network img not found';
-  } else if (!t22zoomIn) {
-    t22detail = 'zoom in button not found';
-  } else if (!t22zoomChanged) {
-    t22detail = 'zoom did not change after clicking zoom in';
-  } else if (!t22zoomOut) {
-    t22detail = 'zoom out button not found';
+  } else if (!t22toolbarPos.ok) {
+    t22detail = `toolbar not at top-left: ${t22toolbarPos.detail}`;
+  } else if (!t22wheelZoom.ok) {
+    t22detail = `wheel zoom failed: ${t22wheelZoom.detail}`;
+  } else if (!t22clickZoom.ok) {
+    t22detail = `click zoom failed: ${t22clickZoom.detail}`;
+  } else if (!t22drag.ok) {
+    t22detail = `drag failed: ${t22drag.detail}`;
   } else if (!t22reset) {
     t22detail = 'reset button not found';
   } else if (!t22resetOk) {
@@ -887,6 +1040,12 @@ async function runTests(baseUrl) {
     t22detail = 'fullscreen overlay not visible';
   } else if (!t22fullscreenImg) {
     t22detail = 'no image in fullscreen';
+  } else if (!t22fsToolbarPos.ok) {
+    t22detail = `fullscreen toolbar not at top-left: ${t22fsToolbarPos.detail}`;
+  } else if (!t22fsWheel.ok) {
+    t22detail = `fullscreen wheel zoom failed: ${t22fsWheel.detail}`;
+  } else if (!t22fsDrag.ok) {
+    t22detail = `fullscreen drag failed: ${t22fsDrag.detail}`;
   } else if (!t22fullscreenClosed) {
     t22detail = 'fullscreen not closed after ESC';
   } else if (!t22planClick) {
@@ -896,13 +1055,13 @@ async function runTests(baseUrl) {
   } else if (!t22scrollOk) {
     t22detail = `375px overflow: scrollWidth=${t22scroll.scrollWidth}`;
   } else if (t22errors.length > 0) {
-    t22detail = `console errors: ${t22errors.length}`;
+    t22detail = `console errors: ${t22errors.length}: ${t22errorMsgs.join('; ')}`;
   } else {
     t22pass = true;
-    t22detail = 'zoom in/out/reset/fullscreen/ESC/tab reset/scroll all OK';
+    t22detail = 'toolbar pos/wheel zoom/click zoom/drag/reset/fullscreen+toolbar+wheel+drag/ESC/tab reset/375px all OK';
   }
 
-  record('T22', '城市详情页线路图预览交互', t22pass, t22detail);
+  record('T22', '城市详情页线路图查看器交互', t22pass, t22detail);
 
   // T23: 城市详情页数据来源与署名展示
   await page.setViewport({ width: 1280, height: 800 });

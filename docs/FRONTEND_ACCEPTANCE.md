@@ -58,7 +58,7 @@ npm run test:ui       # 浏览器自动化验收（T01-T23）
 | T19 | 城市详情页移动端 | PASS/FAIL | 375px /#/city/xiamen scrollWidth <= innerWidth + 1 |
 | T20 | 城市封面图资源加载 | PASS/FAIL | manifest-aware 检查：50 张卡片中 49 张 data-has-cover="true"、1 张 "false"（hohhot）；真实 cover fetch 返回 200 + image/*；hohhot backgroundImage 不含 hohhot.webp |
 | T21 | 城市详情页线路图/规划图 | PASS/FAIL | 测试城市 xiamen：network img 存在且 fetch 200+image/*、查看原图链接存在；点击规划图 Tab 后 plan img 存在且 fetch 200+image/*、链接更新；无 console error；375px 无横向滚动；图片返回 text/html 即使 status=200 也 FAIL |
-| T22 | 城市详情页线路图预览交互 | PASS/FAIL | 测试城市 xiamen：线路图 img 存在；点击放大按钮后缩放值变化或 transform 包含 scale；点击缩小按钮成功；点击重置后缩放值回到 100%；点击全屏预览按钮后 overlay 出现且含图片；按 ESC 后 overlay 关闭；切换规划图 Tab 后缩放值仍为 100%；375px 无横向滚动 |
+| T22 | 城市详情页线路图查看器交互 | PASS/FAIL | 测试城市 xiamen：线路图 img 存在；工具栏固定在图片容器左上角（offset < 50px）；鼠标滚轮缩放 transform 变化；左键单击放大 zoom 值变化；左键拖拽 translate 变化（不要求 scale > 1）；重置按钮 zoom 回到 100%；全屏 overlay 出现且含图片；全屏工具栏在左上角；全屏中滚轮缩放 transform 变化；全屏中拖拽 transform 变化；ESC 关闭全屏；Tab 切换后 zoom 重置 100%；375px 无横向滚动 |
 | T23 | 城市详情页数据来源与署名展示 | PASS/FAIL | 访问 /#/city/xiamen 检查"数据来源与署名"标题、MetroDB、Wikimedia/license/CC、查看来源链接(target=_blank, href 非空)、线路图/规划图；访问 /#/city/hohhot 检查封面图 fallback；375px 无横向滚动；控制台无关键错误 |
 
 ### 状态类型说明

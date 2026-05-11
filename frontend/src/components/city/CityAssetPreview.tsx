@@ -10,9 +10,12 @@ interface Props {
 
 type TabKey = 'network' | 'plan';
 
-const MIN_SCALE = 0.5;
-const MAX_SCALE = 3;
-const SCALE_STEP = 0.25;
+const MIN_SCALE = 0.4;
+const MAX_SCALE = 5;
+const WHEEL_STEP = 0.12;
+const CLICK_ZOOM_STEP = 0.35;
+const TOOLBAR_ZOOM_STEP = 0.25;
+const DRAG_THRESHOLD = 4;
 
 function getActiveData(city: MergedCity, tab: TabKey) {
   if (tab === 'network') {
@@ -25,23 +28,22 @@ export default function CityAssetPreview({ city }: Props) {
   const defaultTab: TabKey = city.has_network_map ? 'network' : city.has_plan_map ? 'plan' : 'network';
   const [activeTab, setActiveTab] = useState<TabKey>(defaultTab);
   const [imageError, setImageError] = useState(false);
-  const [imageLoading, setImageLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const [scale, setScale] = useState(1);
   const [translateX, setTranslateX] = useState(0);
   const [translateY, setTranslateY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [fitMode, setFitMode] = useState<'contain' | 'natural'>('contain');
-
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const dragStartRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const viewportRef = useRef<HTMLDivElement>(null);
+  const fullscreenViewportRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const dragStartRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const dragMovedRef = useRef(false);
 
   const { has, mapPath, label } = getActiveData(city, activeTab);
   const imageUrl = has && mapPath ? withBaseUrl(mapPath) : null;
   const alt = `${city.city_cn}${label}`;
-
   const hasRealImage = has && imageUrl && !imageError;
 
   const resetView = useCallback(() => {
@@ -58,24 +60,24 @@ export default function CityAssetPreview({ city }: Props) {
     setIsFullscreen(false);
   }, [resetView]);
 
-  const handleZoomIn = useCallback(() => {
-    setScale(prev => Math.min(prev + SCALE_STEP, MAX_SCALE));
+  // === Toolbar actions ===
+  const handleToolbarZoomIn = useCallback((e?: React.MouseEvent) => {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    setScale(prev => Math.min(prev + TOOLBAR_ZOOM_STEP, MAX_SCALE));
   }, []);
 
-  const handleZoomOut = useCallback(() => {
-    setScale(prev => Math.max(prev - SCALE_STEP, MIN_SCALE));
+  const handleToolbarZoomOut = useCallback((e?: React.MouseEvent) => {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    setScale(prev => Math.max(prev - TOOLBAR_ZOOM_STEP, MIN_SCALE));
   }, []);
 
-  const handleReset = useCallback(() => {
+  const handleToolbarReset = useCallback((e?: React.MouseEvent) => {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
     resetView();
   }, [resetView]);
 
-  const handleFitModeToggle = useCallback(() => {
-    setFitMode(prev => (prev === 'contain' ? 'natural' : 'contain'));
-    resetView();
-  }, [resetView]);
-
-  const handleFullscreenOpen = useCallback(() => {
+  const handleToolbarFullscreen = useCallback((e?: React.MouseEvent) => {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
     setIsFullscreen(true);
   }, []);
 
@@ -83,67 +85,232 @@ export default function CityAssetPreview({ city }: Props) {
     setIsFullscreen(false);
   }, []);
 
-  // ESC to close fullscreen
-  useEffect(() => {
-    if (!isFullscreen) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsFullscreen(false);
-      }
-    };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isFullscreen]);
-
-  // Body scroll lock when fullscreen
-  useEffect(() => {
-    if (isFullscreen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isFullscreen]);
-
-  // Mouse drag handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (scale <= 1) return;
+  // === Shared wheel handler factory ===
+  const createWheelHandler = useCallback((container: HTMLElement) => (e: WheelEvent) => {
     e.preventDefault();
-    setIsDragging(true);
+    e.stopPropagation();
+
+    const rect = container.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    setScale(prevScale => {
+      const nextScale = Math.min(
+        Math.max(prevScale * (e.deltaY < 0 ? (1 + WHEEL_STEP) : (1 - WHEEL_STEP)), MIN_SCALE),
+        MAX_SCALE
+      );
+      const scaleRatio = nextScale / prevScale;
+
+      setTranslateX(prevTx => mouseX - (mouseX - prevTx) * scaleRatio);
+      setTranslateY(prevTy => mouseY - (mouseY - prevTy) * scaleRatio);
+
+      return nextScale;
+    });
+  }, []);
+
+  // === Shared mousedown handler factory ===
+  const createMouseDownHandler = useCallback((container: HTMLElement) => (e: MouseEvent) => {
+    if (e.button !== 0) return;
+    const target = e.target as HTMLElement;
+    if (target.closest(`.${styles.toolbar}`) || target.closest(`.${styles.viewOriginal}`) || target.closest('button') || target.closest('a')) {
+      return;
+    }
+    e.preventDefault();
+    isDraggingRef.current = true;
+    dragMovedRef.current = false;
     dragStartRef.current = {
       x: e.clientX,
       y: e.clientY,
       tx: translateX,
       ty: translateY,
     };
-  }, [scale, translateX, translateY]);
+  }, [translateX, translateY, styles.toolbar, styles.viewOriginal]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging || scale <= 1) return;
+  // === Shared mousemove handler ===
+  const handleGlobalMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDraggingRef.current) return;
     const dx = e.clientX - dragStartRef.current.x;
     const dy = e.clientY - dragStartRef.current.y;
+    if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+      dragMovedRef.current = true;
+    }
     setTranslateX(dragStartRef.current.tx + dx);
     setTranslateY(dragStartRef.current.ty + dy);
-  }, [isDragging, scale]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
   }, []);
 
-  const handleMouseLeave = useCallback(() => {
-    setIsDragging(false);
+  // === Shared mouseup handler factory ===
+  const createMouseUpHandler = useCallback((container: HTMLElement) => (e: MouseEvent) => {
+    if (!isDraggingRef.current) return;
+    const wasDrag = dragMovedRef.current;
+    isDraggingRef.current = false;
+
+    if (!wasDrag && e.button === 0) {
+      const rect = container.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      setScale(prevScale => {
+        const nextScale = Math.min(prevScale + CLICK_ZOOM_STEP, MAX_SCALE);
+        if (nextScale === prevScale) return prevScale;
+        const scaleRatio = nextScale / prevScale;
+        setTranslateX(prevTx => mouseX - (mouseX - prevTx) * scaleRatio);
+        setTranslateY(prevTy => mouseY - (mouseY - prevTy) * scaleRatio);
+        return nextScale;
+      });
+    }
   }, []);
 
-  // Fullscreen overlay click
+  // === Normal mode: native event listeners (non-passive wheel) ===
+  useEffect(() => {
+    const container = viewportRef.current;
+    if (!container || !hasRealImage) return;
+
+    const wheelHandler = createWheelHandler(container);
+    const mouseDownHandler = createMouseDownHandler(container);
+
+    container.addEventListener('wheel', wheelHandler, { passive: false });
+    container.addEventListener('mousedown', mouseDownHandler);
+    return () => {
+      container.removeEventListener('wheel', wheelHandler);
+      container.removeEventListener('mousedown', mouseDownHandler);
+    };
+  }, [hasRealImage, createWheelHandler, createMouseDownHandler]);
+
+  // === Global mouse move/up for normal mode drag ===
+  useEffect(() => {
+    if (!hasRealImage) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
+      if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+        dragMovedRef.current = true;
+      }
+      setTranslateX(dragStartRef.current.tx + dx);
+      setTranslateY(dragStartRef.current.ty + dy);
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      if (!isDraggingRef.current) return;
+      const wasDrag = dragMovedRef.current;
+      isDraggingRef.current = false;
+
+      if (!wasDrag && e.button === 0) {
+        const container = viewportRef.current;
+        if (container) {
+          const rect = container.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+
+          setScale(prevScale => {
+            const nextScale = Math.min(prevScale + CLICK_ZOOM_STEP, MAX_SCALE);
+            if (nextScale === prevScale) return prevScale;
+            const scaleRatio = nextScale / prevScale;
+            setTranslateX(prevTx => mouseX - (mouseX - prevTx) * scaleRatio);
+            setTranslateY(prevTy => mouseY - (mouseY - prevTy) * scaleRatio);
+            return nextScale;
+          });
+        }
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [hasRealImage]);
+
+  // === Fullscreen drag/wheel ===
+  useEffect(() => {
+    if (!isFullscreen || !hasRealImage) return;
+
+    const container = fullscreenViewportRef.current;
+    if (!container) return;
+
+    const wheelHandler = createWheelHandler(container);
+    const mouseDownHandler = createMouseDownHandler(container);
+
+    container.addEventListener('wheel', wheelHandler, { passive: false });
+    container.addEventListener('mousedown', mouseDownHandler);
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    window.addEventListener('mouseup', createMouseUpHandler(container));
+
+    return () => {
+      container.removeEventListener('wheel', wheelHandler);
+      container.removeEventListener('mousedown', mouseDownHandler);
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+    };
+  }, [isFullscreen, hasRealImage, createWheelHandler, createMouseDownHandler, handleGlobalMouseMove, createMouseUpHandler]);
+
+  // Store fullscreen mouseup handler ref for cleanup
+  const fullscreenMouseUpRef = useRef<((e: MouseEvent) => void) | null>(null);
+
+  useEffect(() => {
+    if (!isFullscreen || !hasRealImage) {
+      if (fullscreenMouseUpRef.current) {
+        window.removeEventListener('mouseup', fullscreenMouseUpRef.current);
+        fullscreenMouseUpRef.current = null;
+      }
+      return;
+    }
+
+    const container = fullscreenViewportRef.current;
+    if (!container) return;
+
+    const mouseUpHandler = createMouseUpHandler(container);
+    fullscreenMouseUpRef.current = mouseUpHandler;
+    window.addEventListener('mouseup', mouseUpHandler);
+
+    return () => {
+      window.removeEventListener('mouseup', mouseUpHandler);
+      fullscreenMouseUpRef.current = null;
+    };
+  }, [isFullscreen, hasRealImage, createMouseUpHandler]);
+
+  // === ESC to close fullscreen ===
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullscreen(false);
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isFullscreen]);
+
+  // === Body scroll lock when fullscreen ===
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isFullscreen]);
+
+  // === Fullscreen overlay click (close on backdrop only, not during drag) ===
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
+    if (e.target === e.currentTarget && !dragMovedRef.current) {
       setIsFullscreen(false);
     }
   }, []);
 
   const zoomPercent = Math.round(scale * 100);
+
+  // === Render toolbar (shared between normal & fullscreen) ===
+  const renderToolbar = (classNames: { toolbar: string; toolBtn: string; zoomValue: string }, showFullscreen = true) => (
+    <div className={classNames.toolbar} onClick={(e) => e.stopPropagation()}>
+      <button className={classNames.toolBtn} onClick={handleToolbarZoomIn} aria-label="放大">+</button>
+      <button className={classNames.toolBtn} onClick={handleToolbarZoomOut} aria-label="缩小">−</button>
+      <button className={classNames.toolBtn} onClick={handleToolbarReset} aria-label="重置视图">⌂</button>
+      {showFullscreen && (
+        <button className={classNames.toolBtn} onClick={handleToolbarFullscreen} aria-label="全屏预览">⛶</button>
+      )}
+      <span className={classNames.zoomValue}>{zoomPercent}%</span>
+    </div>
+  );
 
   return (
     <div className={styles.wrapper}>
@@ -163,53 +330,6 @@ export default function CityAssetPreview({ city }: Props) {
       </div>
 
       <div className={styles.content}>
-        {hasRealImage && !imageLoading && (
-          <div className={styles.toolbar}>
-            <div className={styles.toolbarGroup}>
-              <button
-                className={styles.toolButton}
-                onClick={handleZoomOut}
-                disabled={scale <= MIN_SCALE}
-                aria-label="缩小"
-              >
-                −
-              </button>
-              <span className={styles.zoomValue}>{zoomPercent}%</span>
-              <button
-                className={styles.toolButton}
-                onClick={handleZoomIn}
-                disabled={scale >= MAX_SCALE}
-                aria-label="放大"
-              >
-                +
-              </button>
-              <button
-                className={styles.toolButton}
-                onClick={handleReset}
-                aria-label="重置视图"
-              >
-                重置
-              </button>
-            </div>
-            <div className={styles.toolbarGroup}>
-              <button
-                className={`${styles.toolButton} ${fitMode === 'natural' ? styles.toolButtonActive : ''}`}
-                onClick={handleFitModeToggle}
-                aria-label={fitMode === 'contain' ? '切换原始比例' : '切换适应容器'}
-              >
-                {fitMode === 'contain' ? '适应容器' : '原始比例'}
-              </button>
-              <button
-                className={styles.toolButton}
-                onClick={handleFullscreenOpen}
-                aria-label="全屏预览"
-              >
-                全屏
-              </button>
-            </div>
-          </div>
-        )}
-
         {hasRealImage ? (
           <div
             className={styles.imageArea}
@@ -218,73 +338,53 @@ export default function CityAssetPreview({ city }: Props) {
             {imageLoading && (
               <div className={styles.loading}>图片加载中...</div>
             )}
+
+            {/* Toolbar - fixed top-left inside imageArea */}
+            {renderToolbar({ toolbar: styles.toolbar, toolBtn: styles.toolBtn, zoomValue: styles.zoomValue }, true)}
+
+            {/* Image with transform */}
             <div
-              className={`${styles.imageViewport} ${isDragging ? styles.imageDragging : ''}`}
+              className={styles.imageTransform}
               style={{
-                overflow: fitMode === 'natural' && scale > 1 ? 'auto' : 'hidden',
+                transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                transformOrigin: '0 0',
               }}
             >
-              <div
-                className={styles.imageInner}
-                style={{
-                  transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
-                  transformOrigin: 'center center',
-                }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseLeave}
-              >
-                <img
-                  src={imageUrl}
-                  alt={alt}
-                  loading="lazy"
-                  decoding="async"
-                  className={styles.image}
-                  style={{
-                    width: fitMode === 'contain' ? '100%' : undefined,
-                    maxWidth: fitMode === 'natural' ? 'none' : undefined,
-                    cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
-                    userSelect: 'none',
-                    display: imageLoading ? 'none' : 'block',
-                  }}
-                  onLoad={() => setImageLoading(false)}
-                  onError={() => {
-                    setImageError(true);
-                    setImageLoading(false);
-                  }}
-                  draggable={false}
-                />
-              </div>
+              <img
+                src={imageUrl}
+                alt={alt}
+                loading="lazy"
+                decoding="async"
+                className={styles.image}
+                style={{ display: imageLoading ? 'none' : 'block' }}
+                onLoad={() => setImageLoading(false)}
+                onError={() => { setImageError(true); setImageLoading(false); }}
+                draggable={false}
+              />
             </div>
+
             <a
               href={imageUrl}
               target="_blank"
               rel="noreferrer"
               className={styles.viewOriginal}
+              onClick={(e) => e.stopPropagation()}
             >
               查看原图
             </a>
           </div>
         ) : has && imageUrl && imageError ? (
           <div className={styles.empty}>
-            <EmptyState
-              icon="📁"
-              title={`${label}加载失败`}
-              description="图片资源无法加载"
-            />
+            <EmptyState icon="📁" title={`${label}加载失败`} description="图片资源无法加载" />
           </div>
         ) : (
           <div className={styles.empty}>
-            <EmptyState
-              icon="📁"
-              title={`${label}资源正在收集整理中`}
-              description={`暂无${label}资源`}
-            />
+            <EmptyState icon="📁" title={`${label}资源正在收集整理中`} description={`暂无${label}资源`} />
           </div>
         )}
       </div>
 
+      {/* Fullscreen overlay */}
       {isFullscreen && hasRealImage && (
         <div
           className={styles.fullscreenOverlay}
@@ -293,37 +393,57 @@ export default function CityAssetPreview({ city }: Props) {
           aria-modal="true"
           aria-label={`${city.city_cn}${label}全屏预览`}
         >
-          <div className={styles.fullscreenContent}>
-            <div className={styles.fullscreenHeader}>
-              <div className={styles.fullscreenTitle}>
-                {city.city_cn} · {label}
-              </div>
-              <button
-                className={styles.fullscreenClose}
-                onClick={handleFullscreenClose}
-                aria-label="关闭全屏预览"
-              >
-                ✕
-              </button>
-            </div>
-            <div className={styles.fullscreenImageWrap}>
+          {/* Fullscreen toolbar - fixed top-left */}
+          {renderToolbar(
+            { toolbar: styles.fullscreenToolbar, toolBtn: styles.fsToolBtn, zoomValue: styles.fsZoomValue },
+            false
+          )}
+
+          {/* Fullscreen title */}
+          <div className={styles.fullscreenTitle}>
+            {city.city_cn} · {label}
+          </div>
+
+          {/* Fullscreen image viewport */}
+          <div
+            className={styles.fullscreenViewport}
+            ref={fullscreenViewportRef}
+          >
+            <div
+              className={styles.fullscreenImageTransform}
+              style={{
+                transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                transformOrigin: '0 0',
+              }}
+            >
               <img
                 src={imageUrl}
                 alt={alt}
                 className={styles.fullscreenImage}
+                draggable={false}
               />
             </div>
-            <div className={styles.fullscreenFooter}>
-              <a
-                href={imageUrl}
-                target="_blank"
-                rel="noreferrer"
-                className={styles.viewOriginal}
-              >
-                查看原图
-              </a>
-            </div>
           </div>
+
+          {/* Fullscreen close button */}
+          <button
+            className={styles.fullscreenClose}
+            onClick={handleFullscreenClose}
+            aria-label="关闭全屏预览"
+          >
+            ✕
+          </button>
+
+          {/* Fullscreen view original link */}
+          <a
+            href={imageUrl}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.fullscreenViewOriginal}
+            onClick={(e) => e.stopPropagation()}
+          >
+            查看原图
+          </a>
         </div>
       )}
     </div>

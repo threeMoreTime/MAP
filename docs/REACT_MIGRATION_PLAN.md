@@ -97,6 +97,7 @@ React 前端**不直接访问父级目录**。通过 `scripts/sync-data.cjs` 脚
 | 4.8 | 城市详情页真实线路图/规划图渲染（CityAssetPreview 组件、图片同步、构建检查、验收） | 已完成 |
 | 5.0 | 城市详情页线路图/规划图预览体验增强（缩放、拖拽、全屏、加载状态） | 已完成 |
 | 5.2 | 城市详情页数据来源与图片署名展示（CitySourceInfo 组件） | 已完成 |
+| 5.3 | 地铁线路图/规划图查看器交互重构（MetroMan 风格滚轮缩放、拖拽、左上角工具栏） | 已完成 |
 
 ## 6. 验收命令
 
@@ -289,6 +290,35 @@ Phase 4（React 前端迁移）全部子阶段已完成：
 - `run_acceptance.py`：legacy 16/16 PASS
 - `npm run typecheck`：通过
 - `npm run build`：通过
+
+### 6.12 Phase 5.3 地铁线路图/规划图查看器交互重构
+
+Phase 5.3 重构 CityAssetPreview 组件的 PC 端图片查看器交互，使其接近 MetroMan 地铁图查看器体验：
+
+- **交互模型重构**：从按钮式缩放改为地图查看器式交互
+  - 滚轮缩放：鼠标滚轮控制缩放，缩放中心为鼠标当前位置（minScale=0.4, maxScale=5, wheelStep=0.12）
+  - 左键拖拽：鼠标左键按住即可拖拽，不要求 scale > 1（dragThreshold=4px）
+  - 左键单击放大：移动距离 <= 4px 视为单击，图片放大一档（clickZoomStep=0.35）
+  - 双击不绑定重置
+- **工具栏重构**：从独立工具栏区域改为固定在图片容器左上角
+  - position absolute、z-index 高于图片、不参与 transform
+  - 小圆形按钮、浅灰/白色半透明背景、轻微阴影
+  - 按钮：+（放大）、−（缩小）、⌂（重置）、⛶（全屏）、缩放百分比显示
+- **样式重构**：图片查看区域背景从深蓝改为浅灰（#f3f4f6）
+  - 容器高度：desktop 680px、tablet 560px、mobile 400px
+  - 移除 fitMode 切换，统一使用 transform-based 缩放
+  - transformOrigin 使用 0 0 配合滚轮缩放中心计算
+- **全屏模式重构**：与普通模式共用同一套交互逻辑
+  - 全屏工具栏固定在左上角
+  - 全屏中滚轮缩放、拖拽、单击放大行为一致
+  - 全屏背景改为浅灰（#e5e7eb）
+  - Tab 切换关闭全屏并重置视图
+- **EmptyState**：无图/加载失败时不显示查看器工具栏
+- **验收测试**：T22 增强为覆盖滚轮缩放、左键拖拽、左键单击放大、全屏内交互等完整测试
+
+**验收标准**：
+- `test:ui`：T01-T23，Total 23，PASS 22，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 通过
 
 **下一步**：Phase 5.1 — GitHub Actions CI 与 Pages 手动部署配置。详见 [docs/ROADMAP.md](./ROADMAP.md)。
 
