@@ -70,6 +70,65 @@ async function run() {
   await page.setViewport({ width: 1280, height: 800 });
 
   const criticalErrors = [];
+
+  // 判断是否为关键项目资源
+  function isCriticalProjectResource(url) {
+    if (!url) return false;
+    
+    try {
+      const urlObj = new URL(url, 'https://dummy.org');
+      const pathname = urlObj.pathname;
+      // 排除非 Hash 路由本身带来的 404 跳转，它是通过 /404.html 承接并重定向的预期行为
+      if (
+        pathname === '/MAP/cities' || 
+        pathname === '/MAP/cities/' || 
+        pathname === '/cities' || 
+        pathname === '/cities/'
+      ) {
+        return false;
+      }
+    } catch (e) {
+      if (
+        url.endsWith('/MAP/cities') || 
+        url.endsWith('/MAP/cities/') || 
+        url.endsWith('/cities') || 
+        url.endsWith('/cities/')
+      ) {
+        return false;
+      }
+    }
+
+    const criticalPatterns = [
+      '/MAP/assets/',
+      '/MAP/data/',
+      '/MAP/cities/',
+      '/assets/',
+      '/data/',
+      '/cities/'
+    ];
+    return criticalPatterns.some(pattern => url.includes(pattern));
+  }
+
+  // 判断是否是可忽略的控制台错误
+  function isIgnorableConsoleError(text) {
+    if (!text) return true;
+
+    // 关键项目资源路径的错误绝对不能忽略
+    if (isCriticalProjectResource(text)) {
+      return false;
+    }
+
+    // 忽略 favicon.ico
+    if (text.includes('favicon.ico')) return true;
+    // 忽略 sourcemap / source map / .js.map
+    if (text.includes('sourcemap') || text.includes('source map') || text.includes('.js.map')) return true;
+    // 忽略 chrome-extension
+    if (text.includes('chrome-extension')) return true;
+    // 忽略无具体 URL 的 Failed to load resource + 404
+    if (text.includes('Failed to load resource') && text.includes('404') && text.endsWith('()')) return true;
+
+    return false;
+  }
   
   // 监听浏览器端报错
   page.on('pageerror', (err) => {
@@ -79,11 +138,18 @@ async function run() {
   page.on('console', (msg) => {
     if (msg.type() === 'error') {
       const text = msg.text();
-      // 忽略 favicon.ico 或者是 sourcemap 相关的错误，还有 Chrome 扩展程序
-      if (text.includes('favicon.ico') || text.includes('.js.map') || text.includes('chrome-extension')) {
+      if (isIgnorableConsoleError(text)) {
         return;
       }
       criticalErrors.push(`Console error: ${text}`);
+    }
+  });
+
+  page.on('response', (res) => {
+    const status = res.status();
+    const url = res.url();
+    if (status >= 400 && isCriticalProjectResource(url)) {
+      criticalErrors.push(`HTTP ${status}: ${url}`);
     }
   });
 
@@ -91,7 +157,11 @@ async function run() {
     const url = req.url();
     const failure = req.failure();
     const errText = failure ? failure.errorText : 'unknown';
-    if (url.includes('favicon.ico') || url.includes('.js.map') || url.includes('chrome-extension')) {
+    if (url.includes('favicon.ico') || 
+        url.includes('sourcemap') || 
+        url.includes('source map') || 
+        url.includes('.js.map') || 
+        url.includes('chrome-extension')) {
       return;
     }
     criticalErrors.push(`Request failed: ${url} (${errText})`);
