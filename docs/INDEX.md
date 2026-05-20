@@ -12,7 +12,7 @@
 | [DASHBOARD_DESIGN.md](DASHBOARD_DESIGN.md) | 可视化大屏 UI 设计、布局与交互说明 |
 | [REACT_MIGRATION_PLAN.md](REACT_MIGRATION_PLAN.md) | React 前端迁移计划（Phase 4 全部完成） |
 | [FRONTEND_ACCEPTANCE.md](FRONTEND_ACCEPTANCE.md) | React 前端验收测试（T01-T21） |
-| [REACT_DEPLOYMENT_DRAFT.md](REACT_DEPLOYMENT_DRAFT.md) | React 前端静态部署草案（check:static T01-T09） |
+| [REACT_DEPLOYMENT.md](REACT_DEPLOYMENT.md) | React 前端静态部署与发布手册（CI/CD、check:static T01-T09） |
 | [CITY_COVER_IMAGES.md](CITY_COVER_IMAGES.md) | 城市封面图片采集、溯源与前端集成说明 |
 | [TESTING_ACCEPTANCE.md](TESTING_ACCEPTANCE.md) | 旧版 Dashboard 测试方案与验收标准 |
 | [RELEASE_PROCESS.md](RELEASE_PROCESS.md) | 发布流程与版本管理规范 |

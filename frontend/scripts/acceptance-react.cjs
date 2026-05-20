@@ -1319,6 +1319,25 @@ async function runTests(baseUrl) {
   const t25foshanScrollOk = t25foshan.scrollWidth <= t25foshan.innerWidth + 1;
   const t25foshanErrors = consoleErrors.filter(isCriticalError);
 
+  // 3.5. Visit /#/city/taiyuan (has resources but ridership is missing)
+  await page.goto(`${BASE}/#/city/taiyuan`, { waitUntil: 'networkidle0', timeout: 30000 });
+  await wait(2000);
+
+  const t25taiyuan = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    const hasTaiyuan = body.includes('太原');
+    const hasEmptyRidership = body.includes('暂无数据') || body.includes('暂无');
+    return {
+      hasTaiyuan,
+      hasEmptyRidership,
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+    };
+  });
+
+  const t25taiyuanScrollOk = t25taiyuan.scrollWidth <= t25taiyuan.innerWidth + 1;
+  const t25taiyuanErrors = consoleErrors.filter(isCriticalError);
+
   // 4. Set viewport 375x812, visit /#/city/xiamen
   await page.setViewport({ width: 375, height: 812 });
   await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 20000 });
@@ -1355,6 +1374,10 @@ async function runTests(baseUrl) {
   if (!t25foshan.hasEmptyState) t25missing.push('foshan-empty');
   if (!t25foshanScrollOk) t25missing.push(`foshan-scroll: ${t25foshan.scrollWidth}`);
   if (t25foshanErrors.length > 0) t25missing.push(`foshan-errors=${t25foshanErrors.length}`);
+  if (!t25taiyuan.hasTaiyuan) t25missing.push('taiyuan-content');
+  if (!t25taiyuan.hasEmptyRidership) t25missing.push('taiyuan-empty-ridership');
+  if (!t25taiyuanScrollOk) t25missing.push(`taiyuan-scroll: ${t25taiyuan.scrollWidth}`);
+  if (t25taiyuanErrors.length > 0) t25missing.push(`taiyuan-errors=${t25taiyuanErrors.length}`);
   if (!t25mobile.hasMetricsGrid) t25missing.push('mobile-metrics');
   if (!t25mobile.hasResourcePanel) t25missing.push('mobile-resource');
   if (!t25mobile.hasToolbar) t25missing.push('mobile-toolbar');
@@ -1364,7 +1387,7 @@ async function runTests(baseUrl) {
     t25detail = `missing: ${t25missing.join(', ')}`;
   } else {
     t25pass = true;
-    t25detail = 'xiamen(6 cards/panel/scroll)/hohhot(partial/plan-empty)/foshan(content/empty)/375px(metrics/panel/toolbar/scroll) all OK';
+    t25detail = 'xiamen(6 cards/panel/scroll)/hohhot(partial/plan-empty)/foshan(content/empty)/taiyuan(content/empty-ridership)/375px(metrics/panel/toolbar/scroll) all OK';
   }
 
   record('T25', '城市详情页响应式与边界城市状态', t25pass, t25detail);

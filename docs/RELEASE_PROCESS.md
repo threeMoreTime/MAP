@@ -148,32 +148,61 @@ git push origin v1.x.x
 
 ---
 
-## 步骤 8：可选 GitHub Pages 发布
+## 步骤 8：双前端发布与回归校验流程 (Phase 5.1 已配置)
 
-> 当前尚未配置 GitHub Pages，此步骤为未来规划。
+项目现已支持新版 React 前端（主力）与旧版 Dashboard（Frozen Baseline）双规发布。
 
+### 8.1 React 主发布与静态部署
+1. 本地完成开发或数据更新；
+2. 执行全量构建前同步与静态健全性校验：
+   ```bash
+   cd frontend
+   npm ci
+   npm run typecheck
+   npm run build
+   npm run check:static
+   ```
+3. 将修改推送至 GitHub 远程仓库的 `master` 分支，等待 CI 流水线（CI Workflow）全绿通过；
+4. 进入 GitHub Actions 界面，手动触发 **Deploy React Frontend to Pages** 部署工作流，编译发布 `frontend/dist` 至 GitHub Pages；
+5. 在线环境人工验收（参见 `docs/REACT_DEPLOYMENT.md`）。
+
+### 8.2 Legacy 旧版基线回归校验
+每次发布均需验证旧版 `dashboard.html` 的可用性与兼容性：
 ```bash
-# 推送到 main 分支
-git push origin main
-
-# 如已配置 GitHub Pages，访问以下地址验证
-# https://threemoretime.github.io/MAP/dashboard.html
+# 根目录下执行
+npm ci
+npm run test:acceptance
 ```
+
+### 8.3 数据定时/手动采集与发布流程
+数据采集与结构未发生改变，依然保留原有发布机制：
+1. 运行 `python scrapers/scrape_metrodb.py` 及 `scrapers/scrape_all_cities.py`；
+2. 运行 `python scrapers/generate_charts.py`；
+3. 运行 `python scripts/validate_data.py` 对生成数据执行 Schema 校验；
+4. 将数据变更推送至 Git 并重新执行双前端构建发布流程。
 
 ---
 
-## 附录：紧急回滚
+## 附录：紧急回滚 (Rollback)
 
-若发布后发现严重问题：
+若在线发布后发现严重缺陷或异常问题，请按以下双重保障方案回滚：
 
+### 1. GitHub Pages 版本秒级回滚
+1. 打开 GitHub 仓库页面，切换至 **Actions** -> **Deploy React Frontend to Pages**；
+2. 在运行历史列表中，找到上一次已知稳定的部署历史记录；
+3. 点击进入该记录，选择 **Re-run jobs**，将上一版本的静态包重新部署上线，实现秒级生产恢复。
+
+### 2. 代码级别回退
+若需要撤销造成故障的代码提交：
 ```bash
-# 查看提交历史
-git log --oneline -10
+# 查看最近提交历史
+git log --oneline -n 10
 
-# 回退到上一个稳定版本
+# 回退 HEAD 或指定异常提交
 git revert HEAD
-git push origin main
+# (或回退指定哈希) git revert <commit-hash>
 
-# 或回退到指定版本
-git revert <commit-hash>
+# 推送回退代码至远端
+git push origin master
 ```
+推送后，CI 自动校验，全绿后手动触发 Pages Workflow 即可完成生产彻底回滚。

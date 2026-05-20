@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.2.0-dev
-- 当前阶段：Phase 5.5 已完成，准备进入 Phase 5.1 CI 与 Pages 手动部署
+- 当前阶段：Phase 5.1 部署配置与 Phase 5.5 详情页重构已完成，等待远端 Actions 首次手动部署与线上验收
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -297,20 +297,20 @@
 
 ---
 
-### Phase 5.1：GitHub Actions CI 与 Pages 手动部署配置
+### Phase 5.1：GitHub Actions CI 与 Pages 手动部署配置（已完成配置，等待远端 Actions 首次运行验证）
 
 **目标**：建立 CI 流水线，配置 Pages 手动部署。
 
 **产物**：
-- [ ] GitHub Actions workflow：PR 触发 typecheck + build + check:static
-- [ ] `workflow_dispatch` 手动触发 Pages 部署
-- [ ] README 更新在线访问链接（部署后）
-- [ ] 自定义 404 页面
+- [x] GitHub Actions workflow：PR 触发 typecheck + build + check:static
+- [x] `workflow_dispatch` 手动/自动配置 Pages 部署
+- [x] README 更新在线访问链接说明（部署后激活）
+- [x] 自定义 404 静态页面（已配置）
 
 **验收标准**：
 - PR 提交自动触发 CI 检查
 - 手动触发可成功部署到 GitHub Pages
-- `https://threemoretime.github.io/MAP/` 可正常访问
+- `https://threemoretime.github.io/MAP/` 可正常访问（待首次手动部署后验证）
 
 ---
 

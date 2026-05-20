@@ -2,7 +2,7 @@
 
 基于 ECharts 的中国 50 城市地铁客流数据可视化大屏，支持地图散点、排名图表、趋势折线、搜索筛选等交互功能，可离线运行。
 
-> **当前版本：v1.1.0** | 浏览器验证：16/16 PASS
+> **当前版本：v1.2.0-dev** | 浏览器验证：24/25 PASS (1 MANUAL) | [在线演示 🌐](https://threemoretime.github.io/MAP/) *(部署 workflow 已配置，待首次手动部署与线上验收)*
 
 ---
 
@@ -156,19 +156,24 @@ npm run test:acceptance    # 全部验收
 | 规划图覆盖   | 41 城           |
 
 
-## React 前端（Phase 4 已完成）
-
-基于 React + TypeScript + Vite 的新版前端已完成 Phase 4 全部迁移，提供四页路由、城市详情、封面图、真实线路图/规划图等增强功能：
+基于 React + TypeScript + Vite 的新版前端已完成 Phase 5.1 部署配置，提供四页路由、城市详情、封面图、真实线路图/规划图、手势及滚轮平移缩放、版权署名展示等增强功能：
 
 ```bash
 cd frontend
-npm install        # 安装依赖（自动同步数据）
+npm ci             # 安装依赖（自动同步数据）
 npm run dev        # 启动开发服务器
 npm run build      # 生产构建
 npm run preview    # 预览构建结果
 npm run check:static  # 静态构建检查（T01-T09）
-npm run test:ui    # React 前端浏览器验收（T01-T21）
+npm run test:ui    # React 前端浏览器验收（T01-T25）
 ```
+
+### CI/CD 与 Pages 部署 (Phase 5.1 已配置)
+
+项目已集成 GitHub Actions 自动化工作流：
+- **CI 流水线** (`.github/workflows/ci.yml`)：在推送或拉取请求到 `master` 分支时自动触发。包含旧版基线验收 (`legacy-check`)、React 构建编译与静态校验 (`react-check`)，以及独立的 React 浏览器 UI 验收 (`react-ui-test`)。
+- **Pages 部署工作流** (`.github/workflows/pages.yml`)：支持在远端通过 `workflow_dispatch` 手动触发，将 React 生产编译包 (`frontend/dist`) 安全部署发布至 GitHub Pages 在线环境。
+- **自定义 404 错误页** (`frontend/public/404.html`)：极简静态科技风页面，用于在 GitHub Pages 环境下，对外部或第三方直接发起非 Hash 格式的子路径访问（例如直接打开/刷新 `/MAP/cities`）进行自动识别与修复，将其安全地重定向回 SPA 的 Hash 路由格式（如 `/MAP/#/cities`），避免 404 错误。
 
 四页路由：
 - `/#/` 或 `/#/dashboard` — 数据大屏
@@ -176,7 +181,7 @@ npm run test:ui    # React 前端浏览器验收（T01-T21）
 - `/#/city/:id` — 城市详情（如 `/#/city/xiamen`）
 - `/#/about` — 数据说明
 
-> `dashboard.html` 为旧版稳定基线（frozen baseline），仍可通过旧版验收脚本验证。React 版为当前主力前端。
+> `dashboard.html` 为旧版稳定基线（frozen baseline / legacy fallback），仍可通过旧版验收脚本进行本地验证。React 版为当前主力前端。
 
 ## 更多文档
 

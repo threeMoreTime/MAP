@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - 页面未找到 | 全国城市地铁客流数据可视化大屏</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #060e1a;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .container {
+      max-width: 500px;
+      padding: 2rem;
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 12px;
+      background: rgba(6, 14, 26, 0.8);
+      box-shadow: 0 4px 20px rgba(0, 212, 255, 0.05);
+    }
+    h1 {
+      font-size: 5rem;
+      font-weight: 800;
+      margin: 0 0 1rem 0;
+      color: #00d4ff;
+      letter-spacing: -1px;
+    }
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 0 1rem 0;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      color: #060e1a;
+      background-color: #00d4ff;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .btn:hover {
+      background-color: #33e0ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>404</h1>
+    <h2>列车驶入未开通区域</h2>
+    <p>抱歉，您访问的页面或地铁线路暂未开通，或者地址已发生变更。</p>
+    <a href="/MAP/#/" class="btn" id="go-home">返回大屏首页</a>
+  </div>
+
+  <script>
+    // GitHub Pages sub-folder route fixer
+    // If a user refreshes /MAP/cities, window.location.pathname is '/MAP/cities'
+    // We can auto-redirect them back to /MAP/#/cities
+    const pathname = window.location.pathname;
+    const parts = pathname.split('/');
+    // Check if we are running on GitHub Pages (subfolder environment)
+    if (window.location.hostname.includes('github.io')) {
+      const repoName = parts[1]; // 'MAP'
+      const routePath = parts.slice(2).join('/');
+      if (routePath) {
+        window.location.replace('/' + repoName + '/#/' + routePath);
+      } else {
+        document.getElementById('go-home').setAttribute('href', '/' + repoName + '/#/');
+      }
+    } else {
+      // Local testing
+      const routePath = parts.slice(1).join('/');
+      if (routePath && routePath !== '404.html') {
+        window.location.replace('/#/' + routePath);
+      }
+    }
+  </script>
+</body>
+</html>
