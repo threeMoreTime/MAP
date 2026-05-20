@@ -148,31 +148,52 @@ git push origin v1.x.x
 
 ---
 
-## 步骤 8：双前端发布与回归校验流程 (Phase 5.1 已配置)
+## 步骤 8：双前端发布与回归校验流程 (Phase 5.1 已完成：CI、自动 Pages CD、线上 Smoke Test 均通过远端验证)
 
-项目现已支持新版 React 前端（主力）与旧版 Dashboard（Frozen Baseline）双规发布。
+项目现已支持新版 React 前端（当前主力前端）与旧版 Dashboard（Frozen Baseline / Legacy Fallback）双轨发布。
 
-### 8.1 React 主发布与静态部署
-1. 本地完成开发或数据更新；
-2. 执行全量构建前同步与静态健全性校验：
+### 8.1 发布前本地回归验证
+为了确保发布万无一失，在推送 `master` 之前，强烈建议在本地完整运行并全绿通过以下双前端验收指令：
+
+1. **旧版稳定基线与数据校验**：
    ```bash
+   # 根目录下执行
+   npm ci
+   npm run test:data
+   npm run test:acceptance
+   ```
+
+2. **新版 React 主力前端静态健全性与交互回归**：
+   ```bash
+   # 进入前端目录
    cd frontend
    npm ci
    npm run typecheck
    npm run build
    npm run check:static
+   npm run test:ui
+   npm run test:pages
    ```
-3. 将修改推送至 GitHub 远程仓库的 `master` 分支，等待 CI 流水线（CI Workflow）全绿通过；
-4. 进入 GitHub Actions 界面，手动触发 **Deploy React Frontend to Pages** 部署工作流，编译发布 `frontend/dist` 至 GitHub Pages；
-5. 在线环境人工验收（参见 `docs/REACT_DEPLOYMENT.md`）。
+   > **注意**：`npm run test:pages` 默认验证线上环境 `https://threemoretime.github.io/MAP/`。如果在上线前需要在本地验证，请先在另一个终端启动 `npm run preview`（通常在 `http://127.0.0.1:4173/`），然后运行：
+   > `BASE_URL=http://127.0.0.1:4173/ npm run test:pages`
 
-### 8.2 Legacy 旧版基线回归校验
-每次发布均需验证旧版 `dashboard.html` 的可用性与兼容性：
-```bash
-# 根目录下执行
-npm ci
-npm run test:acceptance
-```
+---
+
+### 8.2 自动 CI/CD 发布链路
+本地验证通过并确认无误后，将代码推送至远程 `master` 分支触发自动化流程：
+
+1. **Push 到 master 自动触发 CI**：
+   自动化 `CI` 工作流 (`.github/workflows/ci.yml`) 将自动运行，包含三个并行/串行 Job：
+   - `legacy-check` (运行旧版基线测试)
+   - `react-check` (类型检查与编译)
+   - `react-ui-test` (真浏览器交互测试)
+
+2. **自动 CD 部署与线上冒烟测试**：
+   当且仅当 `master` 分支 push 触发的 `CI` 运行全绿成功后，自动 CD 部署工作流 (`.github/workflows/pages.yml`) 将**自动触发**运行（亦保留手动 `workflow_dispatch` 作为兜底重新部署入口）。整个自动链路如下：
+   `push master` ──> `CI` ──> `Deploy React Frontend to Pages` ──> `deploy` (锁定 CI 的 head_sha 部署) ──> `smoke-test` (线上冒烟测试)
+
+3. **线上冒烟测试验证**：
+   部署成功后，Actions 自动启动 `smoke-test` 冒烟测试任务，通过 Puppeteer-core 校验线上路由可用性、控制台报错及图片加载（包含 3 次重试避开 CDN 缓存延迟），免去人工上线首跑验证。
 
 ### 8.3 数据定时/手动采集与发布流程
 数据采集与结构未发生改变，依然保留原有发布机制：

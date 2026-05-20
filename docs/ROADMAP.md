@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.2.0-dev
-- 当前阶段：Phase 5.1 部署配置与 Phase 5.5 详情页重构已完成，等待远端 Actions 首次手动部署与线上验收
+- 当前阶段：Phase 5.1 部署配置与 Phase 5.5 详情页重构已完成。Phase 5.1 已完成：CI、自动 Pages CD、线上 Smoke Test 均通过远端验证
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -297,20 +297,21 @@
 
 ---
 
-### Phase 5.1：GitHub Actions CI 与 Pages 手动部署配置（已完成配置，等待远端 Actions 首次运行验证）
+### Phase 5.1：GitHub Actions CI 与 Pages 自动部署配置（已完成：CI、自动 Pages CD、线上 Smoke Test 均通过远端验证）
 
-**目标**：建立 CI 流水线，配置 Pages 手动部署。
+**目标**：建立 CI 流水线，配置 Pages 自动与手动部署。
 
 **产物**：
-- [x] GitHub Actions workflow：PR 触发 typecheck + build + check:static
-- [x] `workflow_dispatch` 手动/自动配置 Pages 部署
-- [x] README 更新在线访问链接说明（部署后激活）
-- [x] 自定义 404 静态页面（已配置）
+- [x] GitHub Actions CI 工作流：包含 `legacy-check`、`react-check`、`react-ui-test` 独立 Job，覆盖 TypeScript、生产编译、E2E 浏览器与基线校验
+- [x] Pages 自动/手动部署工作流：实现 master push 的 CI 成功后自动部署，且支持手动触发发布刚通过 CI 的 `head_sha` 提交
+- [x] README 更新在线访问链接说明并丰富 CI/CD 安全闭环细节说明
+- [x] 自定义 404 静态重定向兜底页面，支持 SPA 404 毫秒级重定向回 Hash 路由
+- [x] 自动线上冒烟测试，集成 `npm run test:pages`，自动检验线上各功能路由及图片加载
 
 **验收标准**：
-- PR 提交自动触发 CI 检查
-- 手动触发可成功部署到 GitHub Pages
-- `https://threemoretime.github.io/MAP/` 可正常访问（待首次手动部署后验证）
+- [x] PR/Push 到 master 自动触发远端 CI 检查并全绿通过
+- [x] push master CI 成功后自动触发 Deploy React Frontend to Pages 并成功部署
+- [x] 自动部署后，线上冒烟测试全绿通过，`https://threemoretime.github.io/MAP/` 线上可正常访问，非 Hash 跳转及图片加载符合预期
 
 ---
 
