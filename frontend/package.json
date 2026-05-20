@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test:ui": "node scripts/acceptance-react.cjs",
-    "check:static": "node scripts/check-static-build.cjs"
+    "check:static": "node scripts/check-static-build.cjs",
+    "test:pages": "node scripts/smoke-pages.cjs"
   },
   "dependencies": {
     "echarts": "^5.5.0",

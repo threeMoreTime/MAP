@@ -620,6 +620,24 @@ async function runTests(baseUrl) {
   await page.goto(`${BASE}/#/city/xiamen`, { waitUntil: 'networkidle0', timeout: 30000 });
   await wait(2000);
 
+  // Wait for network img to complete loading
+  let t21networkComplete = false;
+  try {
+    await page.waitForFunction(() => {
+      const img = document.querySelector('img[src*="cities/xiamen/xiamen_network.png"]');
+      return img && img.complete;
+    }, { timeout: 10000 });
+    t21networkComplete = true;
+  } catch (err) {
+    console.log('T21 warning: network image complete timeout');
+  }
+
+  // Check loading text is gone
+  const t21networkLoadingGone = await page.evaluate(() => {
+    const loadingDiv = Array.from(document.querySelectorAll('div')).find(el => el.textContent && el.textContent.includes('图片加载中...'));
+    return !loadingDiv;
+  });
+
   // Check network image
   const t21networkImg = await page.evaluate(() => {
     const img = document.querySelector('img[src*="cities/xiamen/xiamen_network.png"]');
@@ -658,6 +676,24 @@ async function runTests(baseUrl) {
     return false;
   });
   await wait(1500);
+
+  // Wait for plan img to complete loading
+  let t21planComplete = false;
+  try {
+    await page.waitForFunction(() => {
+      const img = document.querySelector('img[src*="cities/xiamen/xiamen_plan.png"]');
+      return img && img.complete;
+    }, { timeout: 10000 });
+    t21planComplete = true;
+  } catch (err) {
+    console.log('T21 warning: plan image complete timeout');
+  }
+
+  // Check loading text is gone
+  const t21planLoadingGone = await page.evaluate(() => {
+    const loadingDiv = Array.from(document.querySelectorAll('div')).find(el => el.textContent && el.textContent.includes('图片加载中...'));
+    return !loadingDiv;
+  });
 
   // Check plan image
   const t21planImg = await page.evaluate(() => {
@@ -713,6 +749,10 @@ async function runTests(baseUrl) {
   let t21detail = '';
   if (!t21networkImg.hasImg) {
     t21detail = 'network img not found in DOM';
+  } else if (!t21networkComplete) {
+    t21detail = 'network img did not complete loading';
+  } else if (!t21networkLoadingGone) {
+    t21detail = 'network image "图片加载中..." text is still visible';
   } else if (!t21networkOk && t21networkDetail.includes('html fallback')) {
     t21detail = `network image is html fallback: ${t21networkDetail}`;
   } else if (!t21networkImg.hasLink) {
@@ -721,6 +761,10 @@ async function runTests(baseUrl) {
     t21detail = 'plan tab not found/clicked';
   } else if (!t21planImg.hasImg) {
     t21detail = 'plan img not found in DOM after tab click';
+  } else if (!t21planComplete) {
+    t21detail = 'plan img did not complete loading';
+  } else if (!t21planLoadingGone) {
+    t21detail = 'plan image "图片加载中..." text is still visible';
   } else if (!t21planOk && t21planDetail.includes('html fallback')) {
     t21detail = `plan image is html fallback: ${t21planDetail}`;
   } else if (!t21planImg.hasLink) {
@@ -733,7 +777,7 @@ async function runTests(baseUrl) {
     t21detail = 'image response returned text/html (SPA fallback)';
   } else {
     t21pass = true;
-    t21detail = `network: ${t21networkDetail}; plan: ${t21planDetail}; scroll: ok`;
+    t21detail = `network: ${t21networkDetail}; plan: ${t21planDetail}; scroll: ok; loading states: ok`;
   }
 
   record('T21', '城市详情页线路图/规划图真实图片加载', t21pass, t21detail);

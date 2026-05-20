@@ -46,6 +46,16 @@ export default function CityAssetPreview({ city }: Props) {
   const alt = `${city.city_cn}${label}`;
   const hasRealImage = has && imageUrl && !imageError;
 
+  useEffect(() => {
+    if (imageUrl) {
+      setImageLoading(true);
+      setImageError(false);
+    } else {
+      setImageLoading(false);
+      setImageError(false);
+    }
+  }, [imageUrl]);
+
   const resetView = useCallback(() => {
     setScale(1);
     setTranslateX(0);
@@ -352,12 +362,15 @@ export default function CityAssetPreview({ city }: Props) {
               }}
             >
               <img
-                src={imageUrl}
+                key={imageUrl || ''}
+                src={imageUrl || ''}
                 alt={alt}
-                loading="lazy"
                 decoding="async"
                 className={styles.image}
-                style={{ display: imageLoading ? 'none' : 'block' }}
+                style={{
+                  opacity: imageLoading ? 0 : 1,
+                  visibility: imageLoading ? 'hidden' : 'visible',
+                }}
                 onLoad={() => setImageLoading(false)}
                 onError={() => { setImageError(true); setImageLoading(false); }}
                 draggable={false}
