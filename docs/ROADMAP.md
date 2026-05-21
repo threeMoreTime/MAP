@@ -10,7 +10,7 @@
 ## 当前状态
 
 - 版本：v1.2.0-dev
-- 当前阶段：Phase 5.1 部署配置与 Phase 5.5 详情页重构已完成。Phase 5.1 已完成：CI、自动 Pages CD、线上 Smoke Test 均通过远端验证
+- 当前阶段：Phase 5.1 部署配置与 Phase 5.6 线上体验与数据可信度优化已完成。Phase 5.6 已完成：CI、自动 Pages CD、线上/本地 Smoke Test 均通过验证
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -23,7 +23,7 @@
 
 | 验收体系 | 范围 | 结果 |
 |----------|------|------|
-| React `test:ui` | T01-T25 | **24 PASS / 0 FAIL / 1 MANUAL** |
+| React `test:ui` | T01-T28 | **27 PASS / 0 FAIL / 1 MANUAL** |
 | `check:static` | T01-T09 | **全部通过** |
 | Legacy `run_acceptance.py` | 16 项浏览器测试 | **16/16 PASS** |
 
@@ -375,14 +375,21 @@
 
 ---
 
-### Phase 5.6：数据与资源来源说明增强
+### Phase 5.6：线上体验与数据可信度优化（已完成）
 
-**目标**：在 About 页面和城市详情页增加更完善的数据来源信息。
+**目标**：在 About 页面、Dashboard 页面及城市详情页全面优化数据可信度展示、边界缺失状态人性化解释以及精细筛选机制。
 
 **产物**：
-- [ ] About 页面补充资源来源说明（线路图/规划图来源 MetroMan.cn）
-- [ ] 城市详情页显示数据更新日期
-- [ ] 封面图来源与署名信息展示
+- [x] **Dashboard 数据大屏数据快照**：新增科技风 `DataSnapshotCard` 数据快照卡片与 `LastUpdatedBadge` 数据更新更新时间徽章，动态展示索引城市、客流有无、图表状态、封面覆盖等关键可信度指标。
+- [x] **边界城市缺失状态人性化解释**：新增 `CityDataCompleteness` 人性化解释面板，针对客流完全缺失（如佛山）、客流暂无采集中（如太原）、封面图/规划图部分缺失（如呼和浩特）进行详实、真诚的人性化解释，同时保留版权所有、作者、许可和来源等扩展属性字段。
+- [x] **Cities 城市网格精细化筛选**：新增 `resourceComplete`（完整城市：日客流、线路图、规划图均有且客流 > 0）与 `resourceMissing`（缺失城市）两个大类精细筛选机制，同时升级 `CityCard` 的精细化科技风状态 Badge 样式。
+- [x] **About 页面动态覆盖率统计**：将数据覆盖率、封面图、线路/规划图覆盖率指标全部转化为基于 `useMetroData` 的 `manifest` 动态实时统计，同时展示数据来源及免责声明。
+- [x] **数据解析鲁棒性优化**：升级 `useMetroData` 实现 covers manifest 拉取的优雅 `catch` 降级，避免拉取封面图清单失败阻塞核心业务数据的加载与渲染。
+- [x] **本地与线上冒烟测试闭环**：`test:pages` 支持环境变量 `BASE_URL` 本地/生产平滑切换，本地与线上测试全面通过。
+
+**验收标准**：
+- `test:ui`：T01-T28，Total 28，PASS 27，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 通过
 
 ---
 
