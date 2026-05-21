@@ -12,8 +12,10 @@ import MileageChart from '../components/charts/MileageChart';
 import TrendChart from '../components/charts/TrendChart';
 import IntensityChart from '../components/charts/IntensityChart';
 import CityDetailPanel from '../components/charts/CityDetailPanel';
+import LastUpdatedBadge from '../components/common/LastUpdatedBadge';
+import DataSnapshotCard from '../components/common/DataSnapshotCard';
 
-function HeroSection({ date, cityCount, statsCount }: { date: string; cityCount: number; statsCount: number }) {
+function HeroSection({ date, cityCount, statsCount, generatedAt }: { date: string; cityCount: number; statsCount: number; generatedAt?: string }) {
   return (
     <section style={{
       textAlign: 'center', padding: '44px 24px 32px',
@@ -26,10 +28,10 @@ function HeroSection({ date, cityCount, statsCount }: { date: string; cityCount:
       }} />
       <div style={{
         display: 'inline-flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', justifyContent: 'center',
+        alignItems: 'center',
       }}>
         {[
           { text: 'React 前端', color: '#448aff' },
-          { text: '数据快照', color: '#4caf50' },
           { text: `${cityCount} 城市资源`, color: '#ff9800' },
           { text: `${statsCount} 客流统计城市`, color: '#9c27b0' },
         ].map(tag => (
@@ -41,6 +43,7 @@ function HeroSection({ date, cityCount, statsCount }: { date: string; cityCount:
             {tag.text}
           </span>
         ))}
+        <LastUpdatedBadge generatedAt={generatedAt} style={{ padding: '2px 10px', fontSize: '10px' }} />
       </div>
       <h1 className="gradient-text" style={{
         fontSize: 30, fontWeight: 700, letterSpacing: 6, marginBottom: 10,
@@ -54,7 +57,7 @@ function HeroSection({ date, cityCount, statsCount }: { date: string; cityCount:
         覆盖全国 {cityCount} 个城市地铁线路资源，{statsCount} 个城市客流统计数据
         <br />
         <span style={{ color: 'var(--text-label)', fontSize: 11 }}>
-          数据来源：MetroDB.org · 更新日期：{date}
+          数据来源：MetroDB.org · 声明：非官方实时发布，所有数据均为公开数据快照与整理汇总，仅供参考学习
         </span>
       </p>
     </section>
@@ -107,9 +110,10 @@ export default function DashboardPage() {
 
   return (
     <>
-      <HeroSection date={date} cityCount={merged.length} statsCount={statsCount} />
+      <HeroSection date={date} cityCount={merged.length} statsCount={statsCount} generatedAt={manifest?.generated_at} />
 
       <div className="page-container" style={{ paddingBottom: 32 }}>
+        <DataSnapshotCard cities={merged} manifest={manifest} />
         <SectionTitle icon="◎" title="数据总览" />
         <StatsRow cities={filteredCities} />
         {noDataCount > 0 && (

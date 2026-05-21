@@ -41,6 +41,10 @@ function applyCityFilter(cities: MergedCity[], tag: CityFilterTag): MergedCity[]
       return cities.filter((c) => c.has_network_map);
     case 'hasPlanMap':
       return cities.filter((c) => c.has_plan_map);
+    case 'resourceComplete':
+      return cities.filter((c) => c.has_network_map && c.has_plan_map && c.has_stats && c.daily_ridership_wan > 0);
+    case 'resourceMissing':
+      return cities.filter((c) => !c.has_network_map || !c.has_plan_map || !c.has_stats || c.daily_ridership_wan <= 0);
     case 'all':
     default:
       return cities;

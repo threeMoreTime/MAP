@@ -1435,6 +1435,69 @@ async function runTests(baseUrl) {
   }
 
   record('T25', '城市详情页响应式与边界城市状态', t25pass, t25detail);
+
+  // T26: 数据快照校验
+  await gotoHash(BASE, '#/dashboard');
+  const t26 = await page.evaluate(() => {
+    const card = document.querySelector('.data-snapshot-card');
+    if (!card) return { ok: false, detail: 'data-snapshot-card not found' };
+    const text = card.innerText || '';
+    const hasTotal = text.includes('城市索引');
+    const hasRidership = text.includes('有客流数据');
+    const hasNoRidership = text.includes('暂无日客流');
+    const hasNetwork = text.includes('运营线路图');
+    const hasPlan = text.includes('建设规划图');
+    const hasCovers = text.includes('实景封面图');
+    return {
+      ok: hasTotal && hasRidership && hasNoRidership && hasNetwork && hasPlan && hasCovers,
+      detail: `text=${text.substring(0, 150)}`
+    };
+  });
+  record('T26', 'Dashboard 页面数据快照卡片正确渲染', t26.ok, t26.detail);
+
+  // T27: 详情页不同城市的缺失解释文案验证
+  let t27pass = true;
+  const t27details = [];
+  const t27cities = [
+    { id: 'xiamen', text: '数据完整收录' },
+    { id: 'taiyuan', text: '日客流统计采集中' },
+    { id: 'hohhot', text: '客流与实景封面深度整理中' },
+    { id: 'foshan', text: '数据深度建设中' }
+  ];
+  for (const c of t27cities) {
+    await gotoHash(BASE, `#/city/${c.id}`);
+    const found = await page.evaluate((expected) => {
+      const panel = document.querySelector('.city-completeness-panel');
+      if (!panel) return false;
+      const innerText = panel.innerText || '';
+      return innerText.includes(expected);
+    }, c.text);
+    if (!found) {
+      t27pass = false;
+      t27details.push(`${c.id}: expected "${c.text}" not found`);
+    }
+  }
+  record('T27', '城市详情页不同边界城市的缺失解释与人性化提示校验', t27pass, t27pass ? 'OK' : t27details.join('; '));
+
+  // T28: About 页面动态数据与可信度文本校验
+  await gotoHash(BASE, '#/about');
+  const t28 = await page.evaluate(() => {
+    const badge = document.querySelector('.last-updated-badge');
+    const body = document.body.innerText || '';
+    const hasGeo = body.includes('china.json');
+    const hasMetroDB = body.includes('MetroDB.org');
+    const hasMetroMan = body.includes('MetroMan');
+    return {
+      hasBadge: !!badge,
+      hasGeo,
+      hasMetroDB,
+      hasMetroMan,
+      detail: `badge=${!!badge}, geo=${hasGeo}, metrodb=${hasMetroDB}, metroman=${hasMetroMan}`
+    };
+  });
+  record('T28', 'About 页面动态数据、数据源与可信度文本校验', 
+    t28.hasBadge && t28.hasGeo && t28.hasMetroDB && t28.hasMetroMan, 
+    t28.detail);
 }
 
 // === 主流程 ===

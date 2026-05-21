@@ -75,4 +75,26 @@ export const METRIC_LABELS: Record<MetricKey, MetricMeta> = {
   ridership_intensity: { name: '客流强度', unit: '', decimals: 2 },
 };
 
-export type CityFilterTag = 'all' | 'hasRidership' | 'noRidership' | 'hasNetworkMap' | 'hasPlanMap';
+export type CityFilterTag = 'all' | 'hasRidership' | 'noRidership' | 'hasNetworkMap' | 'hasPlanMap' | 'resourceComplete' | 'resourceMissing';
+
+export interface CoverManifestItem {
+  city: string;
+  city_cn: string;
+  file: string | null;
+  status: 'downloaded' | 'fallback' | 'missing' | 'unknown';
+  source_url?: string;
+  image_url?: string;
+  license?: string;
+  author?: string;
+  attribution?: string;
+  width?: number;
+  height?: number;
+  reason?: string;
+}
+
+export interface CoverManifest {
+  generated_at?: string;
+  source?: string;
+  items: CoverManifestItem[];
+}
+

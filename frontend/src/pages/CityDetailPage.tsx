@@ -6,6 +6,7 @@ import CityTrendAreaChart from '../components/charts/CityTrendAreaChart';
 import CityAssetPreview from '../components/city/CityAssetPreview';
 import CitySourceInfo from '../components/city/CitySourceInfo';
 import EmptyState from '../components/common/EmptyState';
+import CityDataCompleteness from '../components/city/CityDataCompleteness';
 import styles from './CityDetailPage.module.css';
 
 const CITY_DESCRIPTIONS: Record<string, string> = {
@@ -290,30 +291,7 @@ export default function CityDetailPage() {
         {/* Right: Info Panel */}
         <div className={styles.infoPanel}>
           {/* Resource Status */}
-          <div className={styles.infoCard} data-testid="resource-status">
-            <h4 className={styles.infoCardTitle}>资源状态</h4>
-            <div className={allResourcesAvailable ? `${styles.overallStatus} ${styles.overallOk}` : `${styles.overallStatus} ${styles.overallPartial}`}>
-              {allResourcesAvailable ? '✓ 资源完整可用' : '⚠ 部分资源缺失'}
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoField}>线路图</span>
-              <span className={hasNetworkMap ? styles.statusOk : styles.statusNo}>
-                {hasNetworkMap ? '✓ 已收录' : '✗ 暂无'}
-              </span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoField}>规划图</span>
-              <span className={hasPlanMap ? styles.statusOk : styles.statusNo}>
-                {hasPlanMap ? '✓ 已收录' : '✗ 暂无'}
-              </span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoField}>客流数据</span>
-              <span className={hasRidership ? styles.statusOk : styles.statusNo}>
-                {hasRidership ? '✓ 有数据' : '✗ 暂无'}
-              </span>
-            </div>
-          </div>
+          <CityDataCompleteness city={city} />
 
           {/* Usage Tips */}
           <div className={styles.infoCard} data-testid="usage-tips">

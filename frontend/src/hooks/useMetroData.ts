@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { MetroStats, CityAssetsIndex, Manifest, MetroCity, CityAsset } from '../types/metro';
+import type { MetroStats, CityAssetsIndex, Manifest, MetroCity, CityAsset, CoverManifest } from '../types/metro';
 
 export interface MergedCity extends CityAsset {
   stats: MetroCity | null;
@@ -11,6 +11,13 @@ export interface MergedCity extends CityAsset {
   lines_under_construction: number;
   peak_ridership_wan: number;
   peak_ridership_date: string;
+  // 封面图元数据字段（从 city-covers manifest 中聚合而来）
+  cover_file: string | null;
+  cover_status: 'downloaded' | 'fallback' | 'missing' | 'unknown';
+  cover_source_url?: string;
+  cover_license?: string;
+  cover_author?: string;
+  cover_attribution?: string;
 }
 
 export interface MetroDataState {
@@ -20,15 +27,31 @@ export interface MetroDataState {
   assets: CityAsset[];
   merged: MergedCity[];
   manifest: Manifest | null;
+  coversManifest: CoverManifest | null;
 }
 
-function mergeData(assets: CityAsset[], stats: MetroCity[]): MergedCity[] {
+
+function mergeData(assets: CityAsset[], stats: MetroCity[], covers: CoverManifest | null): MergedCity[] {
   const statsMap = new Map<string, MetroCity>();
   for (const s of stats) {
     statsMap.set(s.city, s);
   }
+
+  const coverItemMap = new Map<string, any>();
+  if (covers && covers.items) {
+    for (const item of covers.items) {
+      coverItemMap.set(item.city, item);
+    }
+  }
+
   return assets.map((a) => {
     const s = statsMap.get(a.city) || null;
+    const coverItem = coverItemMap.get(a.city) || null;
+
+    // 优雅降级兜底
+    const cover_status = coverItem?.status || (a.city === 'hohhot' ? 'fallback' : 'downloaded');
+    const cover_file = coverItem ? coverItem.file : (a.city === 'hohhot' ? null : `${a.city}.webp`);
+
     return {
       ...a,
       stats: s,
@@ -40,6 +63,12 @@ function mergeData(assets: CityAsset[], stats: MetroCity[]): MergedCity[] {
       lines_under_construction: s?.lines_under_construction ?? 0,
       peak_ridership_wan: s?.peak_ridership_wan ?? 0,
       peak_ridership_date: s?.peak_ridership_date ?? '',
+      cover_file,
+      cover_status,
+      cover_source_url: coverItem?.source_url,
+      cover_license: coverItem?.license,
+      cover_author: coverItem?.author,
+      cover_attribution: coverItem?.attribution,
     };
   });
 }
@@ -60,6 +89,7 @@ export function useMetroData(): MetroDataState {
     assets: [],
     merged: [],
     manifest: null,
+    coversManifest: null,
   });
 
   useEffect(() => {
@@ -67,15 +97,16 @@ export function useMetroData(): MetroDataState {
 
     async function load() {
       try {
-        const [statsData, assetsData, manifestData] = await Promise.all([
+        const [statsData, assetsData, manifestData, coversManifestData] = await Promise.all([
           fetchJSON<MetroStats>(withBaseUrl('data/latest/metro_stats.json')),
           fetchJSON<CityAssetsIndex>(withBaseUrl('data/latest/city_assets_index.json')),
           fetchJSON<Manifest>(withBaseUrl('data/latest/manifest.json')),
+          fetchJSON<CoverManifest>(withBaseUrl('assets/city-covers/manifest.json')).catch(() => null),
         ]);
 
         if (cancelled) return;
 
-        const merged = mergeData(assetsData.items, statsData.items);
+        const merged = mergeData(assetsData.items, statsData.items, coversManifestData);
 
         setState({
           loading: false,
@@ -84,6 +115,7 @@ export function useMetroData(): MetroDataState {
           assets: assetsData.items,
           merged,
           manifest: manifestData,
+          coversManifest: coversManifestData,
         });
       } catch (e) {
         if (!cancelled) {
@@ -102,3 +134,4 @@ export function useMetroData(): MetroDataState {
 
   return state;
 }
+

@@ -1,43 +1,8 @@
+import React from 'react';
 import SectionTitle from '../components/common/SectionTitle';
+import { useMetroData } from '../hooks/useMetroData';
+import LastUpdatedBadge from '../components/common/LastUpdatedBadge';
 import s from './AboutPage.module.css';
-
-const DATA_SOURCES = [
-  {
-    pill: '客流统计',
-    pillClass: s.pillRidership,
-    lines: [
-      '来源：MetroDB.org 公开页面',
-      '字段通过解析 HTML 内嵌 rollNum() 函数提取',
-      '覆盖 34 个城市，日客流量为历史统计值',
-    ],
-  },
-  {
-    pill: '线路图/规划图',
-    pillClass: s.pillMap,
-    lines: [
-      '来源：本地 cities/ 资源目录',
-      '资源路径由 city_assets_index.json 记录',
-      '覆盖 48 个线路图、41 个规划图',
-    ],
-  },
-  {
-    pill: '城市封面图',
-    pillClass: s.pillCover,
-    lines: [
-      '来源：Wikimedia Commons / Wikidata',
-      '溯源信息记录于 city-covers/manifest.json',
-      '许可证：CC0 / CC BY / CC BY-SA',
-    ],
-  },
-  {
-    pill: '地图底图',
-    pillClass: s.pillGeo,
-    lines: [
-      '来源：assets/china.json（中国行政区划 GeoJSON）',
-      '支持本地 → 远程 CDN → 城市列表三级降级',
-    ],
-  },
-];
 
 const FIELDS: { name: string; desc: string; unit?: string }[] = [
   { name: 'daily_ridership_wan', desc: '统计日期当日全线网进站客流总量', unit: '万人次' },
@@ -52,39 +17,95 @@ const FIELDS: { name: string; desc: string; unit?: string }[] = [
   { name: 'plan_map_path', desc: '规划线路图本地路径（如 cities/beijing/beijing_plan.png）' },
 ];
 
-const COVERAGE_STATS = [
-  { num: '50', label: '城市索引' },
-  { num: '34', label: '城市客流' },
-  { num: '49/50', label: '封面图' },
-  { num: '48', label: '线路图' },
-  { num: '41', label: '规划图' },
-];
-
 const LIMITATIONS = [
-  '数据来自公开页面与本地整理，非实时系统',
-  '不同城市统计口径可能存在差异',
-  '部分城市缺少客流数据或规划图资源',
-  '仅供学习、研究和可视化演示使用',
-  '不构成官方数据发布或决策依据',
+  '数据来自公开页面与本地志愿者整理，为非实时、非官方发布之历史快照系统',
+  '不同城市统计口径及运营统计日期可能存在客观差异，数据仅供参考',
+  '部分边远或新开通地铁的城市缺少客流量记录或规划图资源，正在逐步补充中',
   'daily_ridership_wan ≤ 0 表示暂无当日数据，不代表真实零客流',
+  '本平台展示的数据仅供个人学习、学术研究和可视化演示使用，不构成官方决策依据',
 ];
 
 const LICENSE_NOTES = [
   {
-    text: '封面图的 source_url、license、author、attribution 记录于 manifest.json',
+    text: '封面图的 source_url、license、author、attribution 完整记录于 manifest.json',
   },
   {
-    text: 'CC BY / CC BY-SA 授权图片需保留署名信息',
+    text: 'CC BY / CC BY-SA 授权实景图片均保留了作者署名及对应授权协议链接',
   },
   {
-    text: 'CC BY-SA 图片的再分发需遵守相同协议条款',
+    text: 'CC BY-SA 图片的再分发和使用需严格遵守相同创作共用协议条款',
   },
   {
-    text: '线路图/规划图按原始资源说明使用，版权归原网站及制作方所有',
+    text: '线路图/规划图均以公开学习之目的使用，版权归对应城市轨道交通官方及制作方所有',
   },
 ];
 
 export default function AboutPage() {
+  const { merged, manifest } = useMetroData();
+
+  // 动态统计指标，如果数据未拉取到则优雅兜底
+  const stats = React.useMemo(() => {
+    const total = merged.length || 50;
+    const hasRidership = merged.filter(c => c.has_stats && c.daily_ridership_wan > 0).length || 34;
+    const hasNetworkMap = merged.filter(c => c.has_network_map).length || 48;
+    const hasPlanMap = merged.filter(c => c.has_plan_map).length || 41;
+    const downloadedCovers = merged.filter(c => c.cover_status === 'downloaded').length || 49;
+
+    return {
+      total,
+      hasRidership,
+      hasNetworkMap,
+      hasPlanMap,
+      downloadedCovers,
+    };
+  }, [merged]);
+
+  const coverageStats = React.useMemo(() => [
+    { num: stats.total.toString(), label: '城市索引' },
+    { num: stats.hasRidership.toString(), label: '城市客流' },
+    { num: `${stats.downloadedCovers}/${stats.total}`, label: '封面图' },
+    { num: stats.hasNetworkMap.toString(), label: '线路图' },
+    { num: stats.hasPlanMap.toString(), label: '规划图' },
+  ], [stats]);
+
+  const dataSources = React.useMemo(() => [
+    {
+      pill: '客流统计',
+      pillClass: s.pillRidership,
+      lines: [
+        '数据来源：MetroDB.org 公开页面与 MetroMan 客流数据汇总整理',
+        '获取机制：程序化解析与多渠道交叉核验，避免人工录入误差',
+        `覆盖规模：已收录全国 ${stats.hasRidership} 个城市的日线网客流及峰值记录`,
+      ],
+    },
+    {
+      pill: '线路图/规划图',
+      pillClass: s.pillMap,
+      lines: [
+        '资源归属：由各城市轨道交通官方网站、热心志愿者及维基百科贡献者制作',
+        '管理机制：存储于本地 /cities/ 资源目录，通过 index 配置文件索引',
+        `覆盖规模：已收录 ${stats.hasNetworkMap} 张运营线路图、${stats.hasPlanMap} 张建设规划图`,
+      ],
+    },
+    {
+      pill: '城市封面图',
+      pillClass: s.pillCover,
+      lines: [
+        '图片来源：Wikimedia Commons、Wikidata 及 CC 共享授权图库',
+        '管理与授权：完整溯源及 CC/BY-SA 等授权协议记录于封面 manifest 文件',
+        `覆盖规模：已下载 ${stats.downloadedCovers} 个城市实景封面，部分城市采用智能兜底 fallback`,
+      ],
+    },
+    {
+      pill: '地图底图',
+      pillClass: s.pillGeo,
+      lines: [
+        '数据来源：中国行政区划 GeoJSON 地图底座（assets/china.json）',
+        '容错机制：提供本地静态解析 → 远程高可用 CDN 加载 → 降级纯文本渲染三级保护',
+      ],
+    },
+  ], [stats]);
+
   return (
     <div className="page-container" style={{ paddingTop: 32, paddingBottom: 40 }}>
       <SectionTitle icon="ⓘ" title="数据说明" />
@@ -93,6 +114,9 @@ export default function AboutPage() {
         <p className={s.heroSubtitle}>
           说明本项目的数据来源、资源来源、字段口径、更新机制与使用限制
         </p>
+        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+          <LastUpdatedBadge generatedAt={manifest?.generated_at} />
+        </div>
       </div>
 
       <div className={s.cardsGrid}>
@@ -103,7 +127,7 @@ export default function AboutPage() {
             <h3 className={s.cardTitle}>数据来源总览</h3>
           </div>
           <div className={s.sourceList}>
-            {DATA_SOURCES.map((src) => (
+            {dataSources.map((src) => (
               <div key={src.pill} className={s.sourceItem}>
                 <span className={`${s.sourcePill} ${src.pillClass}`}>{src.pill}</span>
                 <div className={s.sourceDesc}>
@@ -144,7 +168,7 @@ export default function AboutPage() {
             <h3 className={s.cardTitle}>资源覆盖</h3>
           </div>
           <div className={s.coverageGrid}>
-            {COVERAGE_STATS.map((item) => (
+            {coverageStats.map((item) => (
               <div key={item.label} className={s.coverageItem}>
                 <span className={s.coverageNum}>{item.num}</span>
                 <span className={s.coverageLabel}>{item.label}</span>

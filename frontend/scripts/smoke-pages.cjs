@@ -187,8 +187,54 @@ async function run() {
       const url = `${BASE}${p.path}`;
       try {
         await gotoWithRetry(page, url, {}, 3, 4000);
-        await wait(1000);
-        record(p.name, true, `Loaded successfully: ${url}`);
+        await wait(1500);
+        
+        let extraOk = true;
+        let extraDetail = '';
+
+        if (p.name === 'Dashboard') {
+          const snapshotExists = await page.evaluate(() => {
+            const el = document.querySelector('.data-snapshot-card');
+            return !!el && el.innerText.includes('MAP 城市数据快照');
+          });
+          if (!snapshotExists) {
+            extraOk = false;
+            extraDetail = 'Missing .data-snapshot-card container or title';
+          }
+        } else if (p.name === 'Foshan Page') {
+          const completenessOk = await page.evaluate(() => {
+            const el = document.querySelector('.city-completeness-panel');
+            return !!el && el.innerText.includes('数据深度建设中');
+          });
+          if (!completenessOk) {
+            extraOk = false;
+            extraDetail = 'Missing .city-completeness-panel with danger text';
+          }
+        } else if (p.name === 'Taiyuan Page') {
+          const completenessOk = await page.evaluate(() => {
+            const el = document.querySelector('.city-completeness-panel');
+            return !!el && el.innerText.includes('日客流统计采集中');
+          });
+          if (!completenessOk) {
+            extraOk = false;
+            extraDetail = 'Missing .city-completeness-panel with info text';
+          }
+        } else if (p.name === 'About Page') {
+          const badgeExists = await page.evaluate(() => {
+            const el = document.querySelector('.last-updated-badge');
+            return !!el;
+          });
+          if (!badgeExists) {
+            extraOk = false;
+            extraDetail = 'Missing .last-updated-badge container';
+          }
+        }
+
+        if (extraOk) {
+          record(p.name, true, `Loaded and validated successfully: ${url}`);
+        } else {
+          record(p.name, false, `Validation failed: ${extraDetail} on ${url}`);
+        }
       } catch (err) {
         record(p.name, false, `Failed to load ${url} after 3 attempts: ${err.message}`);
       }
