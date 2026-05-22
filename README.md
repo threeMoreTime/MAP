@@ -182,7 +182,13 @@ npm run test:ui    # React 前端浏览器验收（T01-T25）
 - `/#/city/:id` — 城市详情（如 `/#/city/xiamen`）
 - `/#/about` — 数据说明
 
-> `dashboard.html` 为旧版稳定基线（frozen baseline / legacy fallback），仍可通过旧版验收脚本进行本地验证。React 版为当前主力前端。
+### Legacy Dashboard 维护策略
+
+根目录下的 `dashboard.html` 单文件大屏已被正式定义为系统的 **Frozen Baseline / Legacy Fallback（冻结基线 / 灾备回退）**，当前主力前端为 `frontend/` React 现代化系统。
+1. **新功能唯一归属**：所有新业务功能（如数据对比、数据质量、数据导出等）将一律开发在 React 前端中，不再进入旧版大屏；
+2. **限度修改原则**：旧版大屏仅接受阻断性运行错误修复、安全性修复以及底层数据结构非向下兼容的兼容性适配，不对其进行任何新交互、视觉或图表重构；
+3. **CI 质量防线保留**：自动化测试的 `legacy-check` Job 将永久保留在 CI 流水线中，作为底层数据流完整性的最后拦截机制；
+4. **详细规则**：具体的维护、修改红线与发布流程参见正式说明文件 [LEGACY_DASHBOARD_POLICY.md](docs/LEGACY_DASHBOARD_POLICY.md)。
 
 ## 更多文档
 

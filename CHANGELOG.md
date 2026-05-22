@@ -2,6 +2,15 @@
 
 本文件记录项目的所有重要变更。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/)。
 
+## [v1.2.2-dev] - 2026-05-22
+
+### 已完成 (Phase 5.7 旧版 dashboard.html 维护策略落纸)
+
+#### 文档治理
+- **明确冻结基线定位**：新增 [LEGACY_DASHBOARD_POLICY.md](docs/LEGACY_DASHBOARD_POLICY.md)，正式将 `dashboard.html` 冷冻为 **Frozen Baseline / Legacy Fallback**，规定其不再承接任何新功能开发。
+- **发布与回归校验规范化**：修改 `RELEASE_PROCESS.md` 与 `README.md`，规范了双前端发布流程，固化了 `npm run test:data` 和 `npm run test:acceptance` 自动回归防线的“零妥协”阻断原则。
+- **文档导航更新**：在 `docs/INDEX.md` 中补充导航索引，并在 `ROADMAP.md` 及 `NEXT_ROADMAP_PLAN.md` 中合规将 Phase 5.7 状态合拢归档。
+
 ---
 
 ## [v1.2.1-dev] - 2026-05-22

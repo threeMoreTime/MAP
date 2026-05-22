@@ -18,4 +18,5 @@
 | [RELEASE_PROCESS.md](RELEASE_PROCESS.md) | 发布流程与版本管理规范 |
 | [ROADMAP.md](ROADMAP.md) | 项目路线图与后续迭代计划 |
 | [NEXT_ROADMAP_PLAN.md](NEXT_ROADMAP_PLAN.md) | 后续全量规划任务：Phase 5.6.1 → Phase 10 长期路线设计 |
+| [LEGACY_DASHBOARD_POLICY.md](LEGACY_DASHBOARD_POLICY.md) | 旧版 dashboard.html 冻结基线与维护策略 |
 | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | 已知问题与限制清单 |

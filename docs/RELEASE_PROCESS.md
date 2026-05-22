@@ -152,30 +152,45 @@ git push origin v1.x.x
 
 项目现已支持新版 React 前端（当前主力前端）与旧版 Dashboard（Frozen Baseline / Legacy Fallback）双轨发布。
 
-### 8.1 发布前本地回归验证
-为了确保发布万无一失，在推送 `master` 之前，强烈建议在本地完整运行并全绿通过以下双前端验收指令：
+### 8.1 发布前本地回归验证与旧版冻结基线校验规则
 
-1. **旧版稳定基线与数据校验**：
-   ```bash
-   # 根目录下执行
-   npm ci
-   npm run test:data
-   npm run test:acceptance
-   ```
+为确保发布万无一失并彻底捍卫旧大屏作为 Frozen Baseline 的向下兼容底线，在向 `master` 分支推送代码之前，必须在本地完整运行以下双轨道回归流程并全绿通过：
 
-2. **新版 React 主力前端静态健全性与交互回归**：
-   ```bash
-   # 进入前端目录
-   cd frontend
-   npm ci
-   npm run typecheck
-   npm run build
-   npm run check:static
-   npm run test:ui
-   npm run test:pages
-   ```
-   > **注意**：`npm run test:pages` 默认验证线上环境 `https://threemoretime.github.io/MAP/`。如果在上线前需要在本地验证，请先在另一个终端启动 `npm run preview`（通常在 `http://127.0.0.1:4173/`），然后运行：
-   > `BASE_URL=http://127.0.0.1:4173/ npm run test:pages`
+#### 1. 旧版冻结基线校验（Legacy Fallback 回归）
+- **核心判定原则**：旧版大屏仅验证核心数据流正常载入、客流排行榜与年度历史折线能基础渲染即可。旧版不再承接任何新版 React 前端上的视觉或交互功能；
+- **错误排查流程**：若旧版验收测试（`npm run test:acceptance`）失败，须研判是否是客流 Schema 改变导致兼容性受损或本地测试驱动问题。**严禁以任何手段在 CI 配置文件中注释或跳过 `legacy-check` Job，亦不允许通过随意调低或删除测试断言来绕过拦截**；
+- **验证指令**：
+  ```bash
+  # 根目录下执行
+  npm ci
+  npm run test:data         # 校验最新数据 Schema 的健全性
+  npm run test:acceptance   # 运行旧大屏一键式浏览器 E2E 回归测试
+  ```
+
+#### 2. 新版 React 主力前端校验（全量构建与交互回归）
+- **验证指令**：
+  ```bash
+  # 进入前端目录
+  cd frontend
+  npm ci
+  npm run typecheck       # TypeScript 静态类型健全性校验
+  npm run build           # 编译打包，验证 Chunk 自动分包与防阻断
+  npm run check:static    # T01-T09 静态打包产物及依赖路径自检
+  npm run test:ui         # T01-T28 真浏览器本地自动化交互验收
+  ```
+- **本地冒烟测试**：
+  在推送前，强烈建议验证本地打包产物的冒烟状态。在当前终端启动：
+  ```bash
+  npm run preview         # 启动本地预览（默认端口为 4173 或递增）
+  ```
+  在另一个终端中，指定本地 `BASE_URL` 运行：
+  ```bash
+  # Windows PowerShell 环境下：
+  $env:BASE_URL="http://127.0.0.1:4173/"; npm run test:pages
+  
+  # Linux / macOS 环境下：
+  BASE_URL=http://127.0.0.1:4173/ npm run test:pages
+  ```
 
 ---
 

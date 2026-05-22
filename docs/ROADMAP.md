@@ -409,14 +409,20 @@
 
 ---
 
-### Phase 5.7：旧版 dashboard.html 维护策略
+### Phase 5.7：旧版 dashboard.html 维护策略（已完成）
 
-**目标**：明确 dashboard.html 的长期定位与维护策略。
+**目标**：明确 dashboard.html 的 Frozen Baseline / Legacy Fallback 定位，规范双前端长期维护边界。
 
 **产物**：
-- [ ] 明确 dashboard.html 为 frozen baseline，仅做数据更新
-- [ ] 评估是否保留 dashboard.html 或在 React 版稳定后归档
-- [ ] 更新 RELEASE_PROCESS.md 反映双前端发布流程
+- [x] **新增策略规约文档**：编写 [LEGACY_DASHBOARD_POLICY.md](LEGACY_DASHBOARD_POLICY.md) 彻底界定修改例外和红线边界。
+- [x] **README legacy 入口说明**：更新 README 补充“Legacy Dashboard 维护策略”跳转说明。
+- [x] **RELEASE_PROCESS legacy 发布回归说明**：更新 RELEASE_PROCESS 明确双轨回归的“零妥协”阻断原则和命令。
+- [x] **INDEX 导航更新**：更新 [INDEX.md](INDEX.md) 加入规约入口。
+- [x] **CI legacy-check 完整保留**：ci.yml 任务长青。
+
+**验收标准**：
+- dashboard.html 未被修改
+- legacy-check 本地与远端 CI 均完美通过
 
 ---
 
