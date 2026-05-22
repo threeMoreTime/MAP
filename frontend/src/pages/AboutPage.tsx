@@ -18,9 +18,10 @@ const FIELDS: { name: string; desc: string; unit?: string }[] = [
 ];
 
 const LIMITATIONS = [
-  '数据来自公开页面与本地志愿者整理，为非实时、非官方发布之历史快照系统',
+  '本项目展示的是公开资料整理快照，非实时运营数据',
+  '有统计记录与有日客流展示值不是同一概念，两者不可混淆',
+  '部分城市已纳入索引并进行了线路或基础信息整理，但暂未收录可展示日客流',
   '不同城市统计口径及运营统计日期可能存在客观差异，数据仅供参考',
-  '部分边远或新开通地铁的城市缺少客流量记录或规划图资源，正在逐步补充中',
   'daily_ridership_wan ≤ 0 表示暂无当日数据，不代表真实零客流',
   '本平台展示的数据仅供个人学习、学术研究和可视化演示使用，不构成官方决策依据',
 ];
@@ -43,17 +44,25 @@ const LICENSE_NOTES = [
 export default function AboutPage() {
   const { merged, manifest } = useMetroData();
 
-  // 动态统计指标，如果数据未拉取到则优雅兜底
+  // 基于当前快照动态计算，如果数据未拉取到则优雅兜底
   const stats = React.useMemo(() => {
     const total = merged.length || 50;
-    const hasRidership = merged.filter(c => c.has_stats && c.daily_ridership_wan > 0).length || 34;
+    const hasStats = merged.filter(c => c.has_stats === true).length || 34;
+    const hasRidership = merged.filter(c => c.has_stats && c.daily_ridership_wan > 0).length || 23;
+    const statsButNoRidership = merged.filter(c => c.has_stats && c.daily_ridership_wan <= 0).length || 11;
+    const noStats = merged.filter(c => !c.has_stats).length || 16;
+    const noRidership = merged.filter(c => !c.has_stats || c.daily_ridership_wan <= 0).length || 27;
     const hasNetworkMap = merged.filter(c => c.has_network_map).length || 48;
     const hasPlanMap = merged.filter(c => c.has_plan_map).length || 41;
     const downloadedCovers = merged.filter(c => c.cover_status === 'downloaded').length || 49;
 
     return {
       total,
+      hasStats,
       hasRidership,
+      statsButNoRidership,
+      noStats,
+      noRidership,
       hasNetworkMap,
       hasPlanMap,
       downloadedCovers,
@@ -62,10 +71,14 @@ export default function AboutPage() {
 
   const coverageStats = React.useMemo(() => [
     { num: stats.total.toString(), label: '城市索引' },
-    { num: stats.hasRidership.toString(), label: '城市客流' },
-    { num: `${stats.downloadedCovers}/${stats.total}`, label: '封面图' },
-    { num: stats.hasNetworkMap.toString(), label: '线路图' },
-    { num: stats.hasPlanMap.toString(), label: '规划图' },
+    { num: stats.hasStats.toString(), label: '有统计记录' },
+    { num: stats.hasRidership.toString(), label: '有日客流展示值' },
+    { num: stats.noRidership.toString(), label: '暂无日客流展示值' },
+    { num: stats.statsButNoRidership.toString(), label: '其中有统计但无日客流' },
+    { num: stats.noStats.toString(), label: '完全无统计记录' },
+    { num: stats.hasNetworkMap.toString(), label: '线路图覆盖' },
+    { num: stats.hasPlanMap.toString(), label: '规划图覆盖' },
+    { num: `${stats.downloadedCovers}/${stats.total}`, label: '封面图覆盖' },
   ], [stats]);
 
   const dataSources = React.useMemo(() => [
@@ -75,7 +88,7 @@ export default function AboutPage() {
       lines: [
         '数据来源：MetroDB.org 公开页面与 MetroMan 客流数据汇总整理',
         '获取机制：程序化解析与多渠道交叉核验，避免人工录入误差',
-        `覆盖规模：已收录全国 ${stats.hasRidership} 个城市的日线网客流及峰值记录`,
+        `覆盖规模：已收录全国 ${stats.hasRidership} 个有日客流展示值的城市记录`,
       ],
     },
     {
@@ -165,7 +178,7 @@ export default function AboutPage() {
         <div className={s.card}>
           <div className={s.cardHeader}>
             <span className={s.cardIcon}>📦</span>
-            <h3 className={s.cardTitle}>资源覆盖</h3>
+            <h3 className={s.cardTitle}>基于当前快照动态计算的资源覆盖</h3>
           </div>
           <div className={s.coverageGrid}>
             {coverageStats.map((item) => (
@@ -174,6 +187,24 @@ export default function AboutPage() {
                 <span className={s.coverageLabel}>{item.label}</span>
               </div>
             ))}
+          </div>
+          <div style={{
+            marginTop: '12px',
+            padding: '8px 10px',
+            background: 'rgba(15, 23, 42, 0.2)',
+            border: '1px dashed rgba(51, 65, 85, 0.3)',
+            borderRadius: '6px',
+            fontSize: '11px',
+            color: '#94a3b8',
+            lineHeight: '1.5'
+          }}>
+            💡 统计口径说明：
+            <br />
+            1. 城市索引 ({stats.total} 城) = 有统计记录 ({stats.hasStats} 城) + 完全无统计记录 ({stats.noStats} 城)
+            <br />
+            2. 有统计记录 ({stats.hasStats} 城) = 有日客流展示值 ({stats.hasRidership} 城) + 其中有统计但无日客流 ({stats.statsButNoRidership} 城)
+            <br />
+            3. 暂无日客流展示值 ({stats.noRidership} 城) = 完全无统计记录 ({stats.noStats} 城) + 其中有统计但无日客流 ({stats.statsButNoRidership} 城)
           </div>
         </div>
 

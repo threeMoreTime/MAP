@@ -1442,15 +1442,32 @@ async function runTests(baseUrl) {
     const card = document.querySelector('.data-snapshot-card');
     if (!card) return { ok: false, detail: 'data-snapshot-card not found' };
     const text = card.innerText || '';
+    
+    // 原有字段的合理兼容与升级断言
     const hasTotal = text.includes('城市索引');
-    const hasRidership = text.includes('有客流数据');
-    const hasNoRidership = text.includes('暂无日客流');
-    const hasNetwork = text.includes('运营线路图');
-    const hasPlan = text.includes('建设规划图');
-    const hasCovers = text.includes('实景封面图');
+    const hasStats = text.includes('有统计记录');
+    const hasRidership = text.includes('有日客流展示值');
+    const hasNoRidership = text.includes('暂无日客流展示值');
+    const hasNetwork = text.includes('线路图覆盖') || text.includes('运营线路图');
+    const hasPlan = text.includes('规划图覆盖') || text.includes('建设规划图');
+    const hasCovers = text.includes('封面图覆盖') || text.includes('实景封面图');
+
+    // 新增数值断言
+    const has34 = text.includes('34');
+    const has23 = text.includes('23');
+    const has27 = text.includes('27');
+    const has11 = text.includes('11');
+    const has16 = text.includes('16');
+
+    // 新增文案断言
+    const hasDisclaimer = text.includes('公开数据快照') || text.includes('非实时运营数据');
+
+    const ok = hasTotal && hasStats && hasRidership && hasNoRidership && hasNetwork && hasPlan && hasCovers &&
+               has34 && has23 && has27 && has11 && has16 && hasDisclaimer;
+
     return {
-      ok: hasTotal && hasRidership && hasNoRidership && hasNetwork && hasPlan && hasCovers,
-      detail: `text=${text.substring(0, 150)}`
+      ok,
+      detail: `text=${text.substring(0, 180)}`
     };
   });
   record('T26', 'Dashboard 页面数据快照卡片正确渲染', t26.ok, t26.detail);
@@ -1487,16 +1504,33 @@ async function runTests(baseUrl) {
     const hasGeo = body.includes('china.json');
     const hasMetroDB = body.includes('MetroDB.org');
     const hasMetroMan = body.includes('MetroMan');
+    
+    // 增强部分：校验 Phase 5.6.1 数据覆盖口径与非实时文案
+    const hasSnapshot = body.includes('公开资料整理快照');
+    const hasNonRealtime = body.includes('非实时运营数据');
+    const hasStats = body.includes('有统计记录');
+    const hasRidership = body.includes('有日客流展示值');
+    const hasNotCollected = body.includes('暂未收录');
+
+    const ok = !!badge && hasGeo && hasMetroDB && hasMetroMan && 
+               hasSnapshot && hasNonRealtime && hasStats && hasRidership && hasNotCollected;
+
     return {
       hasBadge: !!badge,
       hasGeo,
       hasMetroDB,
       hasMetroMan,
-      detail: `badge=${!!badge}, geo=${hasGeo}, metrodb=${hasMetroDB}, metroman=${hasMetroMan}`
+      hasSnapshot,
+      hasNonRealtime,
+      hasStats,
+      hasRidership,
+      hasNotCollected,
+      ok,
+      detail: `badge=${!!badge}, geo=${hasGeo}, db=${hasMetroDB}, man=${hasMetroMan}, snapshot=${hasSnapshot}, nonReal=${hasNonRealtime}, stats=${hasStats}, ridership=${hasRidership}, notColl=${hasNotCollected}`
     };
   });
   record('T28', 'About 页面动态数据、数据源与可信度文本校验', 
-    t28.hasBadge && t28.hasGeo && t28.hasMetroDB && t28.hasMetroMan, 
+    t28.ok, 
     t28.detail);
 }
 

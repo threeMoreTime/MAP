@@ -195,11 +195,15 @@ async function run() {
         if (p.name === 'Dashboard') {
           const snapshotExists = await page.evaluate(() => {
             const el = document.querySelector('.data-snapshot-card');
-            return !!el && el.innerText.includes('MAP 城市数据快照');
+            if (!el) return false;
+            const text = el.innerText || '';
+            return text.includes('MAP 城市数据快照') && 
+                   text.includes('有统计记录') && 
+                   text.includes('有日客流展示值');
           });
           if (!snapshotExists) {
             extraOk = false;
-            extraDetail = 'Missing .data-snapshot-card container or title';
+            extraDetail = 'Missing .data-snapshot-card container, title, or unified terminology (有统计记录 / 有日客流展示值)';
           }
         } else if (p.name === 'Foshan Page') {
           const completenessOk = await page.evaluate(() => {
@@ -220,13 +224,15 @@ async function run() {
             extraDetail = 'Missing .city-completeness-panel with info text';
           }
         } else if (p.name === 'About Page') {
-          const badgeExists = await page.evaluate(() => {
-            const el = document.querySelector('.last-updated-badge');
-            return !!el;
+          const aboutValidated = await page.evaluate(() => {
+            const badge = document.querySelector('.last-updated-badge');
+            const body = document.body.innerText || '';
+            const hasWording = body.includes('非实时运营数据') || body.includes('公开资料整理快照');
+            return !!badge && hasWording;
           });
-          if (!badgeExists) {
+          if (!aboutValidated) {
             extraOk = false;
-            extraDetail = 'Missing .last-updated-badge container';
+            extraDetail = 'Missing .last-updated-badge or unified terminology (非实时运营数据 / 公开资料整理快照)';
           }
         }
 
