@@ -2,7 +2,7 @@
 
 基于 ECharts 的中国 50 城市地铁客流数据可视化大屏，支持地图散点、排名图表、趋势折线、搜索筛选等交互功能，可离线运行。
 
-> **当前版本：v1.2.0-dev** | Phase 5.6 已完成：线上体验与数据可信度优化（数据快照、城市缺失人性化提示、About 动态统计、Cities 精细筛选等）均通过远端验证 | [在线演示 🌐](https://threemoretime.github.io/MAP/)
+> **当前版本：v1.2.1-dev** | Phase 5.6 & Phase 5.6.1 数据覆盖口径与文案统一已完成，并通过远端 CI/CD 与线上冒烟验证 | [在线演示 🌐](https://threemoretime.github.io/MAP/)
 
 ---
 
@@ -152,7 +152,7 @@ npm run test:acceptance    # 全部验收
 | ------- | -------------- |
 | 浏览器功能验证 | **16/16 PASS** |
 | 城市目录覆盖  | 50/50          |
-| 客流数据覆盖  | 34 城           |
+| 客流数据覆盖  | 34 城 (有统计记录) / 23 城 (有日客流展示) |
 | 规划图覆盖   | 41 城           |
 
 
@@ -168,7 +168,7 @@ npm run check:static  # 静态构建检查（T01-T09）
 npm run test:ui    # React 前端浏览器验收（T01-T25）
 ```
 
-### CI/CD 与 Pages 部署 (Phase 5.1/5.6 已完成：自动 CI/CD 部署、线上 Smoke Test 及数据可信度增强均通过验证)
+### CI/CD 与 Pages 部署 (Phase 5.1/5.6/5.6.1 已完成：自动 CI/CD 部署、线上 Smoke Test、数据可信度与数据口径文案统一均通过验证)
 
 项目已集成完善的 GitHub Actions 持续集成与持续部署（CI/CD）安全闭环：
 - **CI 流水线** (`.github/workflows/ci.yml`)：在向 `master` 分支推送（push）或提交拉取请求（PR）时自动触发运行。包含旧版基线验收 (`legacy-check`)、React 编译静态校验 (`react-check`)，以及独立的 React 真浏览器 UI 验收 (`react-ui-test`) 三个独立 Job。

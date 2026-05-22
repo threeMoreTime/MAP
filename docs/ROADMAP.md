@@ -9,8 +9,8 @@
 
 ## 当前状态
 
-- 版本：v1.2.0-dev
-- 当前阶段：Phase 5.1 部署配置与 Phase 5.6 线上体验与数据可信度优化已完成。Phase 5.6 已完成：CI、自动 Pages CD、线上/本地 Smoke Test 均通过验证
+- 版本：v1.2.1-dev
+- 当前阶段：Phase 5.1 部署配置、Phase 5.6 线上体验与数据可信度优化、Phase 5.6.1 数据覆盖口径文案统一已完成并验证通过
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
   - 新版：`frontend/` React + Vite + TypeScript
@@ -27,7 +27,7 @@
 | `check:static` | T01-T09 | **全部通过** |
 | Legacy `run_acceptance.py` | 16 项浏览器测试 | **16/16 PASS** |
 
-- 数据覆盖：50 城市索引、34 城市客流数据、49/50 封面图（hohhot fallback）、48 线路图、41 规划图
+- 数据覆盖（动态快照）：城市索引 50 城、有统计记录 34 城、有日客流展示值 23 城、暂无日客流展示值 27 城（其中 11 城有统计无客流，16 城完全无统计）、线路图覆盖 48 城、规划图覆盖 41 城、封面图覆盖 49/50
 - 资源同步：`scripts/sync-data.cjs` 自动将 `data/latest/`、`assets/china.json`、`assets/city-covers/`、`cities/` 图片同步到 `frontend/public/`
 
 ---
@@ -390,6 +390,22 @@
 **验收标准**：
 - `test:ui`：T01-T28，Total 28，PASS 27，FAIL 0，MANUAL 1
 - `npm run typecheck` 和 `npm run build` 通过
+
+---
+
+### Phase 5.6.1：数据覆盖口径文案统一（已完成）
+
+**目标**：消除 34/23/27 数据指标在 Dashboard、About 页面和文档中的不一致表述，统一全网文案口径，消除“实时性”误导文案。
+
+**产物**：
+- [x] **DataSnapshotCard 口径重构**：统一为 9 大标准口径，并在底部增设微拟态提示框清晰解析 27 城的计算关系，清除“实时数据”或“官方认证”等可能产生实时性误导的文案，统一改为“公开数据快照”。
+- [x] **AboutPage 文案与动态统计重构**：在显著位置补充免责声明与公开快照属性，同步 9 大动态统计和三维公式分类解析区。
+- [x] **T26/T28 验收测试增强**：对 Dashboard 和 About 页面的新口径执行强断言比对，不允许降低现有测试断言。
+- [x] **线上 Smoke Test 增强**：`smoke-pages.cjs` 中增加对新口径文案的轻量级检查。
+
+**验收标准**：
+- `test:ui`：T01-T28，Total 28，PASS 27，FAIL 0，MANUAL 1
+- `npm run typecheck` 和 `npm run build` 均通过，线上冒烟测试全绿
 
 ---
 
