@@ -112,6 +112,23 @@ def validate_snapshot_integrity(data, file_name, errors_list):
         elif file_name == "city_assets_index.json" and len(seen_cities) < 50:
             errors_list.append(f"新数据中 asset 城市数 ({len(seen_cities)}) 低于底线值 50")
 
+    elif file_name == "quality_report.json":
+        for field in ["summary", "cities", "missing_groups"]:
+            if field not in data:
+                errors_list.append(f"{file_name} 缺少 {field} 字段")
+                return False
+        if not isinstance(data["cities"], list):
+            errors_list.append(f"{file_name} 中的 cities 字段不是数组")
+            return False
+        if not isinstance(data["summary"], dict):
+            errors_list.append(f"{file_name} 中的 summary 字段不是对象")
+            return False
+        if not isinstance(data["missing_groups"], dict):
+            errors_list.append(f"{file_name} 中的 missing_groups 字段不是对象")
+            return False
+        if len(data["cities"]) < 50:
+            errors_list.append(f"新数据中 quality_report cities 数 ({len(data['cities'])}) 低于底线值 50")
+
     return True
 
 
@@ -196,6 +213,104 @@ def compare_items_list(before_items, after_items, file_name, stats_city_map=None
         for field, (b_val, a_val) in diffs.items():
             changes.append({
                 "file": file_name,
+                "city": city,
+                "city_cn": city_cn,
+                "field": field,
+                "before": b_val,
+                "after": a_val,
+                "change_type": "modified"
+            })
+
+    return changes
+
+
+def compare_quality_report(before_quality, after_quality, stats_city_map=None):
+    """
+    比较 quality_report.json，分别比对 summary、missing_groups 和 cities 的变化。
+    """
+    changes = []
+    if not before_quality or not after_quality:
+        return changes
+
+    # 1. 比对 summary 字段
+    b_summary = before_quality.get("summary", {})
+    a_summary = after_quality.get("summary", {})
+    diffs_summary = diff_dict_value(b_summary, a_summary)
+    for field, (b_val, a_val) in diffs_summary.items():
+        changes.append({
+            "file": "quality_report.json",
+            "city": None,
+            "city_cn": None,
+            "field": f"summary.{field}",
+            "before": b_val,
+            "after": a_val,
+            "change_type": "modified"
+        })
+
+    # 2. 比对 missing_groups
+    b_groups = before_quality.get("missing_groups", {})
+    a_groups = after_quality.get("missing_groups", {})
+    diffs_groups = diff_dict_value(b_groups, a_groups)
+    for field, (b_val, a_val) in diffs_groups.items():
+        changes.append({
+            "file": "quality_report.json",
+            "city": None,
+            "city_cn": None,
+            "field": f"missing_groups.{field}",
+            "before": b_val,
+            "after": a_val,
+            "change_type": "modified"
+        })
+
+    # 3. 比对 cities 列表中的各个城市字段
+    b_cities = before_quality.get("cities", [])
+    a_cities = after_quality.get("cities", [])
+    
+    b_map = {item["city"]: item for item in b_cities if "city" in item}
+    a_map = {item["city"]: item for item in a_cities if "city" in item}
+
+    all_cities = sorted(set(b_map.keys()) | set(a_map.keys()))
+    for city in all_cities:
+        b_item = b_map.get(city)
+        a_item = a_map.get(city)
+
+        city_cn = None
+        if a_item:
+            city_cn = a_item.get("city_cn")
+        elif b_item:
+            city_cn = b_item.get("city_cn")
+        
+        if not city_cn and stats_city_map and city in stats_city_map:
+            city_cn = stats_city_map[city].get("city_cn")
+
+        if not b_item:
+            changes.append({
+                "file": "quality_report.json",
+                "city": city,
+                "city_cn": city_cn,
+                "field": "city",
+                "before": None,
+                "after": city,
+                "change_type": "added"
+            })
+            continue
+        elif not a_item:
+            changes.append({
+                "file": "quality_report.json",
+                "city": city,
+                "city_cn": city_cn,
+                "field": "city",
+                "before": city,
+                "after": None,
+                "change_type": "removed"
+            })
+            continue
+
+        # 比对每一个属性变化，忽略 NOISE_KEYS
+        diffs_city = diff_dict_value(b_item, a_item)
+        for field, (b_val, a_val) in diffs_city.items():
+            changes.append({
+                "file": "quality_report.json",
                 "city": city,
                 "city_cn": city_cn,
                 "field": field,
@@ -351,7 +466,7 @@ def main():
         sys.exit(20)
 
     # 2. 依次加载核心文件
-    files_to_compare = ["metro_stats.json", "city_assets_index.json", "manifest.json"]
+    files_to_compare = ["metro_stats.json", "city_assets_index.json", "manifest.json", "quality_report.json"]
     b_data = {}
     a_data = {}
 
@@ -409,6 +524,10 @@ def main():
     # 比对 manifest.json
     if "manifest.json" in b_data or "manifest.json" in a_data:
         changes.extend(compare_manifest(b_data.get("manifest.json"), a_data.get("manifest.json")))
+
+    # 比对 quality_report.json
+    if "quality_report.json" in b_data or "quality_report.json" in a_data:
+        changes.extend(compare_quality_report(b_data.get("quality_report.json"), a_data.get("quality_report.json"), stats_city_map))
 
     # 5. 输出结论与 exit code
     if changes:
