@@ -425,15 +425,16 @@ export default function DataQualityPage() {
                   </Link>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span style={{
-                      fontSize: 12, fontWeight: 700,
-                      color: c.quality_level === 'high' ? '#38a169' : (c.quality_level === 'medium' ? '#dd6b20' : '#e53e3e')
+                      fontSize: 13, fontWeight: 700,
+                      color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#fb7185')
                     }}>
                       {c.quality_score}分
                     </span>
                     <span style={{
-                      fontSize: 10, padding: '1px 6px', borderRadius: 4,
-                      background: c.quality_level === 'high' ? 'rgba(56,161,105,0.12)' : (c.quality_level === 'medium' ? 'rgba(221,107,32,0.12)' : 'rgba(229,62,62,0.12)'),
-                      color: c.quality_level === 'high' ? '#38a169' : (c.quality_level === 'medium' ? '#dd6b20' : '#e53e3e')
+                      fontSize: 11, padding: '2px 7px', borderRadius: 20, fontWeight: 500,
+                      background: c.quality_level === 'high' ? 'rgba(52,211,153,0.12)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.12)' : 'rgba(251,113,133,0.12)'),
+                      color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#fb7185'),
+                      border: `1px solid ${c.quality_level === 'high' ? 'rgba(52,211,153,0.20)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.20)' : 'rgba(251,113,133,0.20)')}`
                     }}>
                       {c.quality_level === 'high' ? '完整度高' : (c.quality_level === 'medium' ? '完整度中' : '完整度低')}
                     </span>
@@ -442,26 +443,26 @@ export default function DataQualityPage() {
 
                 {/* 资源状态小表格 */}
                 <div style={{
-                  display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6,
-                  background: 'rgba(0,0,0,0.08)', padding: 6, borderRadius: 4, fontSize: 11
+                  display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
+                  background: 'rgba(0,0,0,0.12)', padding: 8, borderRadius: 6, fontSize: 13
                 }}>
-                  <div style={{ color: c.has_stats ? '#48bb78' : '#e53e3e', textAlign: 'center' }}>
-                    {c.has_stats ? '✔' : '✘'} 统计记录
+                  <div style={{ color: c.has_stats ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_stats ? '✔' : '✘'}</span> 统计记录
                   </div>
-                  <div style={{ color: c.has_daily_ridership ? '#48bb78' : '#e53e3e', textAlign: 'center' }}>
-                    {c.has_daily_ridership ? '✔' : '✘'} 日客流
+                  <div style={{ color: c.has_daily_ridership ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_daily_ridership ? '✔' : '✘'}</span> 日客流
                   </div>
-                  <div style={{ color: c.has_yearly_trend ? '#48bb78' : '#e53e3e', textAlign: 'center' }}>
-                    {c.has_yearly_trend ? '✔' : '✘'} 年趋势
+                  <div style={{ color: c.has_yearly_trend ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_yearly_trend ? '✔' : '✘'}</span> 年趋势
                   </div>
-                  <div style={{ color: c.has_network_map ? '#48bb78' : '#e53e3e', textAlign: 'center' }}>
-                    {c.has_network_map ? '✔' : '✘'} 线路图
+                  <div style={{ color: c.has_network_map ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_network_map ? '✔' : '✘'}</span> 线路图
                   </div>
-                  <div style={{ color: c.has_plan_map ? '#48bb78' : '#e53e3e', textAlign: 'center' }}>
-                    {c.has_plan_map ? '✔' : '✘'} 规划图
+                  <div style={{ color: c.has_plan_map ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_plan_map ? '✔' : '✘'}</span> 规划图
                   </div>
-                  <div style={{ color: c.cover_status === 'downloaded' ? '#48bb78' : '#e53e3e', textAlign: 'center' }}>
-                    {c.cover_status === 'downloaded' ? '✔' : '✘'} 封面图
+                  <div style={{ color: c.cover_status === 'downloaded' ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.cover_status === 'downloaded' ? '✔' : '✘'}</span> 封面图
                   </div>
                 </div>
 
@@ -487,17 +488,17 @@ export default function DataQualityPage() {
               textAlign: 'left', minWidth: 700
             }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', color: '#718096' }}>
-                  <th style={{ padding: '10px 8px' }}>城市</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>完整度分</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>完整度评级</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>有无统计</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>有客流值</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>客流趋势</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>线路图</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>规划图</th>
-                  <th style={{ padding: '10px 8px', textAlign: 'center' }}>高清封面</th>
-                  <th style={{ padding: '10px 8px' }}>收录缺失项</th>
+                <tr style={{ borderBottom: '1px solid rgba(34, 211, 238, 0.10)', color: '#94a3b8' }}>
+                  <th style={{ padding: '12px 10px', fontWeight: 500 }}>城市</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>完整度分</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>完整度评级</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>有无统计</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>有客流值</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>客流趋势</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>线路图</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>规划图</th>
+                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>高清封面</th>
+                  <th style={{ padding: '12px 10px', fontWeight: 500 }}>收录缺失项</th>
                 </tr>
               </thead>
               <tbody>
@@ -510,50 +511,82 @@ export default function DataQualityPage() {
                       transition: 'background 0.25s'
                     }}
                   >
-                    <td style={{ padding: '12px 8px' }}>
-                      <Link to={`/city/${c.city}`} style={{ textDecoration: 'none', color: '#00d4ff', fontWeight: 600 }}>
-                        {c.city_cn} <span style={{ fontSize: 10, color: '#4a5568', fontWeight: 400 }}>{c.city}</span>
+                    <td style={{ padding: '14px 10px' }}>
+                      <Link to={`/city/${c.city}`} style={{ textDecoration: 'none', color: '#22d3ee', fontWeight: 600 }}>
+                        {c.city_cn} <span style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>{c.city}</span>
                       </Link>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center', fontWeight: 700 }}>
+                    <td style={{ padding: '14px 10px', textAlign: 'center', fontWeight: 700 }}>
                       <span style={{
-                        color: c.quality_level === 'high' ? '#38a169' : (c.quality_level === 'medium' ? '#dd6b20' : '#e53e3e')
+                        color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#fb7185')
                       }}>
                         {c.quality_score}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
                       <span style={{
-                        fontSize: 10, padding: '2px 8px', borderRadius: 4,
-                        background: c.quality_level === 'high' ? 'rgba(56,161,105,0.12)' : (c.quality_level === 'medium' ? 'rgba(221,107,32,0.12)' : 'rgba(229,62,62,0.12)'),
-                        color: c.quality_level === 'high' ? '#38a169' : (c.quality_level === 'medium' ? '#dd6b20' : '#e53e3e')
+                        fontSize: 11, padding: '3px 9px', borderRadius: 20,
+                        fontWeight: 500,
+                        background: c.quality_level === 'high' ? 'rgba(52,211,153,0.12)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.12)' : 'rgba(251,113,133,0.12)'),
+                        color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#fb7185'),
+                        border: `1px solid ${c.quality_level === 'high' ? 'rgba(52,211,153,0.20)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.20)' : 'rgba(251,113,133,0.20)')}`
                       }}>
                         {c.quality_level === 'high' ? '完整度高' : (c.quality_level === 'medium' ? '完整度中' : '完整度低')}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center', color: c.has_stats ? '#48bb78' : '#e53e3e', fontSize: 14 }}>
-                      {c.has_stats ? '✔' : '✘'}
+                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
+                        background: c.has_stats ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
+                        color: c.has_stats ? '#34d399' : '#fb7185'
+                      }}>{c.has_stats ? '✔' : '✘'}</span>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center', color: c.has_daily_ridership ? '#48bb78' : '#e53e3e', fontSize: 14 }}>
-                      {c.has_daily_ridership ? '✔' : '✘'}
+                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
+                        background: c.has_daily_ridership ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
+                        color: c.has_daily_ridership ? '#34d399' : '#fb7185'
+                      }}>{c.has_daily_ridership ? '✔' : '✘'}</span>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center', color: c.has_yearly_trend ? '#48bb78' : '#e53e3e', fontSize: 14 }}>
-                      {c.has_yearly_trend ? '✔' : '✘'}
+                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
+                        background: c.has_yearly_trend ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
+                        color: c.has_yearly_trend ? '#34d399' : '#fb7185'
+                      }}>{c.has_yearly_trend ? '✔' : '✘'}</span>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center', color: c.has_network_map ? '#48bb78' : '#e53e3e', fontSize: 14 }}>
-                      {c.has_network_map ? '✔' : '✘'}
+                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
+                        background: c.has_network_map ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
+                        color: c.has_network_map ? '#34d399' : '#fb7185'
+                      }}>{c.has_network_map ? '✔' : '✘'}</span>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center', color: c.has_plan_map ? '#48bb78' : '#e53e3e', fontSize: 14 }}>
-                      {c.has_plan_map ? '✔' : '✘'}
+                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
+                        background: c.has_plan_map ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
+                        color: c.has_plan_map ? '#34d399' : '#fb7185'
+                      }}>{c.has_plan_map ? '✔' : '✘'}</span>
                     </td>
-                    <td style={{ padding: '12px 8px', textAlign: 'center', color: c.cover_status === 'downloaded' ? '#48bb78' : '#e53e3e', fontSize: 14 }}>
-                      {c.cover_status === 'downloaded' ? '✔' : '✘'}
+                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
+                        background: c.cover_status === 'downloaded' ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
+                        color: c.cover_status === 'downloaded' ? '#34d399' : '#fb7185'
+                      }}>{c.cover_status === 'downloaded' ? '✔' : '✘'}</span>
                     </td>
-                    <td style={{ padding: '12px 8px', color: '#a0aec0', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <td style={{ padding: '14px 10px', color: '#94a3b8', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {c.missing_items.length === 0 ? (
-                        <span style={{ color: '#718096' }}>—</span>
+                        <span style={{ color: '#475569' }}>—</span>
                       ) : (
-                        <span title={c.missing_items.join(', ')} style={{ fontSize: 11 }}>
+                        <span title={c.missing_items.join(', ')} style={{ fontSize: 12 }}>
                           {c.missing_items.join(', ')}
                         </span>
                       )}
@@ -564,7 +597,7 @@ export default function DataQualityPage() {
             </table>
             <style>{`
               .table-row-hover:hover {
-                background: rgba(0,212,255,0.02) !important;
+                background: rgba(34, 211, 238, 0.025) !important;
               }
             `}</style>
           </div>

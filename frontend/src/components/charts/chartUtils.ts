@@ -1,18 +1,33 @@
+// === 项目统一图表色板 — 深色科技主题 ===
+// 核心色：青色 / 湖绿 / 翠绿 / 琥珀 / 蓝紫 / 玫红 / 天蓝 / 橙黄
 export const COLOR_PALETTE = [
-  '#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de',
-  '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#48b8d0',
-  '#ff9f7f', '#87cefa', '#da70d6', '#32cd32', '#ffa07a',
-  '#20b2aa', '#778899', '#ffb6c1', '#98fb98', '#dda0dd',
-  '#f0e68c', '#add8e6', '#ffb347', '#77dd77', '#fdfd96',
-  '#aec6cf', '#cb99c9', '#c23b22', '#779ecb', '#f7b7d0',
-  '#b39eb5', '#fdfc8f', '#836953', '#b19cd9', '#ff6961',
+  '#22d3ee', // cyan-400
+  '#2dd4bf', // teal-400
+  '#34d399', // emerald-400
+  '#fbbf24', // amber-400
+  '#818cf8', // indigo-400
+  '#fb7185', // rose-400
+  '#38bdf8', // sky-400
+  '#fb923c', // orange-400
+  '#a78bfa', // violet-400
+  '#4ade80', // green-400
+  '#facc15', // yellow-400
+  '#60a5fa', // blue-400
+  '#f472b6', // pink-400
+  '#86efac', // green-300
+  '#67e8f9', // cyan-300
+  '#5eead4', // teal-300
+  '#6ee7b7', // emerald-300
+  '#fde68a', // amber-200
+  '#c4b5fd', // violet-300
+  '#fdba74', // orange-300
 ];
 
 export const METRIC_COLORS: Record<string, [string, string]> = {
-  daily_ridership_wan: ['#1565C0', '#42A5F5'],
-  operating_mileage_km: ['#2E7D32', '#66BB6A'],
-  operating_stations: ['#6A1B9A', '#AB47BC'],
-  ridership_intensity: ['#E65100', '#FFB74D'],
+  daily_ridership_wan:    ['#0e7490', '#22d3ee'],  // 深青 → 青
+  operating_mileage_km:  ['#0f766e', '#2dd4bf'],  // 深湖绿 → 湖绿
+  operating_stations:    ['#4338ca', '#818cf8'],  // 深靛 → 蓝紫
+  ridership_intensity:   ['#b45309', '#fbbf24'],  // 深琥珀 → 琥珀
 };
 
 export const AXIS_LABEL_STYLE = { color: '#aaa' };
