@@ -171,20 +171,37 @@ jobs:
           
       - name: Perform Data Integrity Validation
         # 对刚刚抓取的临时数据结构，强制执行 Schema、必填字段 and 资产完整性强校验
+        # 💡 注：由于原有 validate_data.py 不支持自定义目录，实现阶段需在 validate_data.py 中增加 --data-dir 参数，默认仍为 data/latest/
         run: |
-          python scripts/validate_data.py --dir output/data-update-staging/
+          python scripts/validate_data.py --data-dir output/data-update-staging/
           
       - name: Compile and Run Consolidate Diff
         id: data-diff
         # 比对 data/latest 目录与 output/data-update-staging/
-        # 该脚本将忽略 generated_at 等时间戳差异
-        # 出口 Code: 0 代表无实质变化；10 代表有实质变化并输出报告；其余代表异常报错
+        # 该脚本将忽略 generated_at 等时间戳差异，并返回 exit code: 0(无实质变化), 10(有实质变化), 20(数据异常/失败)
+        # 💡 针对 Exit Code 10 的 workflow Step 失败防范处理逻辑：
         run: |
+          set +e
           python scripts/diff_data_snapshot.py --original data/latest/ --new output/data-update-staging/
+          DIFF_EXIT=$?
+          set -e
+          
+          if [ "$DIFF_EXIT" = "0" ]; then
+            echo "has_substantive_changes=false" >> "$GITHUB_OUTPUT"
+          elif [ "$DIFF_EXIT" = "10" ]; then
+            echo "has_substantive_changes=true" >> "$GITHUB_OUTPUT"
+            echo "has_substantive_changes=true"
+          elif [ "$DIFF_EXIT" = "20" ]; then
+            echo "Error: Diff snapshot failed or data anomaly detected."
+            exit 20
+          else
+            echo "Unexpected exit code: $DIFF_EXIT"
+            exit "$DIFF_EXIT"
+          fi
         continue-on-error: false
 
       - name: Apply Staging Data (Write Mode)
-        # 仅当 diff 判定有实质性数据更新（exit_code=10）时，将临时数据区写入真正的物理区
+        # 仅当 diff 判定有实质性数据更新时，将临时数据区写入真正的物理区
         if: steps.data-diff.outputs.has_substantive_changes == 'true'
         run: |
           python scripts/run_data_update.py --write
@@ -193,10 +210,13 @@ jobs:
 
       - name: Generate Automated Pull Request
         # 采用 peter-evans/create-pull-request，将修改自动提交并拉起新 PR
+        # 💡 注意：此处必须使用专门配置的精细化权限 PAT: secrets.DATA_UPDATE_BOT_TOKEN
+        # 因为由默认 GITHUB_TOKEN 创建的 PR 不会触发新的 workflow 递归保护机制，导致 PR CI 无法自动运行
+        # DATA_UPDATE_BOT_TOKEN 必须是最小权限 Token，仅允许 contents:write 与 pull-requests:write
         if: steps.data-diff.outputs.has_substantive_changes == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.DATA_UPDATE_BOT_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.DATA_UPDATE_BOT_TOKEN }}
           branch: data-update/update-${{ steps.data-diff.outputs.current_month }}
           commit-message: "data: update metro snapshot ${{ steps.data-diff.outputs.current_month }}"
           title: "data: update metro snapshot ${{ steps.data-diff.outputs.current_month }}"
@@ -306,7 +326,7 @@ jobs:
 2. **渐进式请求间隔 (Polite Interval)**：爬虫爬取时，线程池数量最大限制为 2 或 3，且单次 HTTP 请求后强制引入 `time.sleep(3.0)` 至 `time.sleep(5.0)` 的休眠间隔，严密防范对 `metrodb.org` 造成高并发流量拥堵。
 3. **明示 User-Agent**：网络请求必须在 Header 中清晰标注 User-Agent，明示为开源 MAP 数据抓取小助手（如 `User-Agent: MAP-MetroDataScraper-Bot/1.2 (+https://github.com/threeMoreTime/MAP)`）。
 4. **快速失败 (Fail-Fast) 机制**：单次爬取超时上限限制为 `10s`。重试最多 2 次，3 次均失败则立刻跳过或视为异常报错。
-5. **敏感凭据绝不泄露**：管道所用的 PR 创建 Token (GITHUB_TOKEN) 仅限对仓库自身分支的读写权限，绝不在脚本中硬编码任何外部服务器账号密码，且不对外部提供任何 API 终点。
+5. **敏感凭据绝不泄露**：为安全触发 PR 的自动化 CI 检查，必须使用专门的精细化权限 PAT `DATA_UPDATE_BOT_TOKEN`（具有最小的 `contents:write` 与 `pull-requests:write` 权限），严禁在脚本中硬编码任何外部账号密码，且不对外暴露任何敏感凭证。
 6. **不保存外部 HTML**：爬虫仅提取 `rollNum` 核心数值及年份数组，绝对禁止将外部页面的 HTML 全文或多余第三方文件 commit 并推送到 master，维持仓库体量整洁。
 
 ---

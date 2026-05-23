@@ -440,7 +440,7 @@
 
 **验收标准**：
 - GitHub Actions 按计划自动执行数据采集
-- 新数据自动提交到仓库并打 Tag
+- 增量数据自动创建 Pull Request 并通过人工审核合并
 - 无数据变化时不产生空提交
 - 采集失败时可通过 GitHub Notification 获知
 
