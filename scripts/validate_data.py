@@ -125,13 +125,21 @@ def validate_manifest(manifest, stats, assets):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="数据校验脚本")
+    parser.add_argument("--data-dir", default=os.path.join(ROOT, "data", "latest"), help="要校验的数据目录，默认为 data/latest")
+    args = parser.parse_args()
+
+    data_dir = args.data_dir
+
     print("=" * 50)
     print(" 数据校验")
+    print(f" 校验目录: {data_dir}")
     print("=" * 50)
 
-    stats = load_json(os.path.join(DATA_DIR, "metro_stats.json"), "metro_stats.json")
-    assets = load_json(os.path.join(DATA_DIR, "city_assets_index.json"), "city_assets_index.json")
-    manifest = load_json(os.path.join(DATA_DIR, "manifest.json"), "manifest.json")
+    stats = load_json(os.path.join(data_dir, "metro_stats.json"), "metro_stats.json")
+    assets = load_json(os.path.join(data_dir, "city_assets_index.json"), "city_assets_index.json")
+    manifest = load_json(os.path.join(data_dir, "manifest.json"), "manifest.json")
 
     print()
     print("[1/3] 校验 metro_stats.json ...")

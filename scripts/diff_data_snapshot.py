@@ -247,7 +247,7 @@ def write_reports(json_path, md_path, status, changes, errors):
     """
     # 自动创建父目录
     for p in [json_path, md_path]:
-        p_dir = path_dir = os.path.dirname(os.path.abspath(p))
+        p_dir = os.path.dirname(os.path.abspath(p))
         os.makedirs(p_dir, exist_ok=True)
 
     # 1. 编译并写入 JSON 报告
