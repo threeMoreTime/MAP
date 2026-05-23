@@ -57,11 +57,11 @@ jobs:
         
         set +e
         if [ "$RUN_MODE" = "write" ]; then
-          log "[CI] 正在运行 write 覆盖模式..."
+          echo "[CI] 正在运行 write 覆盖模式..."
           python scripts/run_data_update.py --write --confirm-write
         else
-          log "[CI] 正在运行 dry-run 演练模式..."
-          python scripts/run_data_update.py --dry-run
+          echo "[CI] 正在运行 dry-run 演练模式..."
+          python scripts/run_data_update.py --dry-run --use-current-data
         fi
         UPDATE_EXIT=$?
         set -e
