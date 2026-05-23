@@ -449,15 +449,30 @@
 
 ---
 
-### Phase 7：数据质量与覆盖率提升
+### Phase 6.1：数据质量报告与异常检测
 
-**目标**：提升数据质量和城市资源覆盖率。
+**目标**：为数据管道建立多维质量评分，自动产出质量报告，并在 CI 校验中硬性阻断。
 
 **产物**：
-- [ ] 补全缺失城市的线路图/规划图
-- [ ] 封面图覆盖率提升（目标 50/50）
-- [ ] 数据交叉验证与异常值标注
-- [ ] 客流数据年度更新机制
+- [x] **多维评估器脚本**：已实现 [scripts/build_quality_report.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/build_quality_report.py) 并集成在构建流
+- [x] **数据质量报告**：已产出防噪生成的 [data/latest/quality_report.json](file:///c:/Users/Administrator/Desktop/FL/MAP/data/latest/quality_report.json)
+- [x] **数据校验强拦截**：在 [scripts/validate_data.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/validate_data.py) 中实现对质量报告的强校验
+- [x] **质量指标文档**：已编写 [docs/DATA_QUALITY.md](file:///c:/Users/Administrator/Desktop/FL/MAP/docs/DATA_QUALITY.md)
+
+**状态**：Phase 6.1 已完成并验证通过。
+
+---
+
+### Phase 7：数据质量中心 (Data Quality Center)
+
+**目标**：新增可视化数据质量中心，供用户直观审计资源收录完整度。
+
+**产物**：
+- [x] **数据质量大屏**：已开发并上线 [frontend/src/pages/DataQualityPage.tsx](file:///c:/Users/Administrator/Desktop/FL/MAP/frontend/src/pages/DataQualityPage.tsx)
+- [x] **路由与组件导航**：在 [frontend/src/routes.tsx](file:///c:/Users/Administrator/Desktop/FL/MAP/frontend/src/routes.tsx) 及导航栏挂载 `/data-quality` 入口
+- [x] **双端多视口校验**：新增 Puppeteer 自动化测试 `T29`, `T30`, `T31` 以及 pages 冒烟测试以进行多端阻断校验
+
+**状态**：Phase 7 数据质量中心已完成，全量测试已跑通。
 
 ---
 
