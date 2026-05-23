@@ -426,15 +426,17 @@
 
 ---
 
-### Phase 6：增量更新与定期采集
+### Phase 6：增量更新与定期采集（OpenSpec 设计中）
 
 **目标**：实现数据自动采集和定期更新。
 
 **产物**：
+- [x] **OpenSpec 设计**：已编写并提交 [openspec/data_update.md](openspec/data_update.md) 设计方案
 - [ ] GitHub Actions 定时任务（Cron）
 - [ ] 自动数据采集 + 提交工作流
 - [ ] 数据变更检测（仅在有变化时提交）
 - [ ] 更新失败的通知机制
+
 
 **验收标准**：
 - GitHub Actions 按计划自动执行数据采集
