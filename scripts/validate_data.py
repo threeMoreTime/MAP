@@ -140,6 +140,56 @@ def validate_manifest(manifest, stats, assets, data_dir):
             err(f"manifest 引用的数据文件不存在: {df}")
 
 
+def validate_quality_report(quality, assets):
+    if quality is None:
+        return
+
+    # 1. 结构健壮性
+    for field in ["summary", "cities", "missing_groups"]:
+        if field not in quality:
+            err(f"quality_report.json 缺少核心字段 {field}")
+            return
+
+    summary = quality["summary"]
+    cities = quality["cities"]
+    groups = quality["missing_groups"]
+
+    total_cities = len(assets.get("items", [])) if assets else 50
+
+    # 2. 数量一致性
+    if summary.get("city_count", -1) != total_cities:
+        err(f"quality_report.json summary.city_count({summary.get('city_count')}) 与 50 城索引({total_cities}) 不一致")
+    if len(cities) != total_cities:
+        err(f"quality_report.json cities 数组长度({len(cities)}) 与 50 城索引({total_cities}) 不一致")
+
+    # 3. 详细遍历城市校验
+    city_ids = set()
+    if assets:
+        city_ids = {item["city"] for item in assets.get("items", [])}
+
+    for idx, item in enumerate(cities):
+        city = item.get("city", f"index={idx}")
+        if city_ids and city not in city_ids:
+            err(f"quality_report.json 包含未注册的城市: {city}")
+
+        score = item.get("quality_score", -1)
+        if not isinstance(score, (int, float)) or not (0 <= score <= 100):
+            err(f"{city}: quality_score({score}) 超出合法范围(0-100)")
+
+        level = item.get("quality_level")
+        if level not in ["high", "medium", "low"]:
+            err(f"{city}: quality_level({level}) 不是合法选项(high / medium / low)")
+
+    # 4. 校验 missing_groups
+    for group_name, list_val in groups.items():
+        if not isinstance(list_val, list):
+            err(f"quality_report.json missing_groups.{group_name} 不是数组")
+            continue
+        for c in list_val:
+            if city_ids and c not in city_ids:
+                err(f"quality_report.json missing_groups.{group_name} 中包含未注册城市: {c}")
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="数据校验脚本")
@@ -167,18 +217,23 @@ def main():
     stats = load_json(os.path.join(data_dir, "metro_stats.json"), "metro_stats.json")
     assets = load_json(os.path.join(data_dir, "city_assets_index.json"), "city_assets_index.json")
     manifest = load_json(os.path.join(data_dir, "manifest.json"), "manifest.json")
+    quality = load_json(os.path.join(data_dir, "quality_report.json"), "quality_report.json")
 
     print()
-    print("[1/3] 校验 metro_stats.json ...")
+    print("[1/4] 校验 metro_stats.json ...")
     validate_metro_stats(stats)
 
     print()
-    print("[2/3] 校验 city_assets_index.json ...")
+    print("[2/4] 校验 city_assets_index.json ...")
     validate_city_assets_index(assets)
 
     print()
-    print("[3/3] 校验 manifest.json ...")
+    print("[3/4] 校验 manifest.json ...")
     validate_manifest(manifest, stats, assets, data_dir)
+
+    print()
+    print("[4/4] 校验 quality_report.json ...")
+    validate_quality_report(quality, assets)
 
     # 汇总
     print()

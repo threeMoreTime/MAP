@@ -126,6 +126,7 @@ def build_manifest(stats, assets):
         "data_files": [
             "data/latest/metro_stats.json",
             "data/latest/city_assets_index.json",
+            "data/latest/quality_report.json",
         ],
     }
 
@@ -293,6 +294,23 @@ def main():
     schema_path = os.path.join(ROOT, "data", "schema", "metro_stats.schema.json")
     changed = write_json_if_changed(schema_path, schema)
     print(f"  metro_stats.schema.json — {'UPDATED' if changed else 'UNCHANGED'}")
+
+    # 5. quality_report.json
+    print("正在同步生成 quality_report.json ...")
+    try:
+        import sys
+        scripts_dir = os.path.dirname(os.path.abspath(__file__))
+        if scripts_dir not in sys.path:
+            sys.path.append(scripts_dir)
+        import build_quality_report
+        
+        stats_dir = os.path.join(ROOT, "data", "latest")
+        output_q = os.path.join(stats_dir, "quality_report.json")
+        q_changed = build_quality_report.build_and_write(stats_dir, output_q)
+        print(f"  quality_report.json — {'UPDATED' if q_changed else 'UNCHANGED'}")
+    except Exception as e:
+        print(f"  [ERROR] 生成 quality_report 失败: {e}")
+        raise e
 
     # 统计摘要
     net_count = manifest["network_map_count"]
