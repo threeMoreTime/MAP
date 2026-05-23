@@ -1532,6 +1532,53 @@ async function runTests(baseUrl) {
   record('T28', 'About 页面动态数据、数据源与可信度文本校验', 
     t28.ok, 
     t28.detail);
+
+  // T29: /#/data-quality accessible
+  await gotoHash(BASE, '#/data-quality');
+  const t29 = await page.evaluate(() => {
+    const title = document.querySelector('h1');
+    const text = document.body.innerText || '';
+    const hasTitle = !!title && title.textContent.includes('数据质量中心');
+    const hasDisclaimer = text.includes('非实时运营数据') || text.includes('公开资料整理快照') || text.includes('免责声明');
+    return { hasTitle, hasDisclaimer, titleText: title?.textContent || '' };
+  });
+  const t29errors = consoleErrors.filter(isCriticalError);
+  record('T29', '/#/data-quality 可访问，含"数据质量中心"与免责声明，且无 JS 错误',
+    t29.hasTitle && t29.hasDisclaimer && t29errors.length === 0,
+    `hasTitle=${t29.hasTitle}, hasDisclaimer=${t29.hasDisclaimer}, errors=${t29errors.length}`);
+
+  // T30: Check dynamic indices and cities list output "厦门"
+  const t30 = await page.evaluate(() => {
+    const text = document.body.innerText || '';
+    const has50 = text.includes('50');
+    const has34 = text.includes('34');
+    const has23 = text.includes('23');
+    const has27 = text.includes('27');
+    const hasXiamen = text.includes('厦门');
+    return { has50, has34, has23, has27, hasXiamen };
+  });
+  record('T30', '数据质量中心动态数据指标口径（50/34/23/27）及城市列表含厦门',
+    t30.has50 && t30.has34 && t30.has23 && t30.has27 && t30.hasXiamen,
+    `50=${t30.has50}, 34=${t30.has34}, 23=${t30.has23}, 27=${t30.has27}, xiamen=${t30.hasXiamen}`);
+
+  // T31: 375px mobile viewport - check data quality page has no horizontal overflow and no JS error
+  await page.setViewport({ width: 375, height: 812 });
+  consoleErrors = [];
+  await page.goto(`${BASE}/#/data-quality`, { waitUntil: 'networkidle0', timeout: 20000 });
+  await wait(1500);
+  const t31scroll = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+  }));
+  const t31errors = consoleErrors.filter(isCriticalError);
+  const t31pass = t31scroll.scrollWidth <= t31scroll.innerWidth + 1 && t31errors.length === 0;
+
+  // Restore viewport
+  await page.setViewport({ width: 1280, height: 800 });
+  await wait(500);
+
+  record('T31', '375px 移动端数据质量页无横向溢出且无 JS 错误', t31pass,
+    t31pass ? 'OK' : `scrollWidth=${t31scroll.scrollWidth}, innerWidth=${t31scroll.innerWidth}, errors=${t31errors.length}`);
 }
 
 // === 主流程 ===

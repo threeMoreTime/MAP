@@ -98,3 +98,49 @@ export interface CoverManifest {
   items: CoverManifestItem[];
 }
 
+export interface QualityReportCity {
+  city: string;
+  city_cn: string;
+  quality_score: number;
+  quality_level: 'high' | 'medium' | 'low';
+  has_stats: boolean;
+  has_daily_ridership: boolean;
+  has_yearly_trend: boolean;
+  has_network_map: boolean;
+  has_plan_map: boolean;
+  cover_status: string;
+  missing_items: string[];
+  warnings: string[];
+  risk_flags: string[];
+}
+
+export interface QualityReportSummary {
+  city_count: number;
+  stats_city_count: number;
+  daily_ridership_display_count: number;
+  no_daily_display_count: number;
+  stats_without_daily_count: number;
+  no_stats_count: number;
+  network_map_count: number;
+  plan_map_count: number;
+  cover_downloaded_count: number;
+  cover_fallback_count: number;
+  high_quality_count: number;
+  medium_quality_count: number;
+  low_quality_count: number;
+}
+
+export interface QualityReport {
+  schema_version: string;
+  generated_at: string;
+  summary: QualityReportSummary;
+  cities: QualityReportCity[];
+  missing_groups: {
+    no_stats: string[];
+    no_daily_ridership: string[];
+    no_network_map: string[];
+    no_plan_map: string[];
+    cover_fallback: string[];
+  };
+}
+

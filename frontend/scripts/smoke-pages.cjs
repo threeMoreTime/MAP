@@ -181,6 +181,7 @@ async function run() {
       { name: 'About Page', path: '#/about' },
       { name: 'Foshan Page', path: '#/city/foshan' },
       { name: 'Taiyuan Page', path: '#/city/taiyuan' },
+      { name: 'Data Quality Center', path: '#/data-quality' },
     ];
 
     for (const p of testPages) {
@@ -233,6 +234,18 @@ async function run() {
           if (!aboutValidated) {
             extraOk = false;
             extraDetail = 'Missing .last-updated-badge or unified terminology (非实时运营数据 / 公开资料整理快照)';
+          }
+        } else if (p.name === 'Data Quality Center') {
+          const qualityValidated = await page.evaluate(() => {
+            const title = document.querySelector('h1');
+            const body = document.body.innerText || '';
+            const hasTitle = !!title && title.textContent.includes('数据质量中心');
+            const hasWording = body.includes('非实时运营数据') || body.includes('公开资料整理快照') || body.includes('数据完整度评分');
+            return hasTitle && hasWording;
+          });
+          if (!qualityValidated) {
+            extraOk = false;
+            extraDetail = 'Missing Data Quality header or unified terminology (非实时运营数据 / 公开资料整理快照 / 数据完整度评分)';
           }
         }
 

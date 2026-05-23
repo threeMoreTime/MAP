@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { MetroStats, CityAssetsIndex, Manifest, MetroCity, CityAsset, CoverManifest } from '../types/metro';
+import type { MetroStats, CityAssetsIndex, Manifest, MetroCity, CityAsset, CoverManifest, QualityReport } from '../types/metro';
 
 export interface MergedCity extends CityAsset {
   stats: MetroCity | null;
@@ -28,6 +28,7 @@ export interface MetroDataState {
   merged: MergedCity[];
   manifest: Manifest | null;
   coversManifest: CoverManifest | null;
+  qualityReport: QualityReport | null;
 }
 
 
@@ -90,6 +91,7 @@ export function useMetroData(): MetroDataState {
     merged: [],
     manifest: null,
     coversManifest: null,
+    qualityReport: null,
   });
 
   useEffect(() => {
@@ -97,11 +99,12 @@ export function useMetroData(): MetroDataState {
 
     async function load() {
       try {
-        const [statsData, assetsData, manifestData, coversManifestData] = await Promise.all([
+        const [statsData, assetsData, manifestData, coversManifestData, qualityReportData] = await Promise.all([
           fetchJSON<MetroStats>(withBaseUrl('data/latest/metro_stats.json')),
           fetchJSON<CityAssetsIndex>(withBaseUrl('data/latest/city_assets_index.json')),
           fetchJSON<Manifest>(withBaseUrl('data/latest/manifest.json')),
           fetchJSON<CoverManifest>(withBaseUrl('assets/city-covers/manifest.json')).catch(() => null),
+          fetchJSON<QualityReport>(withBaseUrl('data/latest/quality_report.json')).catch(() => null),
         ]);
 
         if (cancelled) return;
@@ -116,6 +119,7 @@ export function useMetroData(): MetroDataState {
           merged,
           manifest: manifestData,
           coversManifest: coversManifestData,
+          qualityReport: qualityReportData,
         });
       } catch (e) {
         if (!cancelled) {

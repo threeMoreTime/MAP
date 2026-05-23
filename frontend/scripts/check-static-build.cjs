@@ -57,9 +57,9 @@ check('T02', 'dist assets exists', () => {
   return dirExists(assetsDir);
 });
 
-// T03: data/latest three JSONs exist
+// T03: data/latest four JSONs exist
 check('T03', 'data latest files exist', () => {
-  const required = ['metro_stats.json', 'city_assets_index.json', 'manifest.json'];
+  const required = ['metro_stats.json', 'city_assets_index.json', 'manifest.json', 'quality_report.json'];
   for (const name of required) {
     if (!fileExists(path.join(dataDir, name))) {
       throw new Error(`Missing ${name}`);
