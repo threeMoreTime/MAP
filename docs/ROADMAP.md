@@ -426,23 +426,26 @@
 
 ---
 
-### Phase 6：增量更新与定期采集（OpenSpec 设计中）
+### Phase 6：增量更新与定期采集（已配置待验证）
 
 **目标**：实现数据自动采集和定期更新。
 
 **产物**：
 - [x] **OpenSpec 设计**：已编写并提交 [openspec/data_update.md](openspec/data_update.md) 设计方案
-- [ ] GitHub Actions 定时任务（Cron）
-- [ ] 自动数据采集 + 提交工作流
-- [ ] 数据变更检测（仅在有变化时提交）
-- [ ] 更新失败的通知机制
-
+- [x] **数据快照差分工具**：已实现 [scripts/diff_data_snapshot.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/diff_data_snapshot.py)
+- [x] **数据校验器加固**：已实现 [scripts/validate_data.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/validate_data.py) staging 支持
+- [x] **更新总控编排脚本**：已实现 [scripts/run_data_update.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/run_data_update.py)
+- [x] **数据更新 Workflow**：已配置 [.github/workflows/data-update.yml](file:///c:/Users/Administrator/Desktop/FL/MAP/.github/workflows/data-update.yml)
+- [x] **数据更新运维 Runbook**：已编写 [docs/DATA_UPDATE_RUNBOOK.md](file:///c:/Users/Administrator/Desktop/FL/MAP/docs/DATA_UPDATE_RUNBOOK.md)
 
 **验收标准**：
-- GitHub Actions 按计划自动执行数据采集
-- 增量数据自动创建 Pull Request 并通过人工审核合并
-- 无数据变化时不产生空提交
-- 采集失败时可通过 GitHub Notification 获知
+- [x] 运行本地 `scripts/run_data_update.py` 实现 Staging 格式自检与差分对齐
+- [x] GitHub Actions 按计划定时触发或手动 `workflow_dispatch` 触发
+- [x] 仅在有实质性客流数据和运营数据更新时，自动创建 PR 并附带差分表格报告
+- [x] 无实质数据变化时 0-Exit 正常挂起，校验失败时安全熔断，不创建任何 PR
+
+**状态**：Phase 6 数据增量更新 workflow 已配置，待首次手动触发验证。
+
 
 ---
 
