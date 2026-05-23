@@ -92,12 +92,47 @@ def extract_yearly_data(html):
     return years, values
 
 
-def scrape_city(city):
-    city_cn = CITY_CN.get(city, city)
-    city_dir = os.path.join(CITIES_DIR, city)
+NOISE_KEYS = {"scrape_date"}
 
-    if not os.path.isdir(city_dir):
+
+def strip_noise(data):
+    """
+    递归过滤字典或列表中的噪声字段（如 scrape_date），用作比对。
+    """
+    if isinstance(data, dict):
+        return {k: strip_noise(v) for k, v in data.items() if k not in NOISE_KEYS}
+    elif isinstance(data, list):
+        return [strip_noise(item) for item in data]
+    return data
+
+
+def write_json_if_substantive_changed(path, new_data):
+    """
+    判定是否发生实质性变动。如果没有实质性变动，则跳过文件写入，避免刷新文件的修改时间。
+    """
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                old_data = json.load(f)
+            if strip_noise(old_data) == strip_noise(new_data):
+                return False
+        except Exception:
+            pass
+    # 写入新数据
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(new_data, f, ensure_ascii=False, indent=2)
+    return True
+
+
+def scrape_city(city, output_dir=None):
+    city_cn = CITY_CN.get(city, city)
+    city_dir = os.path.join(output_dir if output_dir else CITIES_DIR, city)
+
+    if not output_dir and not os.path.isdir(city_dir):
         return
+    
+    if output_dir:
+        os.makedirs(city_dir, exist_ok=True)
 
     if city in NO_DATA_CITIES:
         log("SKIP", f"{city} ({city_cn}) 无客流数据(已知缺数据城市)")
@@ -134,19 +169,29 @@ def scrape_city(city):
     }
 
     json_path = os.path.join(city_dir, f"{city}_stats.json")
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    written = write_json_if_substantive_changed(json_path, data)
 
-    log("  OK", f"{city} ({city_cn}) 日客流 {data['daily_ridership_wan']}万, "
-               f"里程 {data['operating_mileage_km']}km, "
-               f"站点 {data['operating_stations']}座")
+    status_tag = "  OK" if written else "ALIGN"
+    log(status_tag, f"{city} ({city_cn}) 日客流 {data['daily_ridership_wan']}万, "
+                   f"里程 {data['operating_mileage_km']}km, "
+                   f"站点 {data['operating_stations']}座" + (" (写入数据)" if written else " (数据无变动对齐)"))
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="MetroDB 城市客流数据爬取工具 (Python)")
+    parser.add_argument("--output-dir", default=None, help="重定向输出的 Staging 城市目录")
+    args = parser.parse_args()
+
+    output_dir = args.output_dir
+
     print("=" * 44)
     print(" MetroDB 客流数据爬取工具 (Python)")
     print(f" 并发: {MAX_WORKERS}")
-    print(f" 输出: cities/{{city}}/{{city}}_stats.json")
+    if output_dir:
+        print(f" 输出: {output_dir}/{{city}}/{{city}}_stats.json")
+    else:
+        print(f" 输出: cities/{{city}}/{{city}}_stats.json")
     print("=" * 44)
     print()
 
@@ -159,7 +204,7 @@ def main():
     print(f"发现 {len(cities)} 个城市文件夹\n")
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
-        futures = {pool.submit(scrape_city, c): c for c in cities}
+        futures = {pool.submit(scrape_city, c, output_dir): c for c in cities}
         for f in as_completed(futures):
             try:
                 f.result()
@@ -167,8 +212,9 @@ def main():
                 log("FAIL", f"{futures[f]} 异常: {e}")
 
     # 统计
+    base_dir = output_dir if output_dir else CITIES_DIR
     json_count = sum(
-        1 for root, _, files in os.walk(CITIES_DIR)
+        1 for root, _, files in os.walk(base_dir)
         for f in files if f.endswith("_stats.json")
     )
 
@@ -186,3 +232,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
