@@ -100,7 +100,23 @@ def validate_city_assets_index(data):
                     err(f"{city}: 资源路径不存在: {path_val}")
 
 
-def validate_manifest(manifest, stats, assets):
+def resolve_manifest_data_file_path(path_value, data_dir):
+    """
+    根据给定的数据目录解析 manifest.data_files 中的路径。
+    如果路径以默认的 'data/latest/' 开头，且处于自定义 data_dir 场景下，
+    则映射到 data_dir 下的同名文件；否则保持原有的 ROOT 相对路径解析。
+    """
+    default_prefix = "data/latest/"
+    if path_value.startswith(default_prefix):
+        file_name = path_value[len(default_prefix):]
+        default_data_dir = os.path.join(ROOT, "data", "latest")
+        if os.path.abspath(data_dir) != os.path.abspath(default_data_dir):
+            return os.path.join(data_dir, file_name)
+    
+    return os.path.join(ROOT, path_value.replace("/", os.sep))
+
+
+def validate_manifest(manifest, stats, assets, data_dir):
     if manifest is None:
         return
 
@@ -117,9 +133,9 @@ def validate_manifest(manifest, stats, assets):
         if asset_count != actual_assets:
             err(f"manifest.asset_city_count({asset_count}) 与 city_assets_index.items({actual_assets}) 不一致")
 
-    # data_files 路径存在性
+    # data_files 路径存在性 (对自定义 data_dir 目录下的同名临时文件进行映射校验)
     for df in manifest.get("data_files", []):
-        full = os.path.join(ROOT, df.replace("/", os.sep))
+        full = resolve_manifest_data_file_path(df, data_dir)
         if not os.path.exists(full):
             err(f"manifest 引用的数据文件不存在: {df}")
 
@@ -137,6 +153,17 @@ def main():
     print(f" 校验目录: {data_dir}")
     print("=" * 50)
 
+    # 校验数据目录本身的存在性 (加固 staging 沙盒校验)
+    if not os.path.exists(data_dir) or not os.path.isdir(data_dir):
+        err(f"数据目录不存在: {data_dir}")
+        print()
+        print("-" * 50)
+        print(f"  Errors:   {len(errors)}")
+        print(f"  Warnings: {len(warnings)}")
+        print("-" * 50)
+        print("结果: FAIL")
+        sys.exit(1)
+
     stats = load_json(os.path.join(data_dir, "metro_stats.json"), "metro_stats.json")
     assets = load_json(os.path.join(data_dir, "city_assets_index.json"), "city_assets_index.json")
     manifest = load_json(os.path.join(data_dir, "manifest.json"), "manifest.json")
@@ -151,7 +178,7 @@ def main():
 
     print()
     print("[3/3] 校验 manifest.json ...")
-    validate_manifest(manifest, stats, assets)
+    validate_manifest(manifest, stats, assets, data_dir)
 
     # 汇总
     print()
