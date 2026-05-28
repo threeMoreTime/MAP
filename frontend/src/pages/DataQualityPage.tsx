@@ -426,15 +426,15 @@ export default function DataQualityPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span style={{
                       fontSize: 13, fontWeight: 700,
-                      color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#fb7185')
+                      color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#94a3b8')
                     }}>
                       {c.quality_score}分
                     </span>
                     <span style={{
                       fontSize: 11, padding: '2px 7px', borderRadius: 20, fontWeight: 500,
-                      background: c.quality_level === 'high' ? 'rgba(52,211,153,0.12)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.12)' : 'rgba(251,113,133,0.12)'),
-                      color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#fb7185'),
-                      border: `1px solid ${c.quality_level === 'high' ? 'rgba(52,211,153,0.20)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.20)' : 'rgba(251,113,133,0.20)')}`
+                      background: c.quality_level === 'high' ? 'rgba(52,211,153,0.12)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.12)' : 'rgba(100,116,139,0.10)'),
+                      color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#94a3b8'),
+                      border: `1px solid ${c.quality_level === 'high' ? 'rgba(52,211,153,0.20)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.20)' : 'rgba(100,116,139,0.18)')}`
                     }}>
                       {c.quality_level === 'high' ? '完整度高' : (c.quality_level === 'medium' ? '完整度中' : '完整度低')}
                     </span>
@@ -446,23 +446,23 @@ export default function DataQualityPage() {
                   display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
                   background: 'rgba(0,0,0,0.12)', padding: 8, borderRadius: 6, fontSize: 13
                 }}>
-                  <div style={{ color: c.has_stats ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_stats ? '✔' : '✘'}</span> 统计记录
+                  <div style={{ color: c.has_stats ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_stats ? '✔' : '–'}</span> 统计记录
                   </div>
-                  <div style={{ color: c.has_daily_ridership ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_daily_ridership ? '✔' : '✘'}</span> 日客流
+                  <div style={{ color: c.has_daily_ridership ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_daily_ridership ? '✔' : '–'}</span> 日客流
                   </div>
-                  <div style={{ color: c.has_yearly_trend ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_yearly_trend ? '✔' : '✘'}</span> 年趋势
+                  <div style={{ color: c.has_yearly_trend ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_yearly_trend ? '✔' : '–'}</span> 年趋势
                   </div>
-                  <div style={{ color: c.has_network_map ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_network_map ? '✔' : '✘'}</span> 线路图
+                  <div style={{ color: c.has_network_map ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_network_map ? '✔' : '–'}</span> 线路图
                   </div>
-                  <div style={{ color: c.has_plan_map ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_plan_map ? '✔' : '✘'}</span> 规划图
+                  <div style={{ color: c.has_plan_map ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.has_plan_map ? '✔' : '–'}</span> 规划图
                   </div>
-                  <div style={{ color: c.cover_status === 'downloaded' ? '#34d399' : '#fb7185', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.cover_status === 'downloaded' ? '✔' : '✘'}</span> 封面图
+                  <div style={{ color: c.cover_status === 'downloaded' ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+                    <span style={{ fontWeight: 700 }}>{c.cover_status === 'downloaded' ? '✔' : '–'}</span> 封面图
                   </div>
                 </div>
 
@@ -518,7 +518,7 @@ export default function DataQualityPage() {
                     </td>
                     <td style={{ padding: '14px 10px', textAlign: 'center', fontWeight: 700 }}>
                       <span style={{
-                        color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#fb7185')
+                        color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#94a3b8')
                       }}>
                         {c.quality_score}
                       </span>
@@ -527,9 +527,9 @@ export default function DataQualityPage() {
                       <span style={{
                         fontSize: 11, padding: '3px 9px', borderRadius: 20,
                         fontWeight: 500,
-                        background: c.quality_level === 'high' ? 'rgba(52,211,153,0.12)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.12)' : 'rgba(251,113,133,0.12)'),
-                        color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#fb7185'),
-                        border: `1px solid ${c.quality_level === 'high' ? 'rgba(52,211,153,0.20)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.20)' : 'rgba(251,113,133,0.20)')}`
+                        background: c.quality_level === 'high' ? 'rgba(52,211,153,0.12)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.12)' : 'rgba(100,116,139,0.10)'),
+                        color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#94a3b8'),
+                        border: `1px solid ${c.quality_level === 'high' ? 'rgba(52,211,153,0.20)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.20)' : 'rgba(100,116,139,0.18)')}`
                       }}>
                         {c.quality_level === 'high' ? '完整度高' : (c.quality_level === 'medium' ? '完整度中' : '完整度低')}
                       </span>
@@ -537,50 +537,50 @@ export default function DataQualityPage() {
                     <td style={{ padding: '14px 10px', textAlign: 'center' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
-                        background: c.has_stats ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
-                        color: c.has_stats ? '#34d399' : '#fb7185'
-                      }}>{c.has_stats ? '✔' : '✘'}</span>
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
+                        background: c.has_stats ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
+                        color: c.has_stats ? '#34d399' : '#64748b'
+                      }}>{c.has_stats ? '✔' : '–'}</span>
                     </td>
                     <td style={{ padding: '14px 10px', textAlign: 'center' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
-                        background: c.has_daily_ridership ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
-                        color: c.has_daily_ridership ? '#34d399' : '#fb7185'
-                      }}>{c.has_daily_ridership ? '✔' : '✘'}</span>
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
+                        background: c.has_daily_ridership ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
+                        color: c.has_daily_ridership ? '#34d399' : '#64748b'
+                      }}>{c.has_daily_ridership ? '✔' : '–'}</span>
                     </td>
                     <td style={{ padding: '14px 10px', textAlign: 'center' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
-                        background: c.has_yearly_trend ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
-                        color: c.has_yearly_trend ? '#34d399' : '#fb7185'
-                      }}>{c.has_yearly_trend ? '✔' : '✘'}</span>
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
+                        background: c.has_yearly_trend ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
+                        color: c.has_yearly_trend ? '#34d399' : '#64748b'
+                      }}>{c.has_yearly_trend ? '✔' : '–'}</span>
                     </td>
                     <td style={{ padding: '14px 10px', textAlign: 'center' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
-                        background: c.has_network_map ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
-                        color: c.has_network_map ? '#34d399' : '#fb7185'
-                      }}>{c.has_network_map ? '✔' : '✘'}</span>
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
+                        background: c.has_network_map ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
+                        color: c.has_network_map ? '#34d399' : '#64748b'
+                      }}>{c.has_network_map ? '✔' : '–'}</span>
                     </td>
                     <td style={{ padding: '14px 10px', textAlign: 'center' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
-                        background: c.has_plan_map ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
-                        color: c.has_plan_map ? '#34d399' : '#fb7185'
-                      }}>{c.has_plan_map ? '✔' : '✘'}</span>
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
+                        background: c.has_plan_map ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
+                        color: c.has_plan_map ? '#34d399' : '#64748b'
+                      }}>{c.has_plan_map ? '✔' : '–'}</span>
                     </td>
                     <td style={{ padding: '14px 10px', textAlign: 'center' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 11, fontWeight: 700,
-                        background: c.cover_status === 'downloaded' ? 'rgba(52,211,153,0.12)' : 'rgba(251,113,133,0.10)',
-                        color: c.cover_status === 'downloaded' ? '#34d399' : '#fb7185'
-                      }}>{c.cover_status === 'downloaded' ? '✔' : '✘'}</span>
+                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
+                        background: c.cover_status === 'downloaded' ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
+                        color: c.cover_status === 'downloaded' ? '#34d399' : '#64748b'
+                      }}>{c.cover_status === 'downloaded' ? '✔' : '–'}</span>
                     </td>
                     <td style={{ padding: '14px 10px', color: '#94a3b8', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {c.missing_items.length === 0 ? (
