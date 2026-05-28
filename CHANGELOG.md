@@ -2,6 +2,21 @@
 
 本文件记录项目的所有重要变更。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/)。
 
+## [v1.2.2-dev] - 2026-05-28
+
+### 已完成 (Phase 7.1 工作区清理与视觉变更收口)
+
+#### 视觉优化
+- **统一图表色板**：移除 rose/pink 色系，精简为 16 色色板，轴标签色统一为 slate-400。
+- **线路图查看器视觉打磨**：容器溢出裁剪、圆角、轻微压暗白底 PNG 以适配深色主题。
+- **数据质量页面语义色修正**：缺失项从红叉（✘ rose）改为中性横杠（– slate），消除"缺失=错误"的视觉误导。
+
+#### 文档治理
+- **Phase 6 状态纠偏**：修正 ROADMAP.md 与 NEXT_ROADMAP_PLAN.md 中 Phase 6 状态为"已完成远端 dry-run 验证"。
+- **output/ 目录加入 .gitignore**：防止临时产物被提交。
+
+---
+
 ## [v1.2.2-dev] - 2026-05-22
 
 ### 已完成 (Phase 5.7 旧版 dashboard.html 维护策略落纸)

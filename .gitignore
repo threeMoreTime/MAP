@@ -9,6 +9,7 @@ frontend/public/data/
 frontend/public/assets/china.json
 frontend/public/assets/city-covers/
 frontend/public/cities/
+output/
 参考图*.png
 .cursor
 .claude
