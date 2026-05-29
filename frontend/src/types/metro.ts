@@ -144,3 +144,26 @@ export interface QualityReport {
   };
 }
 
+export interface ComparableCity {
+  city: string;
+  city_cn: string;
+  hasStats: boolean;
+  dailyRidershipWan: number | null;
+  operatingMileageKm: number | null;
+  operatingStations: number | null;
+  operatingLines: number | null;
+  ridershipIntensity: number | null;
+  peakRidershipWan: number | null;
+  hasYearlyTrend: boolean;
+  hasNetworkMap: boolean;
+  hasPlanMap: boolean;
+  coverStatus: 'downloaded' | 'fallback' | 'missing' | 'unknown';
+  qualityScore: number | null;
+  qualityLevel: 'high' | 'medium' | 'low' | null;
+  missingItems: string[];
+  warnings: string[];
+  riskFlags: string[];
+  yearlyYears: number[];
+  yearlyValues: number[];
+}
+

@@ -3,6 +3,7 @@ import { NavLink, Link } from 'react-router-dom';
 const NAV_ITEMS = [
   { to: '/', label: '数据大屏', end: true },
   { to: '/cities', label: '城市总览', end: false },
+  { to: '/compare', label: '城市对比', end: false },
   { to: '/data-quality', label: '数据质量', end: false },
   { to: '/about', label: '数据说明', end: false },
 ];

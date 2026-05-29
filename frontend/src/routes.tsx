@@ -5,6 +5,7 @@ import CitiesPage from './pages/CitiesPage';
 import CityDetailPage from './pages/CityDetailPage';
 import AboutPage from './pages/AboutPage';
 import DataQualityPage from './pages/DataQualityPage';
+import ComparePage from './pages/ComparePage';
 
 export default function AppRoutes() {
   return (
@@ -14,6 +15,7 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/cities" element={<CitiesPage />} />
         <Route path="/city/:id" element={<CityDetailPage />} />
+        <Route path="/compare" element={<ComparePage />} />
         <Route path="/data-quality" element={<DataQualityPage />} />
         <Route path="/about" element={<AboutPage />} />
       </Route>
