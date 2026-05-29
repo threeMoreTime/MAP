@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useCompareCities } from '../hooks/useCompareCities';
 import CityCompareSelector from '../components/compare/CityCompareSelector';
 import CompareMetricCards from '../components/compare/CompareMetricCards';
+import CompareCharts from '../components/compare/CompareCharts';
+import CompareQualitySection from '../components/compare/CompareQualitySection';
+import CompareTable from '../components/compare/CompareTable';
 import CompareEmptyState from '../components/compare/CompareEmptyState';
 
 export default function ComparePage() {
@@ -96,23 +99,10 @@ export default function ComparePage() {
         <CompareEmptyState />
       ) : (
         <>
-          {/* Metric cards */}
-          <section>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#00d4ff', marginBottom: 12 }}>
-              指标概览
-            </div>
-            <CompareMetricCards cities={selectedCities} isMobile={isMobile} />
-          </section>
-
-          {/* Placeholder for charts (Commit 2) */}
-          <section className="card-glass" style={{
-            padding: 40, borderRadius: 12, textAlign: 'center',
-            border: '1px dashed rgba(0,212,255,0.12)',
-          }}>
-            <div style={{ fontSize: 13, color: '#718096' }}>
-              图表对比区将在后续增强中上线
-            </div>
-          </section>
+          <CompareMetricCards cities={selectedCities} isMobile={isMobile} />
+          <CompareCharts cities={selectedCities} />
+          <CompareQualitySection cities={selectedCities} isMobile={isMobile} />
+          <CompareTable cities={selectedCities} isMobile={isMobile} />
         </>
       )}
     </div>
