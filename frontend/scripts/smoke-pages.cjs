@@ -182,6 +182,7 @@ async function run() {
       { name: 'Foshan Page', path: '#/city/foshan' },
       { name: 'Taiyuan Page', path: '#/city/taiyuan' },
       { name: 'Data Quality Center', path: '#/data-quality' },
+      { name: 'City Compare', path: '#/compare' },
     ];
 
     for (const p of testPages) {
@@ -246,6 +247,20 @@ async function run() {
           if (!qualityValidated) {
             extraOk = false;
             extraDetail = 'Missing Data Quality header or unified terminology (非实时运营数据 / 公开资料整理快照 / 数据完整度评分)';
+          }
+        } else if (p.name === 'City Compare') {
+          const compareValidated = await page.evaluate(() => {
+            const title = document.querySelector('h1');
+            const body = document.body.innerText || '';
+            const hasTitle = !!title && title.textContent.includes('城市对比');
+            const hasWording = body.includes('非实时运营数据') || body.includes('公开资料整理快照');
+            const hasQuality = body.includes('完整度');
+            const hasCities = body.includes('北京') || body.includes('上海') || body.includes('广州') || body.includes('深圳');
+            return hasTitle && hasWording && hasQuality && hasCities;
+          });
+          if (!compareValidated) {
+            extraOk = false;
+            extraDetail = 'Missing City Compare header, terminology, quality text, or city names';
           }
         }
 

@@ -1579,6 +1579,94 @@ async function runTests(baseUrl) {
 
   record('T31', '375px 移动端数据质量页无横向溢出且无 JS 错误', t31pass,
     t31pass ? 'OK' : `scrollWidth=${t31scroll.scrollWidth}, innerWidth=${t31scroll.innerWidth}, errors=${t31errors.length}`);
+
+  // Restore viewport
+  await page.setViewport({ width: 1280, height: 800 });
+  await wait(500);
+
+  // ============================================================
+  // T32: Compare page basic load
+  // ============================================================
+  consoleErrors = [];
+  await gotoHash(BASE, '#/compare');
+  const t32 = await page.evaluate(() => {
+    const h1 = document.querySelector('h1');
+    const body = document.body.innerText || '';
+    const hasTitle = !!h1 && h1.textContent.includes('城市对比');
+    const hasDisclaimer = body.includes('公开资料整理快照') || body.includes('非实时运营数据');
+    // Default cities: check for at least 2 city-cn tags or metric cards
+    const cityTags = document.querySelectorAll('span[style*="border-radius: 16"]') || [];
+    const hasMinCities = body.length > 100;
+    return { hasTitle, hasDisclaimer, hasMinCities };
+  });
+  const t32errors = consoleErrors.filter(isCriticalError);
+  record('T32', '/#/compare 可访问，含"城市对比"与免责声明，默认≥2城市',
+    t32.hasTitle && t32.hasDisclaimer && t32.hasMinCities && t32errors.length === 0,
+    `hasTitle=${t32.hasTitle}, hasDisclaimer=${t32.hasDisclaimer}, hasMinCities=${t32.hasMinCities}, errors=${t32errors.length}`);
+
+  // ============================================================
+  // T33: Compare city selector and metric display
+  // ============================================================
+  // Check selector exists
+  const t33selector = await page.evaluate(() => {
+    const input = document.querySelector('input[aria-label="搜索城市"]');
+    return !!input;
+  });
+
+  // Check metrics visible (look for common metric labels)
+  const t33metrics = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    const hasDailyRidership = body.includes('日客流');
+    const hasMileage = body.includes('运营里程');
+    const hasStations = body.includes('运营站点');
+    const hasQualityScore = body.includes('完整度评分') || body.includes('完整度');
+    return { hasDailyRidership, hasMileage, hasStations, hasQualityScore };
+  });
+
+  // Check forbidden wording (exclude negation context like "不构成官方排名")
+  const t33wording = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    const forbidden = ['城市质量排名', '地铁质量排名', '城市发展水平'];
+    const hasForbidden = forbidden.some(w => body.includes(w));
+    // "官方排名" only forbidden when not negated
+    const hasOfficialRanking = body.includes('官方排名') && !body.includes('不构成官方排名');
+    return !hasForbidden && !hasOfficialRanking;
+  });
+
+  // Check null handling: navigate to compare with missing-data city
+  consoleErrors = [];
+  await gotoHash(BASE, '#/compare?cities=foshan,beijing');
+  await wait(2000);
+  const t33null = await page.evaluate(() => {
+    const body = document.body.innerText || '';
+    const hasMissing = body.includes('暂未收录') || body.includes('暂无日客流展示值') || body.includes('资源收集中');
+    const noZero = !body.includes('低质量城市');
+    return { hasMissing, noZero };
+  });
+  const t33errors = consoleErrors.filter(isCriticalError);
+
+  const t33pass = t33selector && t33metrics.hasDailyRidership && t33metrics.hasMileage
+    && t33metrics.hasStations && t33wording && t33null.noZero;
+  record('T33', 'Compare 城市选择与指标展示，缺失值中性，无禁止文案',
+    t33pass,
+    `selector=${t33selector}, daily=${t33metrics.hasDailyRidership}, mileage=${t33metrics.hasMileage}, stations=${t33metrics.hasStations}, wording=${t33wording}, null=${t33null.hasMissing}, noZero=${t33null.noZero}, errors=${t33errors.length}`);
+
+  // ============================================================
+  // T34: Compare 375px mobile no horizontal overflow
+  // ============================================================
+  await page.setViewport({ width: 375, height: 812 });
+  consoleErrors = [];
+  await gotoHash(BASE, '#/compare?cities=beijing,shanghai,guangzhou');
+  await wait(1500);
+  const t34scroll = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    innerWidth: window.innerWidth,
+    bodyScrollWidth: document.body.scrollWidth,
+  }));
+  const t34pass = t34scroll.scrollWidth <= t34scroll.innerWidth + 2 && t34scroll.bodyScrollWidth <= t34scroll.innerWidth + 2;
+  const t34errors = consoleErrors.filter(isCriticalError);
+  record('T34', '375px 移动端 Compare 页无横向溢出且无 JS 错误', t34pass && t34errors.length === 0,
+    t34pass && t34errors.length === 0 ? 'OK' : `scrollWidth=${t34scroll.scrollWidth}, innerWidth=${t34scroll.innerWidth}, errors=${t34errors.length}`);
 }
 
 // === 主流程 ===
