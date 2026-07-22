@@ -27,10 +27,10 @@ export const METRIC_COLORS: Record<string, [string, string]> = {
   ridership_intensity:   ['#b45309', '#fbbf24'],  // 深琥珀 → 琥珀
 };
 
-export const AXIS_LABEL_STYLE = { color: '#94a3b8' };
+export const AXIS_LABEL_STYLE = { color: '#94a3b8', fontSize: 11 };
 export const SPLIT_LINE_STYLE = { lineStyle: { color: '#1a3a5a' } };
-export const Y_CATEGORY_LABEL = { color: '#94a3b8' };
-export const CHART_GRID = { left: '3%', right: '8%', bottom: '3%', top: '3%', containLabel: true };
+export const Y_CATEGORY_LABEL = { color: '#94a3b8', fontSize: 11 };
+export const CHART_GRID = { left: '4%', right: '12%', bottom: '3%', top: '3%', containLabel: true };
 
 export function tooltipShadow() {
   return { trigger: 'axis' as const, axisPointer: { type: 'shadow' as const } };

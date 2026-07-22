@@ -1,4 +1,5 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useMetroData, type MergedCity } from '../hooks/useMetroData';
 import { useDashboardFilters, hasValidDailyRidership } from '../hooks/useDashboardFilters';
 import { METRIC_LABELS } from '../types/metro';
@@ -88,11 +89,20 @@ function StatsRow({ cities }: { cities: MergedCity[] }) {
 export default function DashboardPage() {
   const { merged, manifest, loading, error } = useMetroData();
   const { keyword, setKeyword, metric, setMetric, topN, setTopN, filteredCities } = useDashboardFilters(merged);
-  const [selectedCityName, setSelectedCityName] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCityName = searchParams.get('city');
 
   const handleCitySelect = useCallback((city: string) => {
-    setSelectedCityName(city);
-  }, []);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (city) {
+        next.set('city', city);
+      } else {
+        next.delete('city');
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const selectedCity = useMemo(() => {
     if (!selectedCityName) return null;

@@ -2,6 +2,7 @@ import React from 'react';
 import SectionTitle from '../components/common/SectionTitle';
 import { useMetroData } from '../hooks/useMetroData';
 import LastUpdatedBadge from '../components/common/LastUpdatedBadge';
+import { withBaseUrl } from '../utils/path';
 import s from './AboutPage.module.css';
 
 const FIELDS: { name: string; desc: string; unit?: string }[] = [
@@ -127,8 +128,23 @@ export default function AboutPage() {
         <p className={s.heroSubtitle}>
           说明本项目的数据来源、资源来源、字段口径、更新机制与使用限制
         </p>
-        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
           <LastUpdatedBadge generatedAt={manifest?.generated_at} />
+          <a
+            href={withBaseUrl('data/latest/manifest.json')}
+            download="manifest.json"
+            title="下载原始数据快照 JSON"
+            aria-label="下载原始数据快照 JSON"
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+              fontSize: 12, color: '#00d4ff', padding: '6px 14px',
+              border: '1px solid rgba(0,212,255,0.3)', borderRadius: 6,
+              background: 'rgba(0,212,255,0.08)', textDecoration: 'none',
+              transition: 'all 0.2s', cursor: 'pointer',
+            }}
+          >
+            ⬇ 下载数据快照 JSON (manifest.json)
+          </a>
         </div>
       </div>
 

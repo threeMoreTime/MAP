@@ -129,6 +129,16 @@ export default function CityCompareSelector({
 
       {/* Selected city tags */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+        <span style={{
+          fontSize: 12, color: maxReached ? '#fbbf24' : '#00d4ff',
+          padding: '2px 8px', borderRadius: 10,
+          background: maxReached ? 'rgba(251,191,36,0.1)' : 'rgba(0,212,255,0.08)',
+          border: `1px solid ${maxReached ? 'rgba(251,191,36,0.25)' : 'rgba(0,212,255,0.15)'}`,
+          fontWeight: 600,
+        }}>
+          {selectedSlugs.length} / 5 城
+        </span>
+
         {selectedSlugs.map(slug => {
           const c = allCities.find(x => x.city === slug);
           if (!c) return null;
@@ -156,7 +166,13 @@ export default function CityCompareSelector({
           );
         })}
         {maxReached && (
-          <span style={{ fontSize: 12, color: '#fbbf24' }}>最多选择 5 个城市</span>
+          <span style={{
+            fontSize: 12, color: '#fbbf24', display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '4px 10px', background: 'rgba(245,158,11,0.08)',
+            border: '1px solid rgba(245,158,11,0.2)', borderRadius: 6,
+          }}>
+            ⚠️ 已达到 5 个城市对比上限，移除旧城市后可继续添加
+          </span>
         )}
         {!maxReached && selectedSlugs.length < 2 && (
           <span style={{ fontSize: 12, color: '#94a3b8' }}>请至少选择 2 个城市开始对比</span>

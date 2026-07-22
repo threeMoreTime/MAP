@@ -217,6 +217,17 @@ export default function MetroMapChart({ data, metric, selectedCity, onCitySelect
     };
   }, []);
 
+  const handleResetView = useCallback(() => {
+    if (instanceRef.current) {
+      instanceRef.current.setOption({
+        geo: {
+          zoom: 1.2,
+          center: [105, 36],
+        },
+      });
+    }
+  }, []);
+
   if (mapState === 'loading') {
     return (
       <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4a6a8a' }}>
@@ -236,7 +247,24 @@ export default function MetroMapChart({ data, metric, selectedCity, onCitySelect
     );
   }
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%', minHeight: 460 }} />;
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 460 }}>
+      <button
+        onClick={handleResetView}
+        title="还原地图视角"
+        aria-label="还原地图视角"
+        style={{
+          position: 'absolute', top: 8, right: 8, zIndex: 10,
+          background: 'rgba(6,18,38,0.85)', border: '1px solid rgba(0,212,255,0.2)',
+          color: '#22d3ee', fontSize: 11, padding: '4px 10px', borderRadius: 6,
+          cursor: 'pointer', backdropFilter: 'blur(4px)', transition: 'all 0.2s',
+        }}
+      >
+        ↻ 还原视角
+      </button>
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+    </div>
+  );
 }
 
 function FallbackTable({ data, metric }: { data: MergedCity[]; metric: MetricKey }) {

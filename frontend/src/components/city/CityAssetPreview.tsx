@@ -388,8 +388,19 @@ export default function CityAssetPreview({ city }: Props) {
             </a>
           </div>
         ) : has && imageUrl && imageError ? (
-          <div className={styles.empty}>
-            <EmptyState icon="📁" title={`${label}加载失败`} description="图片资源无法加载" />
+          <div className={styles.empty} style={{ textAlign: 'center', padding: '24px 16px' }}>
+            <EmptyState icon="⚠️" title={`${label}加载失败`} description="图片资源网络加载中断或无法响应" />
+            <button
+              onClick={() => { setImageError(false); setImageLoading(true); }}
+              style={{
+                marginTop: 12, padding: '6px 16px', fontSize: 12,
+                color: '#00d4ff', border: '1px solid rgba(0,212,255,0.3)',
+                borderRadius: 6, background: 'rgba(0,212,255,0.08)',
+                cursor: 'pointer', transition: 'all 0.2s',
+              }}
+            >
+              ↻ 重新加载
+            </button>
           </div>
         ) : (
           <div className={styles.empty}>
