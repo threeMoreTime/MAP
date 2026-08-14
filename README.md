@@ -26,26 +26,20 @@
 
 ## 快速开始
 
-### 方式一：Python（推荐）
+主力前端为 `frontend/`（React + TypeScript + Vite）：
 
 ```bash
-cd /path/to/MAP
-python -m http.server 8000
-# 浏览器打开 http://localhost:8000/dashboard.html
-```
-
-### 方式二：Node.js
-
-```bash
-npx http-server . -p 8000 -c-1
-# 浏览器打开 http://localhost:8000/dashboard.html
+cd frontend
+npm ci
+npm run dev
+# 浏览器打开开发服务器地址（默认 http://localhost:5173）
 ```
 
 ## 文件结构
 
 ```
 MAP/
-├── dashboard.html              # 可视化大屏（自包含 ~62KB）
+├── frontend/                   # 主力前端（React + TS + Vite）
 ├── scrape_subway_route_map.py  # 线路图爬取脚本
 ├── 爬取图片资源.md              # 线路图爬取文档
 ├── README.md
@@ -77,15 +71,12 @@ MAP/
 ├── scrapers/                   # 数据采集脚本
 │   ├── scrape_metrodb.py           # MetroDB 客流数据爬取
 │   ├── scrape_all_cities.py        # 全城市规划图爬取
-│   ├── scrape_metrodb_data.sh      # Bash 版爬取脚本（备用）
 │   └── generate_charts.py          # matplotlib 图表生成
 │
-├── scripts/                    # 构建/校验/验收脚本
+├── scripts/                    # 构建/校验脚本
 │   ├── build_data_index.py         # 数据索引构建
 │   ├── validate_data.py            # 数据完整性校验
-│   ├── check_dashboard_syntax.py   # JS 语法检查
-│   ├── run_acceptance.py           # 一键总验收
-│   └── acceptance_dashboard.js     # 浏览器真实验收
+│   └── diff_data_snapshot.py       # 数据快照对比
 │
 ├── output/                     # 生成产物
 │   ├── national_comparison.png     # 全国对比图
@@ -129,28 +120,23 @@ npm run generate:charts     # 生成图表
 ## 自动化验收
 
 ```bash
-# 一键运行全部验收（数据构建 + 校验 + 语法检查 + 浏览器测试）
-python scripts/run_acceptance.py
+# 数据层校验（根目录）
+npm run test:data
 
-# 也可以分步运行
-python scripts/validate_data.py           # 数据校验
-python scripts/check_dashboard_syntax.py  # JS 语法检查
-node scripts/acceptance_dashboard.js      # 浏览器真实验收
-
-# 或使用 npm scripts
-npm run test:data          # 数据校验
-npm run test:dashboard     # 浏览器验收
-npm run test:acceptance    # 全部验收
+# React 前端（frontend/ 目录）
+npm run typecheck       # 类型检查
+npm run check:static    # 静态构建检查（T01-T09）
+npm run test:ui         # React 前端浏览器验收（T01-T34）
 ```
 
-验收依赖：Node.js + puppeteer-core（`npm install`）+ Chrome 浏览器。
+验收依赖：Node.js + puppeteer-core（`npm ci`）+ Chrome 浏览器。
 
 ## 验收状态
 
 
 | 检查项     | 结果             |
 | ------- | -------------- |
-| 浏览器功能验证 | **16/16 PASS** |
+| React UI 验收 | T01-T34 通过 |
 | 城市目录覆盖  | 50/50          |
 | 客流数据覆盖  | 34 城 (有统计记录) / 23 城 (有日客流展示) |
 | 规划图覆盖   | 41 城           |
@@ -181,14 +167,6 @@ npm run test:ui    # React 前端浏览器验收（T01-T25）
 - `/#/cities` — 城市总览
 - `/#/city/:id` — 城市详情（如 `/#/city/xiamen`）
 - `/#/about` — 数据说明
-
-### Legacy Dashboard 维护策略
-
-根目录下的 `dashboard.html` 单文件大屏已被正式定义为系统的 **Frozen Baseline / Legacy Fallback（冻结基线 / 灾备回退）**，当前主力前端为 `frontend/` React 现代化系统。
-1. **新功能唯一归属**：所有新业务功能（如数据对比、数据质量、数据导出等）将一律开发在 React 前端中，不再进入旧版大屏；
-2. **限度修改原则**：旧版大屏仅接受阻断性运行错误修复、安全性修复以及底层数据结构非向下兼容的兼容性适配，不对其进行任何新交互、视觉或图表重构；
-3. **CI 质量防线保留**：自动化测试的 `legacy-check` Job 将永久保留在 CI 流水线中，作为底层数据流完整性的最后拦截机制；
-4. **详细规则**：具体的维护、修改红线与发布流程参见正式说明文件 [LEGACY_DASHBOARD_POLICY.md](docs/LEGACY_DASHBOARD_POLICY.md)。
 
 ## 更多文档
 

@@ -42,7 +42,6 @@ export interface Manifest {
   yearly_trend_count: number;
   no_daily_data_count: number;
   no_daily_data_cities: string[];
-  dashboard_file: string;
   data_files: string[];
 }
 

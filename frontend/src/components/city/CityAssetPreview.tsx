@@ -46,15 +46,13 @@ export default function CityAssetPreview({ city }: Props) {
   const alt = `${city.city_cn}${label}`;
   const hasRealImage = has && imageUrl && !imageError;
 
-  useEffect(() => {
-    if (imageUrl) {
-      setImageLoading(true);
-      setImageError(false);
-    } else {
-      setImageLoading(false);
-      setImageError(false);
-    }
-  }, [imageUrl]);
+  // 切换图片源时重置加载/错误态（渲染期对齐前值，避免 effect 级联渲染）
+  const [prevImageUrl, setPrevImageUrl] = useState(imageUrl);
+  if (prevImageUrl !== imageUrl) {
+    setPrevImageUrl(imageUrl);
+    setImageLoading(Boolean(imageUrl));
+    setImageError(false);
+  }
 
   const resetView = useCallback(() => {
     setScale(1);
@@ -118,8 +116,8 @@ export default function CityAssetPreview({ city }: Props) {
     });
   }, []);
 
-  // === Shared mousedown handler factory ===
-  const createMouseDownHandler = useCallback((container: HTMLElement) => (e: MouseEvent) => {
+  // === Shared mousedown handler ===
+  const handleMouseDown = useCallback((e: MouseEvent) => {
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
     if (target.closest(`.${styles.toolbar}`) || target.closest(`.${styles.viewOriginal}`) || target.closest('button') || target.closest('a')) {
@@ -134,7 +132,7 @@ export default function CityAssetPreview({ city }: Props) {
       tx: translateX,
       ty: translateY,
     };
-  }, [translateX, translateY, styles.toolbar, styles.viewOriginal]);
+  }, [translateX, translateY]);
 
   // === Shared mousemove handler ===
   const handleGlobalMouseMove = useCallback((e: MouseEvent) => {
@@ -176,7 +174,7 @@ export default function CityAssetPreview({ city }: Props) {
     if (!container || !hasRealImage) return;
 
     const wheelHandler = createWheelHandler(container);
-    const mouseDownHandler = createMouseDownHandler(container);
+    const mouseDownHandler = handleMouseDown;
 
     container.addEventListener('wheel', wheelHandler, { passive: false });
     container.addEventListener('mousedown', mouseDownHandler);
@@ -184,7 +182,7 @@ export default function CityAssetPreview({ city }: Props) {
       container.removeEventListener('wheel', wheelHandler);
       container.removeEventListener('mousedown', mouseDownHandler);
     };
-  }, [hasRealImage, createWheelHandler, createMouseDownHandler]);
+  }, [hasRealImage, createWheelHandler, handleMouseDown]);
 
   // === Global mouse move/up for normal mode drag ===
   useEffect(() => {
@@ -241,7 +239,7 @@ export default function CityAssetPreview({ city }: Props) {
     if (!container) return;
 
     const wheelHandler = createWheelHandler(container);
-    const mouseDownHandler = createMouseDownHandler(container);
+    const mouseDownHandler = handleMouseDown;
 
     container.addEventListener('wheel', wheelHandler, { passive: false });
     container.addEventListener('mousedown', mouseDownHandler);
@@ -253,7 +251,7 @@ export default function CityAssetPreview({ city }: Props) {
       container.removeEventListener('mousedown', mouseDownHandler);
       window.removeEventListener('mousemove', handleGlobalMouseMove);
     };
-  }, [isFullscreen, hasRealImage, createWheelHandler, createMouseDownHandler, handleGlobalMouseMove, createMouseUpHandler]);
+  }, [isFullscreen, hasRealImage, createWheelHandler, handleMouseDown, handleGlobalMouseMove, createMouseUpHandler]);
 
   // Store fullscreen mouseup handler ref for cleanup
   const fullscreenMouseUpRef = useRef<((e: MouseEvent) => void) | null>(null);

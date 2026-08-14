@@ -6,9 +6,7 @@
     "scrape:metrodb": "python scrapers/scrape_metrodb.py",
     "scrape:cities": "python scrapers/scrape_all_cities.py",
     "generate:charts": "python scrapers/generate_charts.py",
-    "test:data": "python scripts/validate_data.py",
-    "test:dashboard": "node scripts/acceptance_dashboard.js",
-    "test:acceptance": "python scripts/run_acceptance.py"
+    "test:data": "python scripts/validate_data.py"
   },
   "dependencies": {
     "puppeteer-core": "^24.42.0"

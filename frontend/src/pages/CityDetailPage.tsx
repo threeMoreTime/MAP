@@ -194,8 +194,6 @@ export default function CityDetailPage() {
   const hasRidership = city.daily_ridership_wan > 0;
   const hasNetworkMap = city.has_network_map;
   const hasPlanMap = city.has_plan_map;
-  const hasYearlyTrend = !!(yearly && yearly.years.length > 0);
-  const allResourcesAvailable = hasNetworkMap && hasPlanMap && hasRidership;
 
   const currentMapType = hasNetworkMap ? '线路图' : hasPlanMap ? '规划图' : null;
   const currentMapPath = hasNetworkMap ? city.network_map_path : hasPlanMap ? city.plan_map_path : null;

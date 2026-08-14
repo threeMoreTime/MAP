@@ -16,7 +16,7 @@ import CityDetailPanel from '../components/charts/CityDetailPanel';
 import LastUpdatedBadge from '../components/common/LastUpdatedBadge';
 import DataSnapshotCard from '../components/common/DataSnapshotCard';
 
-function HeroSection({ date, cityCount, statsCount, generatedAt }: { date: string; cityCount: number; statsCount: number; generatedAt?: string }) {
+function HeroSection({ cityCount, statsCount, generatedAt }: { cityCount: number; statsCount: number; generatedAt?: string }) {
   return (
     <section style={{
       textAlign: 'center', padding: '44px 24px 32px',
@@ -112,7 +112,6 @@ export default function DashboardPage() {
   if (loading) return <div className="state-message state-message--loading">加载数据中...</div>;
   if (error) return <div className="state-message state-message--error">加载失败：{error}</div>;
 
-  const date = manifest?.generated_at?.split('T')[0] || '-';
   const statsCount = merged.filter((c) => c.has_stats).length;
   const noDataCount = filteredCities.filter((d) => !hasValidDailyRidership(d)).length;
   const ml = METRIC_LABELS[metric];
@@ -120,10 +119,10 @@ export default function DashboardPage() {
 
   return (
     <>
-      <HeroSection date={date} cityCount={merged.length} statsCount={statsCount} generatedAt={manifest?.generated_at} />
+      <HeroSection cityCount={merged.length} statsCount={statsCount} generatedAt={manifest?.generated_at} />
 
       <div className="page-container" style={{ paddingBottom: 32 }}>
-        <DataSnapshotCard cities={merged} manifest={manifest} />
+        <DataSnapshotCard cities={merged} />
         <SectionTitle icon="◎" title="数据总览" />
         <StatsRow cities={filteredCities} />
         {noDataCount > 0 && (

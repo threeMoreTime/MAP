@@ -1,6 +1,5 @@
 import { useRef, useMemo, useEffect, useState, useCallback } from 'react';
 import * as echarts from 'echarts';
-import { useEChart } from '../../hooks/useEChart';
 import { CITY_COORDS } from '../../data/cityCoords';
 import { getMetricValue, isMetricValid, formatMetricValue } from '../../hooks/useDashboardFilters';
 import type { MergedCity } from '../../hooks/useMetroData';
@@ -23,7 +22,7 @@ interface MapItemData {
   rawData: MergedCity;
 }
 
-export default function MetroMapChart({ data, metric, selectedCity, onCitySelect, keyword }: Props) {
+export default function MetroMapChart({ data, metric, onCitySelect, keyword }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mapState, setMapState] = useState<'loading' | 'ready' | 'fallback'>('loading');
   const instanceRef = useRef<echarts.ECharts | null>(null);
@@ -209,8 +208,9 @@ export default function MetroMapChart({ data, metric, selectedCity, onCitySelect
 
   // Dispose on unmount
   useEffect(() => {
+    const el = containerRef.current;
     return () => {
-      if (instanceRef.current && containerRef.current) {
+      if (instanceRef.current && el) {
         instanceRef.current.dispose();
         instanceRef.current = null;
       }

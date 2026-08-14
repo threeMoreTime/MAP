@@ -122,7 +122,6 @@ def build_manifest(stats, assets):
         "yearly_trend_count": trend_count,
         "no_daily_data_count": len(stats["no_daily_data_cities"]),
         "no_daily_data_cities": stats["no_daily_data_cities"],
-        "dashboard_file": "dashboard.html",
         "data_files": [
             "data/latest/metro_stats.json",
             "data/latest/city_assets_index.json",

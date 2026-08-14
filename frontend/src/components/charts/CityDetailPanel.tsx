@@ -7,7 +7,21 @@ interface Props {
 }
 
 export default function CityDetailPanel({ city }: Props) {
-  if (!city) {
+  const metrics = useMemo(() => {
+    if (!city) return null;
+    const items = [
+      { k: '日客流量', v: hasValidDailyRidership(city) ? `${city.daily_ridership_wan.toFixed(1)} 万` : '暂无数据' },
+      { k: '历史最高', v: `${city.peak_ridership_wan} 万 (${city.peak_ridership_date})` },
+      { k: '客流强度', v: city.ridership_intensity.toFixed(2) },
+      { k: '运营线路', v: `${city.operating_lines} 条` },
+      { k: '运营站点', v: `${city.operating_stations} 座` },
+      { k: '运营里程', v: `${city.operating_mileage_km} km` },
+      { k: '在建线路', v: `${city.lines_under_construction} 条` },
+    ];
+    return items;
+  }, [city]);
+
+  if (!city || !metrics) {
     return (
       <div style={{
         height: '100%',
@@ -24,19 +38,6 @@ export default function CityDetailPanel({ city }: Props) {
   }
 
   const yearly = city.stats?.yearly_avg_ridership;
-
-  const metrics = useMemo(() => {
-    const items = [
-      { k: '日客流量', v: hasValidDailyRidership(city) ? `${city.daily_ridership_wan.toFixed(1)} 万` : '暂无数据' },
-      { k: '历史最高', v: `${city.peak_ridership_wan} 万 (${city.peak_ridership_date})` },
-      { k: '客流强度', v: city.ridership_intensity.toFixed(2) },
-      { k: '运营线路', v: `${city.operating_lines} 条` },
-      { k: '运营站点', v: `${city.operating_stations} 座` },
-      { k: '运营里程', v: `${city.operating_mileage_km} km` },
-      { k: '在建线路', v: `${city.lines_under_construction} 条` },
-    ];
-    return items;
-  }, [city]);
 
   return (
     <div style={{ padding: '0 4px', overflowY: 'auto', maxHeight: '100%' }}>

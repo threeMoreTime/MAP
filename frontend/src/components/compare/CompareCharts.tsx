@@ -32,8 +32,9 @@ function BarChart({ cities, metric }: { cities: ComparableCity[]; metric: typeof
     tooltip: {
       trigger: 'axis' as const,
       axisPointer: { type: 'shadow' as const },
-      formatter: (params: any) => {
-        const p = Array.isArray(params) ? params[0] : params;
+      formatter: (params: unknown) => {
+        const raw = Array.isArray(params) ? params[0] : params;
+        const p = raw as { name: string; value: string | number };
         return `${p.name}<br/>${metric.label}：<strong>${p.value}</strong> ${metric.unit}`;
       },
     },
@@ -93,14 +94,12 @@ function RadarChart({ cities }: { cities: ComparableCity[] }) {
     cities.every(c => c[d.key] !== null),
   );
 
-  if (validDims.length < 3) return null;
-
   const maxValues: Record<string, number> = {};
   for (const d of validDims) {
     maxValues[d.key] = Math.max(...cities.map(c => c[d.key] ?? 0));
   }
 
-  const option = {
+  const option = validDims.length < 3 ? null : {
     tooltip: {},
     radar: {
       indicator: validDims.map(d => ({ name: d.label, max: maxValues[d.key] })),
@@ -123,6 +122,8 @@ function RadarChart({ cities }: { cities: ComparableCity[] }) {
 
   useEChart(containerRef, option, [cities.map(c => c.city).join(','), validDims.map(d => d.key).join(',')]);
 
+  if (validDims.length < 3) return null;
+
   return <div ref={containerRef} style={{ width: '100%', height: 340 }} />;
 }
 
@@ -130,11 +131,10 @@ function TrendChart({ cities }: { cities: ComparableCity[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const citiesWithTrend = cities.filter(c => c.yearlyYears.length > 0);
-  if (citiesWithTrend.length < 2) return null;
 
   const allYears = [...new Set(citiesWithTrend.flatMap(c => c.yearlyYears))].sort((a, b) => a - b);
 
-  const option = {
+  const option = citiesWithTrend.length < 2 ? null : {
     tooltip: { trigger: 'axis' as const },
     legend: {
       data: citiesWithTrend.map(c => c.city_cn),
@@ -167,6 +167,8 @@ function TrendChart({ cities }: { cities: ComparableCity[] }) {
   };
 
   useEChart(containerRef, option, [citiesWithTrend.map(c => c.city).join(','), allYears.join(',')]);
+
+  if (citiesWithTrend.length < 2) return null;
 
   return <div ref={containerRef} style={{ width: '100%', height: 300 }} />;
 }

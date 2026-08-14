@@ -9,7 +9,6 @@
 | [DATA_SOURCES.md](DATA_SOURCES.md) | 数据来源（MetroMan.cn、MetroDB.org）说明与采信规则 |
 | [DATA_SCHEMA.md](DATA_SCHEMA.md) | JSON 数据结构、字段含义与取值约定 |
 | [SCRAPER_RUNBOOK.md](SCRAPER_RUNBOOK.md) | 爬虫脚本运行手册，包含环境准备与执行步骤 |
-| [DASHBOARD_DESIGN.md](DASHBOARD_DESIGN.md) | 可视化大屏 UI 设计、布局与交互说明 |
 | [REACT_MIGRATION_PLAN.md](REACT_MIGRATION_PLAN.md) | React 前端迁移计划（Phase 4 全部完成） |
 | [FRONTEND_ACCEPTANCE.md](FRONTEND_ACCEPTANCE.md) | React 前端验收测试（T01-T21） |
 | [REACT_DEPLOYMENT.md](REACT_DEPLOYMENT.md) | React 前端静态部署与发布手册（CI/CD、check:static T01-T09） |
@@ -21,6 +20,5 @@
 | [openspec/data_update.md](openspec/data_update.md) | OpenSpec: Phase 6 数据增量更新与定期采集设计方案 |
 | [openspec/city_compare.md](openspec/city_compare.md) | OpenSpec: Phase 8 多城市数据交叉对比功能设计方案 |
 | [DATA_UPDATE_RUNBOOK.md](DATA_UPDATE_RUNBOOK.md) | 数据增量更新与自动 PR 审查手册 |
-| [LEGACY_DASHBOARD_POLICY.md](LEGACY_DASHBOARD_POLICY.md) | 旧版 dashboard.html 冻结基线与维护策略 |
 | [KNOWN_ISSUES.md](KNOWN_ISSUES.md) | 已知问题与限制清单 |
 

@@ -1,13 +1,11 @@
 import React from 'react';
 import type { MergedCity } from '../../hooks/useMetroData';
-import type { Manifest } from '../../types/metro';
 
 interface Props {
   cities: MergedCity[];
-  manifest: Manifest | null;
 }
 
-export default function DataSnapshotCard({ cities, manifest }: Props) {
+export default function DataSnapshotCard({ cities }: Props) {
   const stats = React.useMemo(() => {
     const total = cities.length || 50;
     const hasStats = cities.filter(c => c.has_stats === true).length || 34;

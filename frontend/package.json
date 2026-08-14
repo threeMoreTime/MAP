@@ -9,6 +9,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test:unit": "vitest run",
     "preview": "vite preview",
     "test:ui": "node scripts/acceptance-react.cjs",
     "check:static": "node scripts/check-static-build.cjs",
@@ -21,11 +23,22 @@
     "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^10.8.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.4",
+    "globals": "^17.11.0",
+    "jsdom": "^30.0.1",
     "puppeteer-core": "^24.43.0",
     "typescript": "^5.5.3",
-    "vite": "^5.4.0"
+    "typescript-eslint": "^8.67.0",
+    "vite": "^5.4.0",
+    "vitest": "^4.1.10"
   }
 }

@@ -2,7 +2,7 @@ import { useRef, useMemo } from 'react';
 import * as echarts from 'echarts';
 import { useEChart } from '../../hooks/useEChart';
 import { tooltipShadow, CHART_GRID, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, Y_CATEGORY_LABEL, METRIC_COLORS } from './chartUtils';
-import { getMetricValue, isMetricValid, formatMetricValue } from '../../hooks/useDashboardFilters';
+import { getMetricValue, isMetricValid } from '../../hooks/useDashboardFilters';
 import type { MergedCity } from '../../hooks/useMetroData';
 import type { MetricKey } from '../../types/metro';
 import { METRIC_LABELS } from '../../types/metro';

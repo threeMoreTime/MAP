@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { MetroStats, CityAssetsIndex, Manifest, MetroCity, CityAsset, CoverManifest, QualityReport } from '../types/metro';
+import type { MetroStats, CityAssetsIndex, Manifest, MetroCity, CityAsset, CoverManifest, CoverManifestItem, QualityReport } from '../types/metro';
 
 export interface MergedCity extends CityAsset {
   stats: MetroCity | null;
@@ -38,7 +38,7 @@ function mergeData(assets: CityAsset[], stats: MetroCity[], covers: CoverManifes
     statsMap.set(s.city, s);
   }
 
-  const coverItemMap = new Map<string, any>();
+  const coverItemMap = new Map<string, CoverManifestItem>();
   if (covers && covers.items) {
     for (const item of covers.items) {
       coverItemMap.set(item.city, item);
