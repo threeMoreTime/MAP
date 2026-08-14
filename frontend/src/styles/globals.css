@@ -1,4 +1,17 @@
+@import 'tailwindcss';
+@import './tokens.css';
 @import './theme.css';
+
+/* 标题衬线字体：Noto Serif SC 子集（可变字重 200-900，OFL 许可，见 assets/fonts/OFL.txt） */
+@font-face {
+  font-family: 'Noto Serif SC';
+  src: url('../assets/fonts/noto-serif-sc-subset.woff2') format('woff2');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === 以下为待迁移的 legacy 样式（P3 逐页迁入 Tailwind 后删除） === */
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 

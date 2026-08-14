@@ -1,0 +1,82 @@
+/**
+ * 纸墨 · 朱印 设计令牌（Tailwind v4 CSS-first @theme）
+ *
+ * 视觉论题：米白宣纸底、墨色正文、朱砂红唯一强调（印章意象），
+ * 宋体衬线标题配系统黑体正文。数值遵循 OKLCH 近似：
+ * 中性色向暖纸色微偏（chroma ≈ 0.005-0.01），高亮度端降低饱和。
+ *
+ * 本文件是全站唯一定义颜色/字体/圆角/阴影刻度的位置；
+ * ECharts 侧调色板以普通 CSS 变量形式暴露（图表无法消费 utility class）。
+ */
+
+@theme {
+  /* === 纸 · 表面 === */
+  --color-paper-50: #faf8f1; /* 页面画布 */
+  --color-paper-100: #f4f0e6; /* 卡片/抬升面 */
+  --color-paper-200: #eae4d5; /* 分割底/悬浮态 */
+  --color-paper-300: #dcd4c0; /* 边线 */
+  --color-paper-400: #c8bda3; /* 强边线/禁用 */
+
+  /* === 墨 · 文字 === */
+  --color-ink-900: #211d16; /* 主文字 */
+  --color-ink-700: #453f33; /* 次文字 */
+  --color-ink-500: #6e6656; /* 弱文字/说明 */
+  --color-ink-400: #8f8672; /* 标签/轴文字 */
+  --color-ink-300: #ab9f87; /* 占位/最弱 */
+  --color-ink-200: #cfc6b0; /* 极弱分割 */
+
+  /* === 朱 · 唯一强调 === */
+  --color-vermilion-700: #8f2f1d; /* 按压深 */
+  --color-vermilion-600: #a83622; /* 悬浮 */
+  --color-vermilion-500: #c03d2b; /* 主强调/印章红 */
+  --color-vermilion-100: #f2ded6; /* 淡朱底 */
+  --color-vermilion-50: #f9efea; /* 极淡朱底 */
+
+  /* === 语义色（收敛用量，仅状态语义） === */
+  --color-jade-600: #37755a; /* 完备/正向 */
+  --color-gold-600: #9a7325; /* 部分/提示 */
+
+  /* === 字体 === */
+  --font-serif:
+    "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --font-sans:
+    -apple-system, "SF Pro Text", "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans SC", sans-serif;
+
+  /* === 圆角（编辑部式克制：小圆角体系） === */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+
+  /* === 纸面阴影（阴影优先于边框表达深度） === */
+  --shadow-card: 0 1px 3px rgba(33, 29, 22, 0.1), 0 6px 18px rgba(33, 29, 22, 0.05);
+  --shadow-card-hover: 0 2px 6px rgba(33, 29, 22, 0.12), 0 10px 28px rgba(33, 29, 22, 0.08);
+
+  /* === 动效（仅 transform/opacity，ease-out 无弹跳） === */
+  --ease-paper: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* === ECharts 墨阶调色板（普通变量，供图表消费） === */
+:root {
+  /* 墨阶序列：单城市/低强调系列，从深到浅 */
+  --chart-ink-1: #2b2620;
+  --chart-ink-2: #4a443a;
+  --chart-ink-3: #6b6354;
+  --chart-ink-4: #8d846f;
+  --chart-ink-5: #aea48b;
+  --chart-ink-6: #cdc4ab;
+  /* 朱砂高亮：榜首/选中/当前指标 */
+  --chart-vermilion: #c03d2b;
+  /* 轴与网格（浅底） */
+  --chart-axis-label: #8f8672;
+  --chart-split-line: rgba(33, 29, 22, 0.08);
+  --chart-axis-line: rgba(33, 29, 22, 0.18);
+  /* 多城市对比序列：朱砂领衔 + 墨阶递进 */
+  --chart-series-1: #c03d2b;
+  --chart-series-2: #2b2620;
+  --chart-series-3: #6b6354;
+  --chart-series-4: #9a7325;
+  --chart-series-5: #37755a;
+  --chart-series-6: #aea48b;
+}
