@@ -63,9 +63,22 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
 
   const isComplete = city.has_network_map && city.has_plan_map && city.has_stats && hasDaily;
 
+  const badge = isComplete
+    ? { cls: 'bg-jade-600', text: '✓ 完整收录' }
+    : city.cover_status === 'fallback'
+      ? { cls: 'bg-gold-600', text: '⚠ 封面降级' }
+      : !hasDaily
+        ? { cls: 'bg-ink-500', text: '✗ 暂无客流' }
+        : { cls: 'bg-vermilion-500', text: '▣ 有数据' };
+
+  const tag = (ok: boolean) =>
+    `rounded-full border px-2 py-0.5 text-[10px] leading-5 ${
+      ok ? 'border-ink-400/30 bg-paper-50 text-ink-700' : 'border-paper-300 bg-paper-200/50 text-ink-300'
+    }`;
+
   return (
     <div
-      className={`city-card${tall ? '' : ''}`}
+      className="city-card mb-4 break-inside-avoid overflow-hidden rounded-lg bg-paper-100 shadow-card transition-shadow duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 hover:shadow-card-hover"
       role="button"
       tabIndex={0}
       onClick={handleClick}
@@ -73,117 +86,69 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
       aria-label={`查看${city.city_cn}城市详情`}
     >
       {/* Cover */}
-      <div className={`city-card-cover${tall ? ' city-card-cover--tall' : ''}`}>
+      <div className={`city-card-cover relative ${tall ? 'city-card-cover--tall' : ''}`} style={{ height: tall ? 240 : 180 }}>
         <div
-          className="city-cover-art city-cover-image"
+          className="city-cover-image absolute inset-0 bg-cover bg-center"
           data-city={city.city}
           data-has-cover={coverUrl ? 'true' : 'false'}
           style={{ backgroundImage }}
         />
         <div
-          className="city-cover-art"
+          className="absolute inset-0"
           style={{ background: getCoverRadial(city.city) }}
         />
-        <div className="city-cover-overlay" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
 
-        {/* Data availability badge / 精简科技风 Badge */}
-        {isComplete ? (
-          <div className="city-data-badge" style={{ background: 'rgba(16, 185, 129, 0.85)' }}>✓ 完整收录</div>
-        ) : city.cover_status === 'fallback' ? (
-          <div className="city-data-badge" style={{ background: 'rgba(217, 119, 6, 0.85)' }}>⚠ 封面降级</div>
-        ) : !hasDaily ? (
-          <div className="city-data-badge" style={{ background: 'rgba(71, 85, 105, 0.75)' }}>✗ 暂无客流</div>
-        ) : (
-          <div className="city-data-badge">▣ 有数据</div>
-        )}
+        {/* Data availability badge */}
+        <div className={`city-data-badge absolute left-2.5 top-2.5 rounded-full px-2 py-0.5 text-[10px] font-medium text-paper-50 ${badge.cls}`}>
+          {badge.text}
+        </div>
 
         {/* Bottom info overlay */}
-        <div className="city-cover-info">
-          <div style={{
-            fontSize: 20, fontWeight: 700, color: '#fff',
-            textShadow: '0 1px 6px rgba(0,0,0,0.4)',
-            letterSpacing: 1,
-            lineHeight: 1.3,
-          }}>
+        <div className="absolute bottom-0 left-0 right-0 p-3">
+          <div className="font-serif text-[20px] font-semibold leading-tight text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.45)]">
             {city.city_cn}
           </div>
-          <div style={{
-            fontSize: 11, color: 'rgba(203,213,225,0.8)',
-            marginTop: 2,
-          }}>
+          <div className="mt-0.5 text-[11px] text-[rgba(226,232,240,0.85)] tabular-nums">
             {city.operating_lines} 条线路 · {city.operating_stations} 座站点
           </div>
         </div>
 
-        {/* Arrow button */}
-        <div className="city-cover-arrow" aria-hidden="true">→</div>
+        {/* Arrow hint */}
+        <div aria-hidden="true" className="absolute bottom-3 right-3 flex size-7 items-center justify-center rounded-full bg-paper-50/90 text-[13px] text-ink-700">→</div>
       </div>
 
       {/* Body */}
-      <div className="city-card-body">
+      <div className="p-3.5">
         {/* 3-column metrics */}
-        <div className="city-metrics-grid">
+        <div className="grid gap-2 text-center" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
           <div>
-            <div className="city-metric-value" style={{ color: 'var(--cyan-400)' }}>
+            <div className="font-serif text-[16px] font-semibold text-ink-900 tabular-nums">
               {city.operating_mileage_km}
-              <span style={{ fontSize: 10, fontWeight: 400, marginLeft: 2 }}>km</span>
+              <span className="ml-0.5 text-[10px] font-normal text-ink-400">km</span>
             </div>
-            <div className="city-metric-label">运营里程</div>
+            <div className="text-[10px] text-ink-500">运营里程</div>
           </div>
           <div>
-            <div className="city-metric-value" style={{
-              color: hasDaily ? 'var(--amber-400)' : 'var(--slate-600)',
-            }}>
+            <div className={`font-serif text-[16px] font-semibold tabular-nums ${hasDaily ? 'text-ink-900' : 'text-ink-300'}`}>
               {hasDaily ? city.daily_ridership_wan.toFixed(1) : '暂无'}
-              {hasDaily && <span style={{ fontSize: 10, fontWeight: 400, marginLeft: 2 }}>万</span>}
+              {hasDaily && <span className="ml-0.5 text-[10px] font-normal text-ink-400">万</span>}
             </div>
-            <div className="city-metric-label">日客流</div>
+            <div className="text-[10px] text-ink-500">日客流</div>
           </div>
           <div>
-            <div className="city-metric-value" style={{
-              color: city.ridership_intensity > 0 ? 'var(--emerald-400)' : 'var(--slate-600)',
-            }}>
+            <div className={`font-serif text-[16px] font-semibold tabular-nums ${city.ridership_intensity > 0 ? 'text-ink-900' : 'text-ink-300'}`}>
               {city.ridership_intensity > 0 ? city.ridership_intensity.toFixed(2) : '--'}
             </div>
-            <div className="city-metric-label">客流强度</div>
+            <div className="text-[10px] text-ink-500">客流强度</div>
           </div>
         </div>
 
         {/* Resource status tags */}
-        <div className="city-tags">
-          <span
-            className="city-tag"
-            style={{
-              color: city.has_network_map ? 'var(--cyan-400)' : 'var(--slate-600)',
-              background: city.has_network_map ? 'rgba(6,182,212,0.15)' : 'rgba(30,41,59,0.35)',
-              borderColor: city.has_network_map ? 'rgba(6,182,212,0.25)' : 'rgba(71,85,105,0.2)',
-              opacity: city.has_network_map ? 1 : 0.7,
-            }}
-          >
-            ⌁ 线路图
-          </span>
-          <span
-            className="city-tag"
-            style={{
-              color: city.has_plan_map ? 'var(--emerald-300)' : 'var(--slate-600)',
-              background: city.has_plan_map ? 'rgba(16,185,129,0.15)' : 'rgba(30,41,59,0.35)',
-              borderColor: city.has_plan_map ? 'rgba(16,185,129,0.25)' : 'rgba(71,85,105,0.2)',
-              opacity: city.has_plan_map ? 1 : 0.7,
-            }}
-          >
-            ◇ 规划图
-          </span>
-          <span
-            className="city-tag"
-            style={{
-              color: hasDaily ? 'var(--amber-300)' : 'var(--slate-600)',
-              background: hasDaily ? 'rgba(245,158,11,0.15)' : 'rgba(30,41,59,0.35)',
-              borderColor: hasDaily ? 'rgba(245,158,11,0.25)' : 'rgba(71,85,105,0.2)',
-              opacity: hasDaily ? 1 : 0.7,
-            }}
-          >
-            ▣ 客流数据
-          </span>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <span className={tag(city.has_network_map)}>⌁ 线路图</span>
+          <span className={tag(city.has_plan_map)}>◇ 规划图</span>
+          <span className={tag(hasDaily)}>▣ 客流数据</span>
         </div>
 
         {/* Hidden text for acceptance script compatibility */}
@@ -206,82 +171,88 @@ export default function CitiesPage() {
   const statsCount = merged.filter((c) => c.has_stats && c.daily_ridership_wan > 0).length;
 
   return (
-    <div className="page-container" style={{ paddingTop: 32, paddingBottom: 40 }}>
+    <div className="mx-auto w-full max-w-[1180px] px-4 pb-10 pt-8 sm:px-6">
       <SectionTitle icon="◆" title="城市资源总览" />
-      <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 20, marginTop: -12 }}>
+      <p className="-mt-2 mb-5 text-[13px] text-ink-500">
         全国 {merged.length} 个城市地铁资源一览，其中 {statsCount} 个城市有客流数据
       </p>
 
       {/* Filter Bar */}
-      <div className="city-filter-bar">
-        {/* Search + Filter Tags */}
-        <div className="city-search-row">
-          <div className="city-search-input-wrap">
-            <span className="city-search-icon">⌕</span>
-            <input
-              type="text"
-              placeholder="搜索城市..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              aria-label="搜索城市"
-            />
-            {keyword && (
-              <button
-                className="city-search-clear"
-                onClick={() => setKeyword('')}
-                aria-label="清空搜索"
-              >
-                ×
-              </button>
-            )}
+      <div className="mb-5 rounded-lg bg-paper-100 p-4 shadow-card">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <span aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[14px] text-ink-300">⌕</span>
+              <input
+                type="text"
+                placeholder="搜索城市..."
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                aria-label="搜索城市"
+                className="h-9 w-56 rounded-sm border border-paper-300 bg-paper-50 pl-7 pr-7 text-[13px] text-ink-900 placeholder-ink-300 focus:border-vermilion-500 focus:outline-none"
+              />
+              {keyword && (
+                <button
+                  onClick={() => setKeyword('')}
+                  aria-label="清空搜索"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 cursor-pointer px-1 text-[14px] text-ink-400 hover:text-ink-700"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-1.5">
+              {FILTER_OPTIONS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  className={`cursor-pointer rounded-full border px-2.5 py-1 text-[12px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
+                    cityFilter === key
+                      ? 'border-vermilion-500 bg-vermilion-500 font-medium text-paper-50'
+                      : 'border-paper-300 bg-paper-50 text-ink-500 hover:text-ink-900'
+                  }`}
+                  onClick={() => setCityFilter(key)}
+                  aria-label={`筛选：${label}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="city-filter-tags">
-            {FILTER_OPTIONS.map(({ key, label }) => (
-              <button
-                key={key}
-                className={cityFilter === key ? 'active' : ''}
-                onClick={() => setCityFilter(key)}
-                aria-label={`筛选：${label}`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Footer: count + legend */}
-        <div className="city-filter-footer">
-          <span className="city-filter-count">共 {allFilteredCities.length} 个城市</span>
-          <div className="city-filter-legend">
-            <span>
-              <span className="city-legend-dot" style={{ background: 'var(--cyan-400)' }} />
-              有线路图
-            </span>
-            <span>
-              <span className="city-legend-dot" style={{ background: 'var(--emerald-400)' }} />
-              有规划图
-            </span>
-            <span>
-              <span className="city-legend-dot" style={{ background: 'var(--amber-400)' }} />
-              有客流数据
-            </span>
+          {/* Footer: count + legend */}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-paper-300 pt-2.5 text-[11px] text-ink-400">
+            <span className="tabular-nums">共 {allFilteredCities.length} 个城市</span>
+            <div className="flex flex-wrap gap-4">
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden className="size-2 rounded-full bg-ink-500" />
+                有线路图
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden className="size-2 rounded-full bg-jade-600" />
+                有规划图
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span aria-hidden className="size-2 rounded-full bg-vermilion-500" />
+                有客流数据
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Masonry Cards */}
       {allFilteredCities.length > 0 ? (
-        <div className="city-masonry">
+        <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4">
           {allFilteredCities.map((c, i) => (
             <CityCard key={c.city} city={c} index={i} />
           ))}
         </div>
       ) : (
-        <div className="city-empty-state">
-          <div className="city-empty-icon">⌕</div>
-          <div className="city-empty-title">未找到匹配城市</div>
-          <div className="city-empty-hint">请尝试其他搜索词或筛选条件</div>
+        <div className="flex flex-col items-center gap-2 py-16">
+          <div aria-hidden className="text-[36px] leading-none text-ink-300">⌕</div>
+          <div className="font-serif text-[15px] font-semibold text-ink-700">未找到匹配城市</div>
+          <div className="text-[12px] text-ink-500">请尝试其他搜索词或筛选条件</div>
         </div>
       )}
     </div>
