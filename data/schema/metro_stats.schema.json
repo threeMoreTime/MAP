@@ -42,7 +42,8 @@
         "properties": {
           "city": {
             "type": "string",
-            "description": "城市拼音代码"
+            "pattern": "^[a-z]+$",
+            "description": "城市拼音目录名"
           },
           "city_cn": {
             "type": "string",

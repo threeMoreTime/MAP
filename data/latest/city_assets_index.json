@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-20T02:24:09Z",
+  "generated_at": "2026-08-14T08:34:03Z",
   "city_count": 50,
   "items": [
     {
@@ -13,7 +13,7 @@
       "has_stats": true,
       "stats_path": "cities/beijing/beijing_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/beijing/beijing_yearly_trend.png"
+      "yearly_trend_path": "cities/beijing/beijing_yearly_trend.webp"
     },
     {
       "city": "changchun",
@@ -26,7 +26,7 @@
       "has_stats": true,
       "stats_path": "cities/changchun/changchun_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/changchun/changchun_yearly_trend.png"
+      "yearly_trend_path": "cities/changchun/changchun_yearly_trend.webp"
     },
     {
       "city": "changsha",
@@ -39,7 +39,7 @@
       "has_stats": true,
       "stats_path": "cities/changsha/changsha_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/changsha/changsha_yearly_trend.png"
+      "yearly_trend_path": "cities/changsha/changsha_yearly_trend.webp"
     },
     {
       "city": "changzhou",
@@ -52,7 +52,7 @@
       "has_stats": true,
       "stats_path": "cities/changzhou/changzhou_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/changzhou/changzhou_yearly_trend.png"
+      "yearly_trend_path": "cities/changzhou/changzhou_yearly_trend.webp"
     },
     {
       "city": "chengdu",
@@ -65,7 +65,7 @@
       "has_stats": true,
       "stats_path": "cities/chengdu/chengdu_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/chengdu/chengdu_yearly_trend.png"
+      "yearly_trend_path": "cities/chengdu/chengdu_yearly_trend.webp"
     },
     {
       "city": "chongqing",
@@ -78,20 +78,20 @@
       "has_stats": true,
       "stats_path": "cities/chongqing/chongqing_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/chongqing/chongqing_yearly_trend.png"
+      "yearly_trend_path": "cities/chongqing/chongqing_yearly_trend.webp"
     },
     {
       "city": "dalian",
       "city_cn": "大连",
       "dir": "dalian",
       "has_network_map": true,
-      "network_map_path": "cities/dalian/dalian_network.png",
+      "network_map_path": "cities/dalian/dalian_network.webp",
       "has_plan_map": true,
-      "plan_map_path": "cities/dalian/dalian_plan.png",
+      "plan_map_path": "cities/dalian/dalian_plan.webp",
       "has_stats": true,
       "stats_path": "cities/dalian/dalian_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/dalian/dalian_yearly_trend.png"
+      "yearly_trend_path": "cities/dalian/dalian_yearly_trend.webp"
     },
     {
       "city": "dongguan",
@@ -104,7 +104,7 @@
       "has_stats": true,
       "stats_path": "cities/dongguan/dongguan_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/dongguan/dongguan_yearly_trend.png"
+      "yearly_trend_path": "cities/dongguan/dongguan_yearly_trend.webp"
     },
     {
       "city": "foshan",
@@ -143,7 +143,7 @@
       "has_stats": true,
       "stats_path": "cities/guangzhou/guangzhou_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/guangzhou/guangzhou_yearly_trend.png"
+      "yearly_trend_path": "cities/guangzhou/guangzhou_yearly_trend.webp"
     },
     {
       "city": "guiyang",
@@ -156,20 +156,20 @@
       "has_stats": true,
       "stats_path": "cities/guiyang/guiyang_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/guiyang/guiyang_yearly_trend.png"
+      "yearly_trend_path": "cities/guiyang/guiyang_yearly_trend.webp"
     },
     {
       "city": "hangzhou",
       "city_cn": "杭州",
       "dir": "hangzhou",
       "has_network_map": true,
-      "network_map_path": "cities/hangzhou/hangzhou_network.png",
+      "network_map_path": "cities/hangzhou/hangzhou_network.webp",
       "has_plan_map": true,
       "plan_map_path": "cities/hangzhou/hangzhou_plan.png",
       "has_stats": true,
       "stats_path": "cities/hangzhou/hangzhou_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/hangzhou/hangzhou_yearly_trend.png"
+      "yearly_trend_path": "cities/hangzhou/hangzhou_yearly_trend.webp"
     },
     {
       "city": "harbin",
@@ -182,7 +182,7 @@
       "has_stats": true,
       "stats_path": "cities/harbin/harbin_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/harbin/harbin_yearly_trend.png"
+      "yearly_trend_path": "cities/harbin/harbin_yearly_trend.webp"
     },
     {
       "city": "hefei",
@@ -195,7 +195,7 @@
       "has_stats": true,
       "stats_path": "cities/hefei/hefei_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/hefei/hefei_yearly_trend.png"
+      "yearly_trend_path": "cities/hefei/hefei_yearly_trend.webp"
     },
     {
       "city": "hohhot",
@@ -208,7 +208,7 @@
       "has_stats": true,
       "stats_path": "cities/hohhot/hohhot_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/hohhot/hohhot_yearly_trend.png"
+      "yearly_trend_path": "cities/hohhot/hohhot_yearly_trend.webp"
     },
     {
       "city": "hongkong",
@@ -273,7 +273,7 @@
       "has_stats": true,
       "stats_path": "cities/kunming/kunming_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/kunming/kunming_yearly_trend.png"
+      "yearly_trend_path": "cities/kunming/kunming_yearly_trend.webp"
     },
     {
       "city": "lanzhou",
@@ -286,7 +286,7 @@
       "has_stats": true,
       "stats_path": "cities/lanzhou/lanzhou_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/lanzhou/lanzhou_yearly_trend.png"
+      "yearly_trend_path": "cities/lanzhou/lanzhou_yearly_trend.webp"
     },
     {
       "city": "luoyang",
@@ -308,7 +308,7 @@
       "has_network_map": true,
       "network_map_path": "cities/macau/macau_network.png",
       "has_plan_map": true,
-      "plan_map_path": "cities/macau/macau_plan.png",
+      "plan_map_path": "cities/macau/macau_plan.webp",
       "has_stats": false,
       "stats_path": null,
       "has_yearly_trend": false,
@@ -325,7 +325,7 @@
       "has_stats": true,
       "stats_path": "cities/nanchang/nanchang_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/nanchang/nanchang_yearly_trend.png"
+      "yearly_trend_path": "cities/nanchang/nanchang_yearly_trend.webp"
     },
     {
       "city": "nanjing",
@@ -338,7 +338,7 @@
       "has_stats": true,
       "stats_path": "cities/nanjing/nanjing_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/nanjing/nanjing_yearly_trend.png"
+      "yearly_trend_path": "cities/nanjing/nanjing_yearly_trend.webp"
     },
     {
       "city": "nanning",
@@ -351,7 +351,7 @@
       "has_stats": true,
       "stats_path": "cities/nanning/nanning_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/nanning/nanning_yearly_trend.png"
+      "yearly_trend_path": "cities/nanning/nanning_yearly_trend.webp"
     },
     {
       "city": "nantong",
@@ -364,7 +364,7 @@
       "has_stats": true,
       "stats_path": "cities/nantong/nantong_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/nantong/nantong_yearly_trend.png"
+      "yearly_trend_path": "cities/nantong/nantong_yearly_trend.webp"
     },
     {
       "city": "ningbo",
@@ -384,13 +384,13 @@
       "city_cn": "青岛",
       "dir": "qingdao",
       "has_network_map": true,
-      "network_map_path": "cities/qingdao/qingdao_network.png",
+      "network_map_path": "cities/qingdao/qingdao_network.webp",
       "has_plan_map": true,
-      "plan_map_path": "cities/qingdao/qingdao_plan.png",
+      "plan_map_path": "cities/qingdao/qingdao_plan.webp",
       "has_stats": true,
       "stats_path": "cities/qingdao/qingdao_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/qingdao/qingdao_yearly_trend.png"
+      "yearly_trend_path": "cities/qingdao/qingdao_yearly_trend.webp"
     },
     {
       "city": "shanghai",
@@ -399,11 +399,11 @@
       "has_network_map": true,
       "network_map_path": "cities/shanghai/shanghai_network.png",
       "has_plan_map": true,
-      "plan_map_path": "cities/shanghai/shanghai_plan.png",
+      "plan_map_path": "cities/shanghai/shanghai_plan.webp",
       "has_stats": true,
       "stats_path": "cities/shanghai/shanghai_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/shanghai/shanghai_yearly_trend.png"
+      "yearly_trend_path": "cities/shanghai/shanghai_yearly_trend.webp"
     },
     {
       "city": "shaoxing",
@@ -429,20 +429,20 @@
       "has_stats": true,
       "stats_path": "cities/shenyang/shenyang_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/shenyang/shenyang_yearly_trend.png"
+      "yearly_trend_path": "cities/shenyang/shenyang_yearly_trend.webp"
     },
     {
       "city": "shenzhen",
       "city_cn": "深圳",
       "dir": "shenzhen",
       "has_network_map": true,
-      "network_map_path": "cities/shenzhen/shenzhen_network.png",
+      "network_map_path": "cities/shenzhen/shenzhen_network.webp",
       "has_plan_map": true,
-      "plan_map_path": "cities/shenzhen/shenzhen_plan.png",
+      "plan_map_path": "cities/shenzhen/shenzhen_plan.webp",
       "has_stats": true,
       "stats_path": "cities/shenzhen/shenzhen_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/shenzhen/shenzhen_yearly_trend.png"
+      "yearly_trend_path": "cities/shenzhen/shenzhen_yearly_trend.webp"
     },
     {
       "city": "shijiazhuang",
@@ -455,7 +455,7 @@
       "has_stats": true,
       "stats_path": "cities/shijiazhuang/shijiazhuang_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/shijiazhuang/shijiazhuang_yearly_trend.png"
+      "yearly_trend_path": "cities/shijiazhuang/shijiazhuang_yearly_trend.webp"
     },
     {
       "city": "suzhou",
@@ -468,14 +468,14 @@
       "has_stats": true,
       "stats_path": "cities/suzhou/suzhou_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/suzhou/suzhou_yearly_trend.png"
+      "yearly_trend_path": "cities/suzhou/suzhou_yearly_trend.webp"
     },
     {
       "city": "taichung",
       "city_cn": "台中",
       "dir": "taichung",
       "has_network_map": true,
-      "network_map_path": "cities/taichung/taichung_network.png",
+      "network_map_path": "cities/taichung/taichung_network.webp",
       "has_plan_map": true,
       "plan_map_path": "cities/taichung/taichung_plan.png",
       "has_stats": false,
@@ -488,7 +488,7 @@
       "city_cn": "台北",
       "dir": "taipei",
       "has_network_map": true,
-      "network_map_path": "cities/taipei/taipei_network.png",
+      "network_map_path": "cities/taipei/taipei_network.webp",
       "has_plan_map": true,
       "plan_map_path": "cities/taipei/taipei_plan.png",
       "has_stats": false,
@@ -507,7 +507,7 @@
       "has_stats": true,
       "stats_path": "cities/taiyuan/taiyuan_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/taiyuan/taiyuan_yearly_trend.png"
+      "yearly_trend_path": "cities/taiyuan/taiyuan_yearly_trend.webp"
     },
     {
       "city": "taizhou",
@@ -533,7 +533,7 @@
       "has_stats": true,
       "stats_path": "cities/tianjin/tianjin_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/tianjin/tianjin_yearly_trend.png"
+      "yearly_trend_path": "cities/tianjin/tianjin_yearly_trend.webp"
     },
     {
       "city": "urumqi",
@@ -572,7 +572,7 @@
       "has_stats": true,
       "stats_path": "cities/wuhan/wuhan_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/wuhan/wuhan_yearly_trend.png"
+      "yearly_trend_path": "cities/wuhan/wuhan_yearly_trend.webp"
     },
     {
       "city": "wuhu",
@@ -585,7 +585,7 @@
       "has_stats": true,
       "stats_path": "cities/wuhu/wuhu_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/wuhu/wuhu_yearly_trend.png"
+      "yearly_trend_path": "cities/wuhu/wuhu_yearly_trend.webp"
     },
     {
       "city": "wuxi",
@@ -598,7 +598,7 @@
       "has_stats": true,
       "stats_path": "cities/wuxi/wuxi_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/wuxi/wuxi_yearly_trend.png"
+      "yearly_trend_path": "cities/wuxi/wuxi_yearly_trend.webp"
     },
     {
       "city": "xiamen",
@@ -611,7 +611,7 @@
       "has_stats": true,
       "stats_path": "cities/xiamen/xiamen_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/xiamen/xiamen_yearly_trend.png"
+      "yearly_trend_path": "cities/xiamen/xiamen_yearly_trend.webp"
     },
     {
       "city": "xian",
@@ -620,11 +620,11 @@
       "has_network_map": true,
       "network_map_path": "cities/xian/xian_network.png",
       "has_plan_map": true,
-      "plan_map_path": "cities/xian/xian_plan.png",
+      "plan_map_path": "cities/xian/xian_plan.webp",
       "has_stats": true,
       "stats_path": "cities/xian/xian_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/xian/xian_yearly_trend.png"
+      "yearly_trend_path": "cities/xian/xian_yearly_trend.webp"
     },
     {
       "city": "xuzhou",
@@ -650,7 +650,7 @@
       "has_stats": true,
       "stats_path": "cities/zhengzhou/zhengzhou_stats.json",
       "has_yearly_trend": true,
-      "yearly_trend_path": "cities/zhengzhou/zhengzhou_yearly_trend.png"
+      "yearly_trend_path": "cities/zhengzhou/zhengzhou_yearly_trend.webp"
     }
   ]
 }

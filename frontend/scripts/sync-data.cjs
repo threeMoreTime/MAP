@@ -53,6 +53,9 @@ if (fs.existsSync(cityAssetsIndexPath)) {
   let copiedPlan = 0;
   let missing = 0;
 
+  // public/cities 为纯派生目录：镜像同步前清理，避免残留已被替换的旧图片
+  fs.rmSync(path.join(PUBLIC, 'cities'), { recursive: true, force: true });
+
   for (const item of indexData.items) {
     if (item.has_network_map && item.network_map_path) {
       const src = path.join(ROOT, item.network_map_path);

@@ -6,7 +6,10 @@
     "scrape:metrodb": "python scrapers/scrape_metrodb.py",
     "scrape:cities": "python scrapers/scrape_all_cities.py",
     "generate:charts": "python scrapers/generate_charts.py",
-    "test:data": "python scripts/validate_data.py"
+    "build:data": "python -m pipeline.cli build-index",
+    "optimize:images": "python -m pipeline.cli optimize-images",
+    "test:data": "python -m pipeline.cli validate",
+    "test:pipeline": "python -m pytest pipeline/tests -q"
   },
   "dependencies": {
     "puppeteer-core": "^24.42.0"

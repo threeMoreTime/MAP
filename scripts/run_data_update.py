@@ -123,27 +123,14 @@ def main():
         else:
             log("[INFO] 已选择跳过网络爬虫爬取，直接基于现有本地数据生成")
 
-        # 5. 调用 build_data_index 逻辑对 Staging 数据进行编译汇总
+        # 5. 调用 pipeline 索引构建逻辑对 Staging 数据进行编译汇总（路径参数化，无需 monkey patch）
         log("[INFO] 正在编译汇总 Staging 数据...")
-        sys_path_backup = sys.path.copy()
-        scripts_dir = os.path.join(ROOT, "scripts")
-        if scripts_dir not in sys.path:
-            sys.path.append(scripts_dir)
+        from pipeline.processors import index_builder
 
-        # 失败回滚和 finally 清理保护的全局变量 Monkey Patch，仅限本地 Staging 过程，不写真实 data/latest
-        import build_data_index
-        original_cities_dir = getattr(build_data_index, "CITIES_DIR", None)
-        try:
-            build_data_index.CITIES_DIR = staging_cities_dir
-            cities_list = build_data_index.scan_city_dirs()
-            
-            stats, no_daily = build_data_index.build_metro_stats(cities_list)
-            assets = build_data_index.build_city_assets_index(cities_list)
-            manifest = build_data_index.build_manifest(stats, assets)
-        finally:
-            if original_cities_dir:
-                build_data_index.CITIES_DIR = original_cities_dir
-            sys.path = sys_path_backup
+        cities_list = index_builder.scan_city_dirs(staging_cities_dir)
+        stats, no_daily = index_builder.build_metro_stats(cities_list, staging_cities_dir)
+        assets = index_builder.build_city_assets_index(cities_list, staging_cities_dir, ROOT)
+        manifest = index_builder.build_manifest(stats, assets)
 
         # 将内存中计算的 Staging 汇总写入到沙盒
         with open(os.path.join(staging_dir, "metro_stats.json"), "w", encoding="utf-8") as f:
@@ -153,11 +140,10 @@ def main():
         with open(os.path.join(staging_dir, "manifest.json"), "w", encoding="utf-8") as f:
             json.dump(manifest, f, ensure_ascii=False, indent=2)
 
-    # 6. 调用 validate_data.py 进行 Staging 沙盒校验
+    # 6. 调用 pipeline 校验器进行 Staging 沙盒校验
     log("[INFO] 正在执行 Staging 目录格式与边界强校验...")
-    validate_script = os.path.join(ROOT, "scripts", "validate_data.py")
-    cmd_validate = [sys.executable, validate_script, "--data-dir", staging_dir]
-    res_validate = subprocess.run(cmd_validate)
+    cmd_validate = [sys.executable, "-m", "pipeline.cli", "validate", "--data-dir", staging_dir]
+    res_validate = subprocess.run(cmd_validate, cwd=ROOT)
     if res_validate.returncode != 0:
         log("[ERROR] Staging 数据校验失败！本次更新被强行阻断熔断。")
         sys.exit(20)
@@ -195,15 +181,16 @@ def main():
             
             # 重新构建物理 data/latest 汇总目录
             log("[INFO] 正在重新构建物理最新索引...")
-            build_script = os.path.join(ROOT, "scripts", "build_data_index.py")
-            res_build = subprocess.run([sys.executable, build_script])
+            res_build = subprocess.run([sys.executable, "-m", "pipeline.cli", "build-index"], cwd=ROOT)
             if res_build.returncode != 0:
                 log("[ERROR] 物理索引重新构建失败！")
                 sys.exit(20)
-                
+
             # 二次验证真实物理目录
             log("[INFO] 正在对更新后的物理目录 data/latest 执行终极校验...")
-            res_val_final = subprocess.run([sys.executable, validate_script])
+            res_val_final = subprocess.run(
+                [sys.executable, "-m", "pipeline.cli", "validate", "--data-dir", DATA_LATEST_DIR], cwd=ROOT
+            )
             if res_val_final.returncode != 0:
                 log("[ERROR] 更新后的物理目录校验失败，物理数据可能存在隐患！")
                 sys.exit(20)
