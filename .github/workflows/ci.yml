@@ -26,6 +26,9 @@ jobs:
     - name: Run Data Validation
       run: npm run test:data
 
+    - name: Run Pipeline Unit Tests
+      run: npm run test:pipeline
+
   react-check:
     name: React Frontend Build Check
     runs-on: ubuntu-latest
@@ -48,6 +51,14 @@ jobs:
     - name: Run React Typecheck
       working-directory: frontend
       run: npm run typecheck
+
+    - name: Run ESLint
+      working-directory: frontend
+      run: npm run lint
+
+    - name: Run Unit Tests
+      working-directory: frontend
+      run: npm run test:unit
 
     - name: Build React Application
       working-directory: frontend

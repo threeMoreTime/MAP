@@ -2,6 +2,38 @@
 
 本文件记录项目的所有重要变更。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/)。
 
+## [v2.0.0-dev] - 2026-08-14
+
+### 全仓重构（P0-P5）
+
+#### 退役与清理
+- **Legacy dashboard.html 正式退役删除**（owner 授权推翻冻结政策）：连同 legacy 验收脚本、CI legacy-check job、LEGACY_DASHBOARD_POLICY.md 一并移除；CI 改造为 data-check（保留数据层校验防线）。
+- 清理被放弃的 pipeline/__pycache__ 残骸；manifest 移除 dashboard_file 字段。
+
+#### 工程质量
+- **ESLint 10 flat config 接入**，修复 14 处违规，含 3 处真实的条件式 Hook 调用缺陷（CompareCharts×2、CityDetailPanel）与 1 处悬停触发的 tooltip 数组参数崩溃。
+- **Vitest + Testing Library 接入**，13 个 hooks/工具单测；CI react-check 增加 lint + 单测步骤。
+- CSS Modules 全部废除（~1250 行 + globals.css 990→60 行），统一 Tailwind v4。
+
+#### 性能
+- **ECharts 按需引入**（src/lib/echarts.ts 中央注册）：echarts chunk 1035KB → 567KB（-45%，gzip 343→189KB）。
+- **路由懒加载**（React.lazy + Suspense）：首屏 index chunk 108KB → 6.5KB，六页各自分包。
+
+#### 视觉（纸墨 · 朱印）
+- 浅色纸墨编辑部风全量换装：米白纸底、墨色排印、朱砂红唯一强调、宋体衬线标题（子集化 Noto Serif SC 299KB woff2，OFL）。
+- ECharts 墨阶调色板 + 朱砂高亮（榜首/Top10/当前系列），纸面 tooltip。
+- 设计契约落地于 frontend/DESIGN.md + tokens.css。
+
+#### 数据管线
+- **pipeline/ Python 包重建**（processors/validators/CLI），与旧脚本 parity 对照逐字节一致后删除旧脚本；18 个 pytest 单测；CI data-check 增加 pytest。
+- **PNG → WebP 优化**（q85 仅在更小时替换）：46 张转换 10.5→8.3MB；sync 镜像清理。
+- run_data_update.py 去除 CITIES_DIR monkey-patch，修复 write 分支 NameError。
+
+#### 验证基线
+- 浏览器验收 T01-T34：33 PASS / 0 FAIL / 1 MANUAL；前端单测、pipeline pytest、数据校验、typecheck、lint 全绿。
+
+---
+
 ## [v1.2.2-dev] - 2026-05-29
 
 ### 已完成 (Phase 8 城市对比功能)

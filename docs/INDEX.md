@@ -13,7 +13,7 @@
 | [FRONTEND_ACCEPTANCE.md](FRONTEND_ACCEPTANCE.md) | React 前端验收测试（T01-T21） |
 | [REACT_DEPLOYMENT.md](REACT_DEPLOYMENT.md) | React 前端静态部署与发布手册（CI/CD、check:static T01-T09） |
 | [CITY_COVER_IMAGES.md](CITY_COVER_IMAGES.md) | 城市封面图片采集、溯源与前端集成说明 |
-| [TESTING_ACCEPTANCE.md](TESTING_ACCEPTANCE.md) | 旧版 Dashboard 测试方案与验收标准 |
+| [TESTING_ACCEPTANCE.md](TESTING_ACCEPTANCE.md) | 测试方案与验收标准（T01-T34 浏览器验收 + 单元测试） |
 | [RELEASE_PROCESS.md](RELEASE_PROCESS.md) | 发布流程与版本管理规范 |
 | [ROADMAP.md](ROADMAP.md) | 项目路线图与后续迭代计划 |
 | [NEXT_ROADMAP_PLAN.md](NEXT_ROADMAP_PLAN.md) | 后续全量规划任务：Phase 5.6.1 → Phase 10 长期路线设计 |

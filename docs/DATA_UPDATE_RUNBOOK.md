@@ -18,7 +18,7 @@
 更新管道基于 GitHub Actions 自动化工作流：
 - **配置文件**：[.github/workflows/data-update.yml](file:///c:/Users/Administrator/Desktop/FL/MAP/.github/workflows/data-update.yml)
 - **总控脚本**：[scripts/run_data_update.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/run_data_update.py)
-- **校验拦截器**：[scripts/validate_data.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/validate_data.py)
+- **校验拦截器**：[pipeline validate (python -m pipeline.cli validate)](file:///c:/Users/Administrator/Desktop/FL/MAP/pipeline validate (python -m pipeline.cli validate))
 - **数据差分引擎**：[scripts/diff_data_snapshot.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/diff_data_snapshot.py)
 - **客流采集爬虫**：[scrapers/scrape_metrodb.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scrapers/scrape_metrodb.py)
 

@@ -1,15 +1,20 @@
 # 项目路线图
 
-> 项目：全国城市地铁客流数据可视化大屏
-> 版本：v1.2.0-dev
-> 日期：2026-05-10
+> 项目：全国城市地铁客流数据可视化平台
+> 版本：v2.0.0-dev
+> 日期：2026-08-14
 > 仓库：threeMoreTime/MAP
 
 ---
 
 ## 当前状态
 
-- 版本：v1.2.1-dev
+- 版本：v2.0.0-dev（全仓重构完成）
+- **v2.0.0 全仓重构（2026-08-14）**：legacy dashboard 退役删除；ESLint/Vitest/pytest 三层测试接入；ECharts 按需引入（-45%）+ 路由分包；Tailwind v4 纸墨·朱印视觉全量换装（DESIGN.md 契约）；pipeline/ 数据管线包重建（parity 验证后替换旧脚本）+ WebP 图片优化
+- 当前前端形态：`frontend/` React 18 + TS + Vite + Tailwind v4（唯一前端）
+- 当前数据管线：`pipeline/` Python 包（`python -m pipeline.cli`）
+- 验收基线：T01-T34 浏览器验收 33 PASS / 0 FAIL / 1 MANUAL；Vitest 单测；pytest 18/18；数据校验 PASS
+- 视觉契约：`frontend/DESIGN.md`（纸墨·朱印），token 唯一来源 `frontend/src/styles/tokens.css`
 - 当前阶段：Phase 5.1 部署配置、Phase 5.6 线上体验与数据可信度优化、Phase 5.6.1 数据覆盖口径文案统一已完成并验证通过
 - 当前前端形态：
   - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）

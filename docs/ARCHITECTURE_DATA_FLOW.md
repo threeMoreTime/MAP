@@ -104,11 +104,11 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  A["cities/ 城市目录"] -->|scripts/build_data_index.py| B[data/latest/metro_stats.json]
+  A["cities/ 城市目录"] -->|pipeline build-index| B[data/latest/metro_stats.json]
   A --> B2[data/latest/city_assets_index.json]
   A --> B3[data/latest/manifest.json]
   A --> B4[data/schema/metro_stats.schema.json]
-  B --> C[scripts/validate_data.py]
+  B --> C[pipeline validate (python -m pipeline.cli validate)]
   B2 --> C
   B3 --> C
   C -->|PASS/FAIL| D[验收结果]
@@ -128,10 +128,10 @@ flowchart TD
 
 ```bash
 # 构建数据索引
-python scripts/build_data_index.py
+python -m pipeline.cli build-index
 
 # 校验数据完整性
-python scripts/validate_data.py
+python -m pipeline.cli validate
 ```
 
 ### 设计原则

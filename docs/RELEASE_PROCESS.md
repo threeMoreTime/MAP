@@ -63,7 +63,7 @@ python scrapers/scrape_metrodb.py
 ### 4.1 一键验收（推荐）
 
 ```bash
-python scripts/run_acceptance.py
+python scripts/(已退役，见 T01-T34 浏览器验收)
 ```
 
 该命令自动执行：数据构建 → 数据校验 → JS 语法检查 → 浏览器真实验收。
@@ -74,10 +74,10 @@ python scripts/run_acceptance.py
 
 ```bash
 # 数据校验
-python scripts/validate_data.py
+python -m pipeline.cli validate
 
 # JS 语法检查
-python scripts/check_dashboard_syntax.py
+python scripts/(已退役)
 
 # 浏览器验收
 node scripts/acceptance_dashboard.js
@@ -214,7 +214,7 @@ git push origin v1.x.x
 数据采集与结构未发生改变，依然保留原有发布机制：
 1. 运行 `python scrapers/scrape_metrodb.py` 及 `scrapers/scrape_all_cities.py`；
 2. 运行 `python scrapers/generate_charts.py`；
-3. 运行 `python scripts/validate_data.py` 对生成数据执行 Schema 校验；
+3. 运行 `python -m pipeline.cli validate` 对生成数据执行 Schema 校验；
 4. 将数据变更推送至 Git 并重新执行双前端构建发布流程。
 
 ---

@@ -142,13 +142,13 @@ python -m http.server 8000
 ### 11.1 一键验收
 
 ```bash
-python scripts/run_acceptance.py
+python scripts/(已退役，见 T01-T34 浏览器验收)
 ```
 
 该脚本按顺序执行：
-1. `scripts/build_data_index.py` — 构建数据索引
-2. `scripts/validate_data.py` — 校验数据完整性
-3. `scripts/check_dashboard_syntax.py` — Dashboard 内联 JS 语法检查
+1. `pipeline build-index` — 构建数据索引
+2. `pipeline validate (python -m pipeline.cli validate)` — 校验数据完整性
+3. `scripts/(已退役)` — Dashboard 内联 JS 语法检查
 4. `scripts/acceptance_dashboard.js` — 浏览器真实验收（16 项）
 
 任一步失败立即停止，退出码 1。全部通过输出 `Phase 3 acceptance PASS`。
@@ -157,10 +157,10 @@ python scripts/run_acceptance.py
 
 ```bash
 # 数据校验
-python scripts/validate_data.py
+python -m pipeline.cli validate
 
 # JS 语法检查
-python scripts/check_dashboard_syntax.py
+python scripts/(已退役)
 
 # 浏览器验收（自动启停静态服务）
 node scripts/acceptance_dashboard.js
@@ -197,7 +197,7 @@ npm run test:acceptance # 全部验收
 
 ### 11.5 稳定写入
 
-`build_data_index.py` 实现了稳定写入逻辑：生成新数据后与旧文件对比（忽略 `generated_at`），仅在有真实内容变化时才写入文件。当源数据未变化时，`run_acceptance.py` 可重复运行且不产生 `data/latest` 时间戳噪音。
+`build_data_index.py` 实现了稳定写入逻辑：生成新数据后与旧文件对比（忽略 `generated_at`），仅在有真实内容变化时才写入文件。当源数据未变化时，`(已退役，见 T01-T34 浏览器验收)` 可重复运行且不产生 `data/latest` 时间戳噪音。
 
 ### 11.6 失败退出码
 
@@ -213,7 +213,7 @@ npm run test:acceptance # 全部验收
 ### 12.1 构建数据索引
 
 ```bash
-python scripts/build_data_index.py
+python -m pipeline.cli build-index
 ```
 
 预期输出：
@@ -225,7 +225,7 @@ python scripts/build_data_index.py
 ### 12.2 校验数据完整性
 
 ```bash
-python scripts/validate_data.py
+python -m pipeline.cli validate
 ```
 
 预期输出：`PASS`（0 errors，warnings 仅限日客流缺失城市）
