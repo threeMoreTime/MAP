@@ -1,7 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { echarts, type EChartsOption } from '../../lib/echarts';
 import { useEChart } from '../../hooks/useEChart';
-import { tooltipShadow, CHART_GRID, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, Y_CATEGORY_LABEL } from './chartUtils';
+import { tooltipShadow, CHART_GRID, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, Y_CATEGORY_LABEL, METRIC_COLORS, PAPER_TOOLTIP } from './chartUtils';
 import type { MergedCity } from '../../hooks/useMetroData';
 
 interface Props {
@@ -26,9 +26,11 @@ export default function IntensityChart({ data, topN }: Props) {
     return {
       tooltip: {
         ...tooltipShadow(),
+        ...PAPER_TOOLTIP,
         formatter: (p: unknown) => {
-          const params = p as { name: string; value: number };
-          return `${params.name}<br/>客流强度: ${params.value.toFixed(3)}`;
+          const raw = Array.isArray(p) ? p[0] : p;
+          const params = raw as { name: string; value: number | null | undefined };
+          return `${params.name}<br/>客流强度: ${params.value != null ? params.value.toFixed(3) : '--'}`;
         },
       },
       grid: CHART_GRID,
@@ -39,14 +41,14 @@ export default function IntensityChart({ data, topN }: Props) {
         data: vals,
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
-            { offset: 0, color: '#E65100' },
-            { offset: 1, color: '#FFB74D' },
+            { offset: 0, color: METRIC_COLORS.ridership_intensity[0] },
+            { offset: 1, color: METRIC_COLORS.ridership_intensity[1] },
           ]),
         },
         label: {
           show: true,
           position: 'right',
-          color: '#ccc',
+          color: '#6e6656',
           fontSize: 11,
           formatter: (p: unknown) => {
             const params = p as { value: number };

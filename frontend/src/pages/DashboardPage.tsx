@@ -18,46 +18,28 @@ import DataSnapshotCard from '../components/common/DataSnapshotCard';
 
 function HeroSection({ cityCount, statsCount, generatedAt }: { cityCount: number; statsCount: number; generatedAt?: string }) {
   return (
-    <section style={{
-      textAlign: 'center', padding: '44px 24px 32px',
-      background: 'linear-gradient(180deg, rgba(0,30,60,0.45) 0%, transparent 100%)',
-      position: 'relative',
-    }}>
-      <div style={{
-        position: 'absolute', bottom: 0, left: '10%', right: '10%', height: 1,
-        background: 'linear-gradient(90deg, transparent, rgba(0,200,255,0.12), transparent)',
-      }} />
-      <div style={{
-        display: 'inline-flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', justifyContent: 'center',
-        alignItems: 'center',
-      }}>
+    <section className="relative px-4 pb-8 pt-10 text-center sm:px-6">
+      <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
         {[
-          { text: 'React 前端', color: '#448aff' },
-          { text: `${cityCount} 城市资源`, color: '#ff9800' },
-          { text: `${statsCount} 客流统计城市`, color: '#9c27b0' },
-        ].map(tag => (
-          <span key={tag.text} style={{
-            fontSize: 10, color: tag.color, letterSpacing: 1,
-            border: `1px solid ${tag.color}33`, borderRadius: 12,
-            padding: '3px 12px', background: `${tag.color}0a`,
-          }}>
-            {tag.text}
+          `${cityCount} 城市资源`,
+          `${statsCount} 客流统计城市`,
+        ].map((tag) => (
+          <span
+            key={tag}
+            className="rounded-full border border-paper-300 bg-paper-100 px-3 py-0.5 text-[11px] text-ink-500"
+          >
+            {tag}
           </span>
         ))}
-        <LastUpdatedBadge generatedAt={generatedAt} style={{ padding: '2px 10px', fontSize: '10px' }} />
+        <LastUpdatedBadge generatedAt={generatedAt} />
       </div>
-      <h1 className="gradient-text" style={{
-        fontSize: 30, fontWeight: 700, letterSpacing: 6, marginBottom: 10,
-      }}>
+      <h1 className="font-serif text-[26px] font-semibold leading-snug text-ink-900 sm:text-[30px]">
         全国城市地铁客流可视化平台
       </h1>
-      <p style={{
-        color: 'var(--text-secondary)', fontSize: 13,
-        maxWidth: 600, margin: '0 auto', lineHeight: 1.8,
-      }}>
+      <p className="mx-auto mt-2.5 max-w-[600px] text-[13px] leading-[1.8] text-ink-700">
         覆盖全国 {cityCount} 个城市地铁线路资源，{statsCount} 个城市客流统计数据
         <br />
-        <span style={{ color: 'var(--text-label)', fontSize: 11 }}>
+        <span className="text-[11px] text-ink-400">
           数据来源：MetroDB.org · 声明：非官方实时发布，所有数据均为公开数据快照与整理汇总，仅供参考学习
         </span>
       </p>
@@ -78,7 +60,7 @@ function StatsRow({ cities }: { cities: MergedCity[] }) {
   }, [cities]);
 
   return (
-    <div className="stat-cards-row">
+    <div className="grid grid-cols-2 gap-3 py-1 sm:grid-cols-3 lg:grid-cols-5">
       {cards.map((c) => (
         <StatCard key={c.label} {...c} />
       ))}
@@ -121,15 +103,12 @@ export default function DashboardPage() {
     <>
       <HeroSection cityCount={merged.length} statsCount={statsCount} generatedAt={manifest?.generated_at} />
 
-      <div className="page-container" style={{ paddingBottom: 32 }}>
+      <div className="mx-auto w-full max-w-[1180px] px-4 pb-8 sm:px-6">
         <DataSnapshotCard cities={merged} />
         <SectionTitle icon="◎" title="数据总览" />
         <StatsRow cities={filteredCities} />
         {noDataCount > 0 && (
-          <div style={{
-            textAlign: 'center', color: 'var(--text-dim)', fontSize: 11,
-            padding: '0 32px 6px',
-          }}>
+          <div className="px-8 pb-1.5 pt-2 text-center text-[11px] text-ink-400">
             日客流统计已排除 {noDataCount} 个暂无数据城市
           </div>
         )}
@@ -144,9 +123,9 @@ export default function DashboardPage() {
         />
 
         {/* Row 1: Map + Detail Panel */}
-        <div className="chart-map-row">
+        <div className="mb-4 flex flex-col gap-4 lg:flex-row">
           <ChartCard title={`全国城市散点地图 — ${ml.name}`} style={{ flex: '3 1 0%' }}>
-            <div className="chart-container chart-container--map">
+            <div className="chart-container h-[490px] w-full">
               <MetroMapChart
                 data={filteredCities}
                 metric={metric}
@@ -157,35 +136,35 @@ export default function DashboardPage() {
             </div>
           </ChartCard>
           <ChartCard title="城市详情" style={{ flex: '2 1 0%' }}>
-            <div className="chart-container chart-container--detail">
+            <div className="chart-container h-[490px] w-full overflow-y-auto">
               <CityDetailPanel city={selectedCity} />
             </div>
           </ChartCard>
         </div>
 
         {/* Row 2: Rank + Mileage */}
-        <div className="chart-grid-2col">
+        <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <ChartCard title={`${ml.name}排行榜（${ml.unit}）`}>
-            <div className="chart-container">
+            <div className="chart-container h-[340px] w-full">
               <RankChart data={filteredCities} metric={metric} topN={topN} />
             </div>
           </ChartCard>
           <ChartCard title="运营里程排行榜（km）">
-            <div className="chart-container">
+            <div className="chart-container h-[340px] w-full">
               <MileageChart data={filteredCities} topN={topN} />
             </div>
           </ChartCard>
         </div>
 
         {/* Row 3: Trend + Intensity */}
-        <div className="chart-grid-2col">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <ChartCard title={`Top ${trendCount} 城市年度客流趋势`}>
-            <div className="chart-container">
+            <div className="chart-container h-[340px] w-full">
               <TrendChart data={filteredCities} />
             </div>
           </ChartCard>
           <ChartCard title="客流强度对比">
-            <div className="chart-container">
+            <div className="chart-container h-[340px] w-full">
               <IntensityChart data={filteredCities} topN={topN} />
             </div>
           </ChartCard>

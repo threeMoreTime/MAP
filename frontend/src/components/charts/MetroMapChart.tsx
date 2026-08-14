@@ -6,6 +6,7 @@ import type { MergedCity } from '../../hooks/useMetroData';
 import type { MetricKey } from '../../types/metro';
 import { METRIC_LABELS } from '../../types/metro';
 import { withBaseUrl } from '../../utils/path';
+import { PAPER_TOOLTIP } from './chartUtils';
 
 interface Props {
   data: MergedCity[];
@@ -57,6 +58,7 @@ export default function MetroMapChart({ data, metric, onCitySelect, keyword }: P
 
     return {
       tooltip: {
+        ...PAPER_TOOLTIP,
         trigger: 'item',
         formatter: (p: unknown) => {
           const params = p as { seriesType: string; data?: MapItemData };
@@ -79,8 +81,8 @@ export default function MetroMapChart({ data, metric, onCitySelect, keyword }: P
         zoom: 1.2,
         center: [105, 36],
         label: { show: false },
-        itemStyle: { areaColor: '#0d2550', borderColor: '#1e5a8a', borderWidth: 0.8 },
-        emphasis: { itemStyle: { areaColor: '#1a3a6a' }, label: { show: false } },
+        itemStyle: { areaColor: '#eae4d5', borderColor: '#c8bda3', borderWidth: 0.8 },
+        emphasis: { itemStyle: { areaColor: '#dcd4c0' }, label: { show: false } },
       },
       series: [
         {
@@ -93,16 +95,16 @@ export default function MetroMapChart({ data, metric, onCitySelect, keyword }: P
             color: (p: unknown) => {
               const params = p as { value: number[] };
               const ratio = (params.value[2] ?? 0) / maxVal;
-              if (ratio > 0.7) return '#ff5252';
-              if (ratio > 0.4) return '#ff9800';
-              if (ratio > 0.2) return '#ffd740';
-              if (ratio > 0.1) return '#69f0ae';
-              return '#40c4ff';
+              if (ratio > 0.7) return '#2b2620';
+              if (ratio > 0.4) return '#4a443a';
+              if (ratio > 0.2) return '#6b6354';
+              if (ratio > 0.1) return '#8d846f';
+              return '#aea48b';
             },
-            shadowBlur: 8,
-            shadowColor: 'rgba(33,150,243,0.4)',
+            shadowBlur: 6,
+            shadowColor: 'rgba(33,29,22,0.25)',
           },
-          label: { show: true, formatter: '{b}', position: 'right', fontSize: 10, color: '#b0c4de' },
+          label: { show: true, formatter: '{b}', position: 'right', fontSize: 10, color: '#453f33' },
         },
         {
           name: 'Top 涟漪',
@@ -112,13 +114,7 @@ export default function MetroMapChart({ data, metric, onCitySelect, keyword }: P
           symbolSize: (val: number[]) => Math.max(10, Math.sqrt((val[2] ?? 0) / maxVal * 900)),
           rippleEffect: { brushType: 'stroke', scale: 4, period: 4 },
           itemStyle: {
-            color: (p: unknown) => {
-              const params = p as { value: number[] };
-              const ratio = (params.value[2] ?? 0) / maxVal;
-              if (ratio > 0.8) return '#ff1744';
-              if (ratio > 0.5) return '#ff9100';
-              return '#ffea00';
-            },
+            color: '#c03d2b',
           },
           label: { show: false },
         },
@@ -230,7 +226,7 @@ export default function MetroMapChart({ data, metric, onCitySelect, keyword }: P
 
   if (mapState === 'loading') {
     return (
-      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4a6a8a' }}>
+      <div className="flex h-full items-center justify-center text-ink-500">
         加载地图数据...
       </div>
     );
@@ -238,8 +234,8 @@ export default function MetroMapChart({ data, metric, onCitySelect, keyword }: P
 
   if (mapState === 'fallback') {
     return (
-      <div style={{ height: '100%', overflow: 'auto' }}>
-        <div style={{ color: '#90caf9', textAlign: 'center', padding: '12px 0', fontSize: 13 }}>
+      <div className="h-full overflow-auto">
+        <div className="py-3 text-center text-[13px] text-ink-500">
           地图数据加载失败，排行榜和城市详情仍可正常使用
         </div>
         <FallbackTable data={data} metric={metric} />
@@ -248,21 +244,16 @@ export default function MetroMapChart({ data, metric, onCitySelect, keyword }: P
   }
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 460 }}>
+    <div className="relative h-full min-h-[460px] w-full">
       <button
         onClick={handleResetView}
         title="还原地图视角"
         aria-label="还原地图视角"
-        style={{
-          position: 'absolute', top: 8, right: 8, zIndex: 10,
-          background: 'rgba(6,18,38,0.85)', border: '1px solid rgba(0,212,255,0.2)',
-          color: '#22d3ee', fontSize: 11, padding: '4px 10px', borderRadius: 6,
-          cursor: 'pointer', backdropFilter: 'blur(4px)', transition: 'all 0.2s',
-        }}
+        className="absolute right-2 top-2 z-10 cursor-pointer rounded-sm border border-paper-300 bg-paper-100 px-2.5 py-1 text-[11px] text-ink-700 shadow-card transition-colors duration-200 hover:bg-paper-200 focus-visible:outline-2 focus-visible:outline-vermilion-500"
       >
         ↻ 还原视角
       </button>
-      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+      <div ref={containerRef} className="h-full w-full" />
     </div>
   );
 }
@@ -276,23 +267,27 @@ function FallbackTable({ data, metric }: { data: MergedCity[]; metric: MetricKey
   }, [data, metric]);
 
   return (
-    <div style={{ maxHeight: 440, overflowY: 'auto' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+    <div className="max-h-[440px] overflow-y-auto">
+      <table className="w-full border-collapse text-[12px]">
         <thead>
           <tr>
-            <th style={{ color: '#4a6a8a', textAlign: 'left', padding: '6px 8px', borderBottom: '1px solid rgba(0,120,180,0.15)', position: 'sticky', top: 0, background: '#061028' }}>城市</th>
-            <th style={{ color: '#4a6a8a', textAlign: 'left', padding: '6px 8px', borderBottom: '1px solid rgba(0,120,180,0.15)', position: 'sticky', top: 0, background: '#061028' }}>{ml.name}({ml.unit})</th>
-            <th style={{ color: '#4a6a8a', textAlign: 'left', padding: '6px 8px', borderBottom: '1px solid rgba(0,120,180,0.15)', position: 'sticky', top: 0, background: '#061028' }}>里程(km)</th>
-            <th style={{ color: '#4a6a8a', textAlign: 'left', padding: '6px 8px', borderBottom: '1px solid rgba(0,120,180,0.15)', position: 'sticky', top: 0, background: '#061028' }}>站点</th>
+            {['城市', `${ml.name}(${ml.unit})`, '里程(km)', '站点'].map((h) => (
+              <th
+                key={h}
+                className="sticky top-0 border-b border-paper-300 bg-paper-100 px-2 py-1.5 text-left font-medium text-ink-500"
+              >
+                {h}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {sorted.map((d) => (
             <tr key={d.city}>
-              <td style={{ padding: '5px 8px', borderBottom: '1px solid rgba(0,120,180,0.08)' }}>{d.city_cn}</td>
-              <td style={{ padding: '5px 8px', borderBottom: '1px solid rgba(0,120,180,0.08)' }}>{formatMetricValue(d, metric)}</td>
-              <td style={{ padding: '5px 8px', borderBottom: '1px solid rgba(0,120,180,0.08)' }}>{d.operating_mileage_km}</td>
-              <td style={{ padding: '5px 8px', borderBottom: '1px solid rgba(0,120,180,0.08)' }}>{d.operating_stations}</td>
+              <td className="border-b border-[rgba(33,29,22,0.06)] px-2 py-1.5 text-ink-900">{d.city_cn}</td>
+              <td className="border-b border-[rgba(33,29,22,0.06)] px-2 py-1.5 text-ink-700 tabular-nums">{formatMetricValue(d, metric)}</td>
+              <td className="border-b border-[rgba(33,29,22,0.06)] px-2 py-1.5 text-right text-ink-700 tabular-nums">{d.operating_mileage_km}</td>
+              <td className="border-b border-[rgba(33,29,22,0.06)] px-2 py-1.5 text-right text-ink-700 tabular-nums">{d.operating_stations}</td>
             </tr>
           ))}
         </tbody>

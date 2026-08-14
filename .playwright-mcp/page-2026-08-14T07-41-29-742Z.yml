@@ -1,0 +1,139 @@
+- generic [ref=f1e2]:
+  - navigation [ref=f1e4]:
+    - generic [ref=f1e5]:
+      - link "铁 MetroViz" [ref=f1e6] [cursor=pointer]:
+        - /url: "#/"
+        - generic [ref=f1e7]: 铁
+        - generic [ref=f1e8]: MetroViz
+      - generic [ref=f1e9]:
+        - link "数据大屏" [ref=f1e10] [cursor=pointer]:
+          - /url: "#/"
+        - link "城市总览" [ref=f1e11] [cursor=pointer]:
+          - /url: "#/cities"
+        - link "城市对比" [ref=f1e12] [cursor=pointer]:
+          - /url: "#/compare"
+        - link "数据质量" [ref=f1e13] [cursor=pointer]:
+          - /url: "#/data-quality"
+        - link "数据说明" [ref=f1e14] [cursor=pointer]:
+          - /url: "#/about"
+  - main [ref=f1e15]:
+    - generic [ref=f1e16]:
+      - generic [ref=f1e17]:
+        - generic [ref=f1e18]: 50 城市资源
+        - generic [ref=f1e19]: 34 客流统计城市
+        - generic [ref=f1e20]:
+          - generic [ref=f1e22]: "数据快照:"
+          - generic [ref=f1e23]: 2026-08-14
+      - heading "全国城市地铁客流可视化平台" [level=1] [ref=f1e24]
+      - paragraph [ref=f1e25]: 覆盖全国 50 个城市地铁线路资源，34 个城市客流统计数据数据来源：MetroDB.org · 声明：非官方实时发布，所有数据均为公开数据快照与整理汇总，仅供参考学习
+    - generic [ref=f1e26]:
+      - generic [ref=f1e27]:
+        - generic [ref=f1e28]:
+          - generic [ref=f1e29]:
+            - generic [ref=f1e30]: 📊
+            - generic [ref=f1e31]: MAP 城市数据快照
+            - generic [ref=f1e32]: 公开数据快照
+          - generic [ref=f1e33]: "* 统计结果基于当前 manifest 动态计算，非实时运营数据"
+        - generic [ref=f1e34]:
+          - generic [ref=f1e35]:
+            - generic [ref=f1e36]: 城市索引
+            - generic [ref=f1e37]: 50 城
+          - generic [ref=f1e38]:
+            - generic [ref=f1e39]: 有统计记录
+            - generic [ref=f1e40]: 34 城
+          - generic [ref=f1e41]:
+            - generic [ref=f1e42]: 有日客流展示值
+            - generic [ref=f1e43]: 23 城
+          - generic [ref=f1e44]:
+            - generic [ref=f1e45]: 暂无日客流展示值
+            - generic [ref=f1e46]: 27 城
+          - generic [ref=f1e47]:
+            - generic [ref=f1e48]: 其中有统计但无日客流
+            - generic [ref=f1e49]: 11 城
+          - generic [ref=f1e50]:
+            - generic [ref=f1e51]: 完全无统计记录
+            - generic [ref=f1e52]: 16 城
+          - generic [ref=f1e53]:
+            - generic [ref=f1e54]: 线路图覆盖
+            - generic [ref=f1e55]: 48 城
+          - generic [ref=f1e56]:
+            - generic [ref=f1e57]: 规划图覆盖
+            - generic [ref=f1e58]: 41 城
+          - generic [ref=f1e59]:
+            - generic [ref=f1e60]: 封面图覆盖
+            - generic [ref=f1e61]: 49 / 50
+        - generic [ref=f1e62]: 💡 口径解析：暂无日客流展示值 (27 城) = 完全无统计记录 (16 城) + 其中有统计但无日客流 (11 城)
+      - generic [ref=f1e63]:
+        - generic [ref=f1e64]: ◎
+        - heading "数据总览" [level=2] [ref=f1e65]
+      - generic [ref=f1e66]:
+        - generic [ref=f1e67]:
+          - generic [ref=f1e68]: 🏙
+          - generic [ref=f1e69]: "34"
+          - generic [ref=f1e70]:
+            - text: 覆盖城市
+            - generic [ref=f1e71]: (座)
+        - generic [ref=f1e72]:
+          - generic [ref=f1e73]: 🚇
+          - generic [ref=f1e74]: "254"
+          - generic [ref=f1e75]:
+            - text: 运营线路
+            - generic [ref=f1e76]: (条)
+        - generic [ref=f1e77]:
+          - generic [ref=f1e78]: 📍
+          - generic [ref=f1e79]: "5662"
+          - generic [ref=f1e80]:
+            - text: 运营站点
+            - generic [ref=f1e81]: (座)
+        - generic [ref=f1e82]:
+          - generic [ref=f1e83]: 📏
+          - generic [ref=f1e84]: "9623"
+          - generic [ref=f1e85]:
+            - text: 总里程
+            - generic [ref=f1e86]: (km)
+        - generic [ref=f1e87]:
+          - generic [ref=f1e88]: 👥
+          - generic [ref=f1e89]: "8045"
+          - generic [ref=f1e90]:
+            - text: 日总客流
+            - generic [ref=f1e91]: (万)
+      - generic [ref=f1e92]: 日客流统计已排除 11 个暂无数据城市
+      - generic [ref=f1e93]:
+        - generic [ref=f1e94]:
+          - generic [ref=f1e95]: 搜索城市
+          - textbox "搜索城市" [ref=f1e96]:
+            - /placeholder: 输入城市名...
+        - generic [ref=f1e97]:
+          - generic [ref=f1e98]: 主指标
+          - combobox "选择主指标" [ref=f1e99]:
+            - option "日客流量" [selected]
+            - option "运营里程"
+            - option "运营站点"
+            - option "客流强度"
+        - generic [ref=f1e100]:
+          - generic [ref=f1e101]: 排行
+          - combobox "选择排行范围" [ref=f1e102]:
+            - option "Top 10" [selected]
+            - option "Top 20"
+            - option "全部"
+      - generic [ref=f1e103]:
+        - generic [ref=f1e104]:
+          - heading "全国城市散点地图 — 日客流量" [level=3] [ref=f1e105]
+          - button "还原地图视角" [ref=f1e108] [cursor=pointer]: ↻ 还原视角
+        - generic [ref=f1e112]:
+          - heading "城市详情" [level=3] [ref=f1e113]
+          - generic [ref=f1e114]: 点击地图上的城市查看详细指标
+      - generic [ref=f1e116]:
+        - heading "日客流量排行榜（万人次）" [level=3] [ref=f1e118]
+        - generic [ref=f1e123]:
+          - heading "运营里程排行榜（km）" [level=3] [ref=f1e124]
+          - generic [ref=f1e127] [cursor=pointer]
+      - generic [ref=f1e129]:
+        - heading "Top 8 城市年度客流趋势" [level=3] [ref=f1e131]
+        - heading "客流强度对比" [level=3] [ref=f1e137]
+  - contentinfo [ref=f1e142]:
+    - generic [ref=f1e143]:
+      - generic [ref=f1e144]:
+        - generic [ref=f1e145]: MetroViz · 全国城市地铁客流数据可视化平台
+        - generic [ref=f1e146]: "数据来源 MetroDB.org / MetroMan.cn · React + TypeScript + ECharts · 开源项目 · GitHub: threeMoreTime/MAP"
+      - generic [ref=f1e147]: 数据来源：MetroDB.org · 仅供学习交流使用 · 不构成正式决策依据

@@ -32,184 +32,48 @@ export default function DataSnapshotCard({ cities }: Props) {
 
   if (cities.length === 0) return null;
 
+  const items = [
+    { label: '城市索引', value: stats.total, unit: '城', tone: 'text-ink-900' },
+    { label: '有统计记录', value: stats.hasStats, unit: '城', tone: 'text-ink-900' },
+    { label: '有日客流展示值', value: stats.hasRidership, unit: '城', tone: 'text-jade-600' },
+    { label: '暂无日客流展示值', value: stats.noRidership, unit: '城', tone: 'text-vermilion-600' },
+    { label: '其中有统计但无日客流', value: stats.statsButNoRidership, unit: '城', tone: 'text-gold-600' },
+    { label: '完全无统计记录', value: stats.noStats, unit: '城', tone: 'text-ink-400' },
+    { label: '线路图覆盖', value: stats.hasNetworkMap, unit: '城', tone: 'text-ink-900' },
+    { label: '规划图覆盖', value: stats.hasPlanMap, unit: '城', tone: 'text-ink-900' },
+    { label: '封面图覆盖', value: stats.downloadedCovers, unit: `/ ${stats.total}`, tone: 'text-ink-900' },
+  ];
+
   return (
-    <div 
-      className="data-snapshot-card"
-      style={{
-        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.7) 100%)',
-        border: '1px solid rgba(51, 65, 85, 0.5)',
-        borderRadius: '12px',
-        padding: '16px 20px',
-        backdropFilter: 'blur(8px)',
-        marginBottom: '20px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
-      }}
-    >
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '12px',
-        borderBottom: '1px solid rgba(51, 65, 85, 0.3)',
-        paddingBottom: '10px',
-        marginBottom: '12px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '16px' }}>📊</span>
-          <span style={{ fontSize: '14px', fontWeight: 600, color: '#f1f5f9', letterSpacing: '0.5px' }}>
-            MAP 城市数据快照
-          </span>
-          <span style={{
-            fontSize: '10px',
-            color: '#38bdf8',
-            background: 'rgba(51, 65, 85, 0.4)',
-            padding: '2px 6px',
-            borderRadius: '4px',
-            border: '1px solid rgba(71, 85, 105, 0.3)'
-          }}>
+    <div className="data-snapshot-card mb-5 rounded-lg bg-paper-100 p-4 shadow-card sm:p-5">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3 border-b border-paper-300 pb-2.5">
+        <div className="flex items-center gap-2">
+          <span aria-hidden className="text-[16px]">📊</span>
+          <span className="font-serif text-[14px] font-semibold text-ink-900">MAP 城市数据快照</span>
+          <span className="rounded-sm border border-paper-300 bg-paper-200/60 px-1.5 py-0.5 text-[10px] text-ink-500">
             公开数据快照
           </span>
         </div>
-        <div style={{ fontSize: '11px', color: '#64748b', fontStyle: 'italic' }}>
+        <div className="text-[11px] italic text-ink-400">
           * 统计结果基于当前 manifest 动态计算，非实时运营数据
         </div>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-        gap: '10px',
-      }}>
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>城市索引</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#38bdf8', fontFamily: 'monospace' }}>
-            {stats.total} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>城</span>
+      <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-5 lg:grid-cols-9">
+        {items.map((it) => (
+          <div
+            key={it.label}
+            className="rounded-md bg-paper-50 px-2 py-2.5 text-center"
+          >
+            <div className="mb-1 text-[11px] leading-tight text-ink-400">{it.label}</div>
+            <div className={`font-serif text-[20px] font-semibold tabular-nums ${it.tone}`}>
+              {it.value} <span className="text-[11px] font-normal text-ink-400">{it.unit}</span>
+            </div>
           </div>
-        </div>
-
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>有统计记录</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#06b6d4', fontFamily: 'monospace' }}>
-            {stats.hasStats} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>城</span>
-          </div>
-        </div>
-
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>有日客流展示值</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#10b981', fontFamily: 'monospace' }}>
-            {stats.hasRidership} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>城</span>
-          </div>
-        </div>
-
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>暂无日客流展示值</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#f43f5e', fontFamily: 'monospace' }}>
-            {stats.noRidership} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>城</span>
-          </div>
-        </div>
-
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>其中有统计但无日客流</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#f97316', fontFamily: 'monospace' }}>
-            {stats.statsButNoRidership} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>城</span>
-          </div>
-        </div>
-
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>完全无统计记录</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#94a3b8', fontFamily: 'monospace' }}>
-            {stats.noStats} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>城</span>
-          </div>
-        </div>
-
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>线路图覆盖</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#fbbf24', fontFamily: 'monospace' }}>
-            {stats.hasNetworkMap} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>城</span>
-          </div>
-        </div>
-
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>规划图覆盖</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#a78bfa', fontFamily: 'monospace' }}>
-            {stats.hasPlanMap} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>城</span>
-          </div>
-        </div>
-
-        <div className="snapshot-item" style={{
-          padding: '10px',
-          background: 'rgba(15, 23, 42, 0.3)',
-          border: '1px solid rgba(51, 65, 85, 0.2)',
-          borderRadius: '8px',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '4px' }}>封面图覆盖</div>
-          <div style={{ fontSize: '20px', fontWeight: 700, color: '#ec4899', fontFamily: 'monospace' }}>
-            {stats.downloadedCovers} <span style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>/ {stats.total}</span>
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div style={{
-        marginTop: '14px',
-        padding: '10px 12px',
-        background: 'rgba(15, 23, 42, 0.4)',
-        border: '1px dashed rgba(51, 65, 85, 0.4)',
-        borderRadius: '8px',
-        fontSize: '11px',
-        color: '#94a3b8',
-        lineHeight: '1.6',
-        textAlign: 'center'
-      }}>
+      <div className="mt-3.5 rounded-md border border-dashed border-paper-400 bg-paper-50 px-3 py-2.5 text-center text-[11px] leading-relaxed text-ink-500">
         💡 口径解析：暂无日客流展示值 ({stats.noRidership} 城) = 完全无统计记录 ({stats.noStats} 城) + 其中有统计但无日客流 ({stats.statsButNoRidership} 城)
       </div>
     </div>

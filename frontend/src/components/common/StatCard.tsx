@@ -7,35 +7,18 @@ interface Props {
 
 export default function StatCard({ label, value, unit, icon }: Props) {
   return (
-    <div className="card-glass" style={{
-      padding: '16px 20px', textAlign: 'center', position: 'relative',
-      overflow: 'hidden', display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center', minHeight: 100,
-    }}>
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, height: 2,
-        background: 'linear-gradient(90deg, transparent, rgba(0,200,255,0.25), transparent)',
-      }} />
+    <div className="flex min-h-[100px] flex-col items-center justify-center rounded-lg bg-paper-100 px-5 py-4 text-center shadow-card">
       {icon && (
-        <div style={{
-          fontSize: 18, marginBottom: 6, opacity: 0.85,
-          lineHeight: 1,
-        }}>
+        <div aria-hidden className="mb-1.5 text-[18px] leading-none opacity-80">
           {icon}
         </div>
       )}
-      <div style={{
-        fontSize: 28, fontWeight: 700, color: 'var(--accent)',
-        letterSpacing: 1, lineHeight: 1.2,
-      }}>
+      <div className="font-serif text-[28px] font-semibold leading-tight text-ink-900 tabular-nums">
         {value}
       </div>
-      <div style={{
-        fontSize: 11, color: 'var(--text-label)', marginTop: 6,
-        display: 'flex', alignItems: 'baseline', gap: 3, justifyContent: 'center',
-      }}>
+      <div className="mt-1.5 flex items-baseline justify-center gap-1 text-[11px] text-ink-500">
         {label}
-        <span style={{ fontSize: 10, color: 'var(--text-dim)' }}>({unit})</span>
+        <span className="text-[10px] text-ink-400">({unit})</span>
       </div>
     </div>
   );

@@ -10,14 +10,18 @@ interface Props {
   onTopNChange: (v: number) => void;
 }
 
+const fieldClass =
+  'h-9 rounded-sm border border-paper-300 bg-paper-50 px-2.5 text-[13px] text-ink-900 placeholder-ink-300 focus:border-vermilion-500 focus:outline-none';
+
 export default function FilterToolbar({ keyword, onKeywordChange, metric, onMetricChange, topN, onTopNChange }: Props) {
   return (
-    <div className="filter-toolbar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <label>搜索城市</label>
+    <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-3">
+      <div className="flex items-center gap-2">
+        <label className="text-[13px] text-ink-500" htmlFor="filter-keyword">搜索城市</label>
         <input
+          id="filter-keyword"
           type="text"
-          className="filter-input"
+          className={fieldClass}
           placeholder="输入城市名..."
           value={keyword}
           onChange={(e) => onKeywordChange(e.target.value)}
@@ -25,10 +29,11 @@ export default function FilterToolbar({ keyword, onKeywordChange, metric, onMetr
           aria-label="搜索城市"
         />
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <label>主指标</label>
+      <div className="flex items-center gap-2">
+        <label className="text-[13px] text-ink-500" htmlFor="filter-metric">主指标</label>
         <select
-          className="filter-input"
+          id="filter-metric"
+          className={fieldClass}
           value={metric}
           onChange={(e) => onMetricChange(e.target.value as MetricKey)}
           style={{ minWidth: 120 }}
@@ -39,10 +44,11 @@ export default function FilterToolbar({ keyword, onKeywordChange, metric, onMetr
           ))}
         </select>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <label>排行</label>
+      <div className="flex items-center gap-2">
+        <label className="text-[13px] text-ink-500" htmlFor="filter-topn">排行</label>
         <select
-          className="filter-input"
+          id="filter-topn"
+          className={fieldClass}
           value={topN}
           onChange={(e) => onTopNChange(Number(e.target.value))}
           style={{ minWidth: 100 }}

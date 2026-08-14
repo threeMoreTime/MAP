@@ -1,38 +1,47 @@
-// === 项目统一图表色板 — 深色科技主题 ===
-// 核心色系：cyan / teal / emerald / amber / indigo / sky / violet / orange / slate
-// 无 red / rose / pink，保持与整体设计系统一致
+// === 项目统一图表色板 — 纸墨 · 朱印主题 ===
+// 与 src/styles/tokens.css 的 --chart-* 变量保持同值；
+// ECharts option 无法消费 CSS 变量，故以常量形式在此集中定义。
+// 墨阶为主，朱砂仅用于"当前关注的系列/榜首"。
+
+/** 墨阶序列：多系列/低强调场景，从深到浅 */
 export const COLOR_PALETTE = [
-  '#22d3ee', // cyan-400      — 主青
-  '#2dd4bf', // teal-400      — 湖绿
-  '#34d399', // emerald-400   — 翠绿
-  '#fbbf24', // amber-400     — 琥珀
-  '#818cf8', // indigo-400    — 靛蓝
-  '#38bdf8', // sky-400       — 天蓝
-  '#a78bfa', // violet-400    — 紫罗兰
-  '#fb923c', // orange-400    — 橙
-  '#67e8f9', // cyan-300      — 浅青
-  '#5eead4', // teal-300      — 浅湖绿
-  '#6ee7b7', // emerald-300   — 浅翠绿
-  '#fde68a', // amber-200     — 浅琥珀
-  '#c4b5fd', // violet-300    — 浅紫
-  '#7dd3fc', // sky-300       — 浅天蓝
-  '#94a3b8', // slate-400     — 石板灰（最低优先）
-  '#fdba74', // orange-300    — 浅橙
+  '#2b2620', // 墨 1 — 最深
+  '#6b6354', // 墨 3
+  '#9a7325', // 赭金
+  '#37755a', // 黛绿
+  '#8d846f', // 墨 4
+  '#aea48b', // 墨 5
+  '#c03d2b', // 朱砂（对比场景压轴使用）
+  '#4a443a', // 墨 2
+  '#cdc4ab', // 墨 6 — 最浅
 ];
 
+/** 主指标墨阶对：单指标图表的起止色（深 → 浅） */
 export const METRIC_COLORS: Record<string, [string, string]> = {
-  daily_ridership_wan:    ['#0e7490', '#22d3ee'],  // 深青 → 青
-  operating_mileage_km:  ['#0f766e', '#2dd4bf'],  // 深湖绿 → 湖绿
-  operating_stations:    ['#4338ca', '#818cf8'],  // 深靛 → 蓝紫
-  ridership_intensity:   ['#b45309', '#fbbf24'],  // 深琥珀 → 琥珀
+  daily_ridership_wan: ['#2b2620', '#8d846f'], // 墨
+  operating_mileage_km: ['#37755a', '#8fae9c'], // 黛绿
+  operating_stations: ['#453f33', '#ab9f87'], // 褐墨
+  ridership_intensity: ['#c03d2b', '#dfa08f'], // 朱砂（强度 = 唯一朱砂主图表）
 };
 
-export const AXIS_LABEL_STYLE = { color: '#94a3b8', fontSize: 11 };
-export const SPLIT_LINE_STYLE = { lineStyle: { color: '#1a3a5a' } };
-export const Y_CATEGORY_LABEL = { color: '#94a3b8', fontSize: 11 };
+export const CHART_VERMILION = '#c03d2b';
+export const CHART_INK = '#2b2620';
+
+export const AXIS_LABEL_STYLE = { color: '#8f8672', fontSize: 11 };
+export const SPLIT_LINE_STYLE = { lineStyle: { color: 'rgba(33,29,22,0.08)' } };
+export const Y_CATEGORY_LABEL = { color: '#453f33', fontSize: 11 };
 export const CHART_GRID = { left: '4%', right: '12%', bottom: '3%', top: '3%', containLabel: true };
+
+/** 浅纸底 tooltip：纸面 + 墨字 + 细边线 */
+export const PAPER_TOOLTIP = {
+  backgroundColor: '#faf8f1',
+  borderColor: '#dcd4c0',
+  borderWidth: 1,
+  padding: [8, 12] as [number, number],
+  textStyle: { color: '#211d16', fontSize: 12 },
+  extraCssText: 'box-shadow: 0 2px 10px rgba(33,29,22,0.12); border-radius: 4px;',
+};
 
 export function tooltipShadow() {
   return { trigger: 'axis' as const, axisPointer: { type: 'shadow' as const } };
 }
-

@@ -1,7 +1,7 @@
 import { useRef, useMemo } from 'react';
 import type { EChartsOption } from '../../lib/echarts';
 import { useEChart } from '../../hooks/useEChart';
-import { COLOR_PALETTE, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE } from './chartUtils';
+import { COLOR_PALETTE, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, PAPER_TOOLTIP } from './chartUtils';
 import { hasValidDailyRidership } from '../../hooks/useDashboardFilters';
 import type { MergedCity } from '../../hooks/useMetroData';
 
@@ -43,10 +43,11 @@ export default function TrendChart({ data }: Props) {
     });
 
     return {
-      tooltip: { trigger: 'axis' },
+      tooltip: { trigger: 'axis', ...PAPER_TOOLTIP },
       legend: {
         data: top8.map((d) => d.city_cn),
-        textStyle: { color: '#ccc', fontSize: 11 },
+        textStyle: { color: '#453f33', fontSize: 11 },
+        inactiveColor: '#ab9f87',
         top: 0,
         type: 'scroll',
       },
@@ -79,7 +80,7 @@ export default function TrendChart({ data }: Props) {
 
   if (top8.length === 0) {
     return (
-      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2a4a6a', fontSize: 13 }}>
+      <div className="flex h-full items-center justify-center text-[13px] text-ink-400">
         暂无有效客流数据
       </div>
     );

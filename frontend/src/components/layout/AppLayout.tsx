@@ -21,17 +21,12 @@ export default function AppLayout() {
   return (
     <>
       {isOffline && (
-        <div style={{
-          background: 'rgba(234,88,12,0.92)', color: '#fff',
-          fontSize: 12, padding: '6px 16px', textAlign: 'center',
-          position: 'sticky', top: 0, zIndex: 1000, fontWeight: 500,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-        }}>
+        <div className="sticky top-0 z-[1000] bg-vermilion-600 px-4 py-1.5 text-center text-[12px] font-medium text-paper-50">
           📡 当前网络已断开，正优先使用本地数据缓存与离线包为您提供服务
         </div>
       )}
       <Header />
-      <main style={{ flex: 1 }}>
+      <main className="flex-1">
         <Outlet />
       </main>
       <Footer />

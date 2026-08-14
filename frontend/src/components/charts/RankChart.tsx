@@ -1,7 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { echarts, type EChartsOption } from '../../lib/echarts';
 import { useEChart } from '../../hooks/useEChart';
-import { tooltipShadow, CHART_GRID, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, Y_CATEGORY_LABEL, METRIC_COLORS } from './chartUtils';
+import { tooltipShadow, CHART_GRID, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, Y_CATEGORY_LABEL, METRIC_COLORS, PAPER_TOOLTIP, CHART_VERMILION } from './chartUtils';
 import { getMetricValue, isMetricValid } from '../../hooks/useDashboardFilters';
 import type { MergedCity } from '../../hooks/useMetroData';
 import type { MetricKey } from '../../types/metro';
@@ -33,8 +33,10 @@ export default function RankChart({ data, metric, topN }: Props) {
     return {
       tooltip: {
         ...tooltipShadow(),
+        ...PAPER_TOOLTIP,
         formatter: (p: unknown) => {
-          const params = p as { name: string; value: number | null };
+          const raw = Array.isArray(p) ? p[0] : p;
+          const params = raw as { name: string; value: number | null | undefined };
           return `${params.name}<br/>${ml.name}: ${params.value != null ? params.value.toFixed(ml.decimals) : '--'} ${ml.unit}`;
         },
       },
@@ -43,7 +45,11 @@ export default function RankChart({ data, metric, topN }: Props) {
       yAxis: { type: 'category', data: cityNames, axisLabel: Y_CATEGORY_LABEL },
       series: [{
         type: 'bar',
-        data: vals,
+        // 榜首（reverse 后最后一项）用朱砂实色，其余沿用指标墨阶渐变
+        data: vals.map((v, i) => ({
+          value: v,
+          itemStyle: i === vals.length - 1 ? { color: CHART_VERMILION } : undefined,
+        })),
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
             { offset: 0, color: colors[0] },
@@ -53,10 +59,10 @@ export default function RankChart({ data, metric, topN }: Props) {
         label: {
           show: true,
           position: 'right',
-          color: '#ccc',
+          color: '#6e6656',
           fontSize: 11,
           formatter: (p: unknown) => {
-            const params = p as { value: number | null };
+            const params = p as { value: number | null | undefined };
             return params.value != null ? params.value.toFixed(ml.decimals) : '--';
           },
         },

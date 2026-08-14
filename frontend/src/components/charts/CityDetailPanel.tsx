@@ -23,15 +23,7 @@ export default function CityDetailPanel({ city }: Props) {
 
   if (!city || !metrics) {
     return (
-      <div style={{
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#2a3a4a',
-        fontSize: 14,
-        padding: 20,
-      }}>
+      <div className="flex h-full items-center justify-center p-5 text-[14px] text-ink-300">
         点击地图上的城市查看详细指标
       </div>
     );
@@ -40,39 +32,34 @@ export default function CityDetailPanel({ city }: Props) {
   const yearly = city.stats?.yearly_avg_ridership;
 
   return (
-    <div style={{ padding: '0 4px', overflowY: 'auto', maxHeight: '100%' }}>
-      <div style={{
-        fontSize: 18, fontWeight: 'bold', color: '#00d4ff',
-        marginBottom: 12, textAlign: 'center',
-      }}>
+    <div className="max-h-full overflow-y-auto px-1 py-0.5">
+      <div className="mb-3 text-center font-serif text-[18px] font-semibold text-vermilion-600">
         {city.city_cn}
       </div>
 
       {metrics.map((m) => (
-        <div key={m.k} style={{
-          display: 'flex', justifyContent: 'space-between',
-          padding: '8px 0', borderBottom: '1px solid rgba(0,120,180,0.1)',
-          fontSize: 13,
-        }}>
-          <span style={{ color: '#4a6a8a' }}>{m.k}</span>
-          <span style={{ color: '#c8d6e5', fontWeight: 'bold' }}>{m.v}</span>
+        <div
+          key={m.k}
+          className="flex justify-between border-b border-[rgba(33,29,22,0.08)] py-2 text-[13px]"
+        >
+          <span className="text-ink-500">{m.k}</span>
+          <span className="font-medium text-ink-900 tabular-nums">{m.v}</span>
         </div>
       ))}
 
       {yearly && yearly.years.length > 0 && (
-        <div style={{ marginTop: 12 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(0,120,180,0.1)', fontSize: 13 }}>
-            <span style={{ color: '#4a6a8a' }}>年度趋势</span>
+        <div className="mt-3">
+          <div className="flex justify-between border-b border-[rgba(33,29,22,0.08)] py-2 text-[13px]">
+            <span className="text-ink-500">年度趋势</span>
             <span />
           </div>
           {yearly.years.map((y, i) => (
-            <div key={y} style={{
-              display: 'flex', justifyContent: 'space-between',
-              padding: '6px 0', borderBottom: '1px solid rgba(0,120,180,0.06)',
-              fontSize: 12,
-            }}>
-              <span style={{ color: '#4a6a8a' }}>{y}</span>
-              <span style={{ color: '#c8d6e5' }}>{yearly.values[i].toFixed(1)} 万</span>
+            <div
+              key={y}
+              className="flex justify-between border-b border-[rgba(33,29,22,0.05)] py-1.5 text-[12px]"
+            >
+              <span className="text-ink-500 tabular-nums">{y}</span>
+              <span className="text-ink-700 tabular-nums">{yearly.values[i].toFixed(1)} 万</span>
             </div>
           ))}
         </div>

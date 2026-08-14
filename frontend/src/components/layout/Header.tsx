@@ -10,34 +10,50 @@ const NAV_ITEMS = [
 
 export default function Header() {
   return (
-    <nav style={{
-      position: 'sticky', top: 0, zIndex: 100,
-      background: 'rgba(6,14,26,0.94)', backdropFilter: 'blur(14px)',
-      borderBottom: '1px solid rgba(0,180,255,0.08)',
-      display: 'flex', justifyContent: 'center', alignItems: 'center',
-      padding: '0 24px', height: 'var(--header-height)',
-    }}>
-      <div style={{
-        maxWidth: 'var(--max-width)', width: '100%',
-        display: 'flex', alignItems: 'center',
-      }}>
-        <Link to="/" className="gradient-text" style={{
-          fontSize: 15, fontWeight: 600, letterSpacing: 2, marginRight: 'auto',
-        }}>
-          MetroViz
+    <nav className="sticky top-0 z-[100] border-b border-paper-300 bg-paper-50/95">
+      <div className="mx-auto flex h-[52px] w-full max-w-[1180px] items-center gap-6 px-4 sm:px-6">
+        <Link
+          to="/"
+          className="mr-auto flex items-center gap-2.5 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion-500"
+        >
+          {/* 朱印 · 站点签章 */}
+          <span className="flex size-5 items-center justify-center rounded-[3px] bg-vermilion-500 font-serif text-[12px] font-semibold leading-none text-paper-50">
+            铁
+          </span>
+          <span className="font-serif text-[15px] font-semibold text-ink-900">MetroViz</span>
         </Link>
-        <div style={{ display: 'flex', gap: 24 }} className="nav-links">
+        <div className="hidden items-center gap-5 sm:flex">
           {NAV_ITEMS.map(({ to, label, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
-              style={({ isActive }) => ({
-                color: isActive ? '#00d4ff' : '#5a7a9a',
-                fontSize: 13, letterSpacing: 1, padding: '4px 0',
-                borderBottom: isActive ? '1.5px solid #00d4ff' : '1.5px solid transparent',
-                transition: 'color 0.3s, border-color 0.3s',
-              })}
+              className={({ isActive }) =>
+                `border-b-2 pb-0.5 pt-1 text-[13px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-vermilion-500 ${
+                  isActive
+                    ? 'border-vermilion-500 font-medium text-ink-900'
+                    : 'border-transparent text-ink-500 hover:text-ink-900'
+                }`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+        </div>
+        {/* 移动端导航：横向滚动 */}
+        <div className="flex items-center gap-4 overflow-x-auto sm:hidden">
+          {NAV_ITEMS.map(({ to, label, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              className={({ isActive }) =>
+                `whitespace-nowrap border-b-2 pb-0.5 pt-1 text-[13px] ${
+                  isActive
+                    ? 'border-vermilion-500 font-medium text-ink-900'
+                    : 'border-transparent text-ink-500'
+                }`
+              }
             >
               {label}
             </NavLink>

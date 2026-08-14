@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useEChart } from '../../hooks/useEChart';
-import { COLOR_PALETTE, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE } from '../charts/chartUtils';
+import { COLOR_PALETTE, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, PAPER_TOOLTIP } from '../charts/chartUtils';
 import type { ComparableCity } from '../../types/metro';
 
 interface Props {
@@ -32,6 +32,7 @@ function BarChart({ cities, metric }: { cities: ComparableCity[]; metric: typeof
     tooltip: {
       trigger: 'axis' as const,
       axisPointer: { type: 'shadow' as const },
+      ...PAPER_TOOLTIP,
       formatter: (params: unknown) => {
         const raw = Array.isArray(params) ? params[0] : params;
         const p = raw as { name: string; value: string | number };
@@ -48,7 +49,7 @@ function BarChart({ cities, metric }: { cities: ComparableCity[]; metric: typeof
       type: 'category' as const,
       data: valid.map(d => d.name).reverse(),
       axisLabel: { ...AXIS_LABEL_STYLE, fontSize: 12 },
-      axisLine: { lineStyle: { color: '#1a3a5a' } },
+      axisLine: { lineStyle: { color: 'rgba(33,29,22,0.18)' } },
     },
     series: [{
       type: 'bar' as const,
@@ -66,12 +67,12 @@ function BarChart({ cities, metric }: { cities: ComparableCity[]; metric: typeof
     <div>
       <div ref={containerRef} style={{ width: '100%', height: Math.max(160, valid.length * 48 + 40) }} />
       {valid.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '24px 0', color: '#718096', fontSize: 13 }}>
+        <div className="py-6 text-center text-[13px] text-ink-500">
           当前所选城市均无该指标数据
         </div>
       )}
       {excluded > 0 && valid.length > 0 && (
-        <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 6, textAlign: 'center' }}>
+        <div className="mt-1.5 text-center text-[11px] text-ink-400">
           部分指标缺失，已从图表中排除（{excluded} 个城市无数据）
         </div>
       )}
@@ -103,10 +104,10 @@ function RadarChart({ cities }: { cities: ComparableCity[] }) {
     tooltip: {},
     radar: {
       indicator: validDims.map(d => ({ name: d.label, max: maxValues[d.key] })),
-      axisName: { color: '#94a3b8', fontSize: 11 },
-      splitArea: { areaStyle: { color: ['rgba(0,212,255,0.02)', 'rgba(0,212,255,0.04)'] } },
-      splitLine: { lineStyle: { color: '#1a3a5a' } },
-      axisLine: { lineStyle: { color: '#1a3a5a' } },
+      axisName: { color: '#8f8672', fontSize: 11 },
+      splitArea: { areaStyle: { color: ['rgba(33,29,22,0.015)', 'rgba(33,29,22,0.035)'] } },
+      splitLine: { lineStyle: { color: 'rgba(33,29,22,0.12)' } },
+      axisLine: { lineStyle: { color: 'rgba(33,29,22,0.15)' } },
     },
     series: [{
       type: 'radar' as const,
@@ -135,10 +136,11 @@ function TrendChart({ cities }: { cities: ComparableCity[] }) {
   const allYears = [...new Set(citiesWithTrend.flatMap(c => c.yearlyYears))].sort((a, b) => a - b);
 
   const option = citiesWithTrend.length < 2 ? null : {
-    tooltip: { trigger: 'axis' as const },
+    tooltip: { trigger: 'axis' as const, ...PAPER_TOOLTIP },
     legend: {
       data: citiesWithTrend.map(c => c.city_cn),
-      textStyle: { color: '#94a3b8', fontSize: 11 },
+      textStyle: { color: '#453f33', fontSize: 11 },
+      inactiveColor: '#ab9f87',
       bottom: 0,
     },
     grid: { left: '3%', right: '4%', bottom: '14%', top: '8%', containLabel: true },
@@ -146,7 +148,7 @@ function TrendChart({ cities }: { cities: ComparableCity[] }) {
       type: 'category' as const,
       data: allYears.map(String),
       axisLabel: { ...AXIS_LABEL_STYLE, fontSize: 11 },
-      axisLine: { lineStyle: { color: '#1a3a5a' } },
+      axisLine: { lineStyle: { color: 'rgba(33,29,22,0.18)' } },
     },
     yAxis: {
       type: 'value' as const,
@@ -177,25 +179,22 @@ export default function CompareCharts({ cities }: Props) {
   const [activeMetric, setActiveMetric] = useState<number>(0);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="flex flex-col gap-5">
       {/* Bar chart with metric switch */}
-      <section className="card-glass" style={{ padding: 20, borderRadius: 12 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#00d4ff', marginBottom: 12 }}>
+      <section className="rounded-lg bg-paper-100 p-5 shadow-card">
+        <div className="mb-3 font-serif text-[15px] font-semibold text-ink-900">
           指标对比
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
+        <div className="mb-4 flex flex-wrap gap-1.5">
           {METRICS.map((m, i) => (
             <button
               key={m.key}
               onClick={() => setActiveMetric(i)}
-              style={{
-                border: 'none',
-                background: activeMetric === i ? '#00d4ff' : 'rgba(255,255,255,0.03)',
-                color: activeMetric === i ? '#060e1a' : '#a0aec0',
-                fontSize: 12, padding: '4px 12px', borderRadius: 16,
-                cursor: 'pointer', fontWeight: activeMetric === i ? 600 : 400,
-                transition: 'all 0.2s',
-              }}
+              className={`cursor-pointer rounded-full px-3 py-1 text-[12px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
+                activeMetric === i
+                  ? 'bg-vermilion-500 font-semibold text-paper-50'
+                  : 'border border-paper-300 bg-paper-50 text-ink-500 hover:text-ink-900'
+              }`}
             >
               {m.label}
             </button>
@@ -205,26 +204,26 @@ export default function CompareCharts({ cities }: Props) {
       </section>
 
       {/* Radar chart */}
-      <section className="card-glass" style={{ padding: 20, borderRadius: 12 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#00d4ff', marginBottom: 12 }}>
+      <section className="rounded-lg bg-paper-100 p-5 shadow-card">
+        <div className="mb-3 font-serif text-[15px] font-semibold text-ink-900">
           多维归一化对比
         </div>
         <RadarChart cities={cities} />
         {cities.some(c => c.dailyRidershipWan === null || c.operatingMileageKm === null) && (
-          <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 8, textAlign: 'center' }}>
+          <div className="mt-2 text-center text-[11px] text-ink-400">
             仅展示所有已选城市均具备有效值的维度
           </div>
         )}
       </section>
 
       {/* Trend chart */}
-      <section className="card-glass" style={{ padding: 20, borderRadius: 12 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#00d4ff', marginBottom: 12 }}>
+      <section className="rounded-lg bg-paper-100 p-5 shadow-card">
+        <div className="mb-3 font-serif text-[15px] font-semibold text-ink-900">
           年度日均客流趋势对比
         </div>
         <TrendChart cities={cities} />
         {cities.filter(c => c.yearlyYears.length > 0).length < 2 && (
-          <div style={{ textAlign: 'center', padding: '24px 0', color: '#718096', fontSize: 13 }}>
+          <div className="py-6 text-center text-[13px] text-ink-500">
             需至少 2 个城市有年度趋势数据时展示
           </div>
         )}

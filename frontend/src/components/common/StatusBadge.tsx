@@ -4,36 +4,25 @@ interface Props {
   active?: boolean;
 }
 
-export default function StatusBadge({ text, color, active }: Props) {
-  const c = color || '#4a6a8a';
-  const bgMap: Record<string, string> = {
-    '#4caf50': 'rgba(76,175,80,0.15)',
-    '#ff9800': 'rgba(255,152,0,0.15)',
-    '#4a6a8a': 'rgba(60,80,100,0.15)',
-  };
-  const bg = bgMap[c] || 'rgba(60,80,100,0.15)';
+/** 旧调用方传入 legacy 十六进制色，此处映射到纸墨语义令牌 */
+const SEMANTIC: Record<string, string> = {
+  '#4caf50': 'border-jade-600/30 bg-jade-600/10 text-jade-600',
+  '#ff9800': 'border-gold-600/30 bg-gold-600/10 text-gold-600',
+  '#4a6a8a': 'border-ink-400/30 bg-ink-400/10 text-ink-500',
+};
 
+export default function StatusBadge({ text, color, active }: Props) {
   if (active === false) {
     return (
-      <span style={{
-        fontSize: 10, color: 'var(--slate-600, #475569)',
-        background: 'rgba(30,41,59,0.35)',
-        padding: '2px 10px', borderRadius: 10,
-        display: 'inline-block', lineHeight: 1.6,
-        opacity: 0.6,
-      }}>
+      <span className="inline-block rounded-full border border-paper-300 bg-paper-200/60 px-2.5 py-0.5 text-[10px] leading-5 text-ink-400 opacity-70">
         {text}
       </span>
     );
   }
 
+  const tone = (color && SEMANTIC[color]) || SEMANTIC['#4a6a8a'];
   return (
-    <span style={{
-      fontSize: 10, color: c,
-      background: bg,
-      padding: '2px 10px', borderRadius: 10,
-      display: 'inline-block', lineHeight: 1.6,
-    }}>
+    <span className={`inline-block rounded-full border px-2.5 py-0.5 text-[10px] leading-5 ${tone}`}>
       {text}
     </span>
   );
