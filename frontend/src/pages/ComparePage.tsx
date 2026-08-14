@@ -24,16 +24,11 @@ export default function ComparePage() {
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '60vh', display: 'flex', flexDirection: 'column',
-        justifyContent: 'center', alignItems: 'center', color: '#00d4ff',
-      }}>
-        <div className="loading-spinner" style={{
-          width: 40, height: 40, border: '3px solid rgba(0,212,255,0.1)',
-          borderTop: '3px solid #00d4ff', borderRadius: '50%',
-          animation: 'spin 1s linear infinite', marginBottom: 16,
-        }} />
-        <div style={{ fontSize: 13, letterSpacing: 1.5 }}>城市对比数据载入中...</div>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-ink-500">
+        <div
+          className="loading-spinner size-10 rounded-full border-[3px] border-paper-200 border-t-vermilion-500 motion-safe:animate-[spin_1s_linear_infinite]"
+        />
+        <div className="text-[13px]">城市对比数据载入中...</div>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
     );
@@ -41,16 +36,13 @@ export default function ComparePage() {
 
   if (error) {
     return (
-      <div style={{
-        maxWidth: 'var(--max-width)', margin: '0 auto', padding: '24px 16px',
-        color: '#fff', display: 'flex', flexDirection: 'column', gap: 16,
-      }}>
-        <div className="card-glass" style={{ padding: 24, borderRadius: 12, textAlign: 'center' }}>
-          <div style={{ fontSize: 15, color: '#e53e3e', marginBottom: 12 }}>数据加载失败</div>
-          <div style={{ fontSize: 13, color: '#a0aec0', marginBottom: 16 }}>{error}</div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-            <a href="#/dashboard" style={{ color: '#00d4ff', fontSize: 13 }}>返回数据大屏</a>
-            <a href="#/data-quality" style={{ color: '#00d4ff', fontSize: 13 }}>数据质量中心</a>
+      <div className="mx-auto flex max-w-[1180px] flex-col gap-4 px-4 py-6 text-ink-900 sm:px-6">
+        <div className="rounded-lg bg-paper-100 p-6 text-center shadow-card">
+          <div className="mb-3 text-[15px] font-semibold text-vermilion-600">数据加载失败</div>
+          <div className="mb-4 text-[13px] text-ink-500">{error}</div>
+          <div className="flex justify-center gap-6">
+            <a href="#/dashboard" className="text-[13px] text-vermilion-500 underline-offset-4 hover:underline">返回数据大屏</a>
+            <a href="#/data-quality" className="text-[13px] text-vermilion-500 underline-offset-4 hover:underline">数据质量中心</a>
           </div>
         </div>
       </div>
@@ -58,33 +50,21 @@ export default function ComparePage() {
   }
 
   return (
-    <div style={{
-      maxWidth: 'var(--max-width)', margin: '0 auto', padding: '24px 16px',
-      color: '#fff', display: 'flex', flexDirection: 'column', gap: 24,
-    }}>
+    <div className="mx-auto flex max-w-[1180px] flex-col gap-6 px-4 py-6 text-ink-900 sm:px-6">
       {/* Hero */}
-      <header className="card-glass" style={{
-        padding: '28px 24px', border: '1px solid rgba(0,212,255,0.08)',
-        borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 10,
-      }}>
-        <h1 style={{ fontSize: 22, fontWeight: 600, margin: 0, color: '#00d4ff' }}>城市对比</h1>
-        <p style={{ fontSize: 13, color: '#a0aec0', lineHeight: 1.6, margin: 0 }}>
+      <header className="flex flex-col gap-2.5 rounded-lg bg-paper-100 p-5 shadow-card sm:p-7">
+        <h1 className="m-0 font-serif text-[22px] font-semibold text-ink-900">城市对比</h1>
+        <p className="m-0 text-[13px] leading-relaxed text-ink-500">
           选择 2-5 个城市，横向比较<strong>公开资料整理快照</strong>中的地铁运营指标与数据完整度。
         </p>
-        <div style={{
-          fontSize: 11, color: '#718096', display: 'flex', alignItems: 'center',
-          gap: 6, padding: '6px 12px', background: 'rgba(0,212,255,0.04)',
-          borderLeft: '3px solid #00d4ff', borderRadius: '0 4px 4px 0',
-        }}>
+        <div className="flex items-center gap-2 rounded-sm bg-paper-200/60 px-3 py-1.5 text-[11px] text-ink-500">
           💡 本页面展示的是项目收录数据完整度与公开资料整理结果，<strong>非实时运营数据，不构成官方排名</strong>。
         </div>
       </header>
 
       {/* City selector */}
-      <section className="card-glass" style={{
-        padding: 20, borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 14,
-      }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#00d4ff' }}>选择对比城市</div>
+      <section className="flex flex-col gap-3.5 rounded-lg bg-paper-100 p-5 shadow-card">
+        <div className="font-serif text-[15px] font-semibold text-ink-900">选择对比城市</div>
         <CityCompareSelector
           allCities={allCities}
           selectedSlugs={selectedSlugs}

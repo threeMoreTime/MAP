@@ -54,9 +54,9 @@ export default function CityCompareSelector({
   };
 
   return (
-    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div className="relative flex flex-col gap-2.5">
       {/* Search input */}
-      <div style={{ position: 'relative' }}>
+      <div className="relative">
         <input
           ref={inputRef}
           type="text"
@@ -67,23 +67,13 @@ export default function CityCompareSelector({
           placeholder="搜索城市中文名或拼音..."
           aria-label="搜索城市"
           disabled={maxReached}
-          style={{
-            width: '100%', maxWidth: 360, boxSizing: 'border-box',
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 6, padding: '8px 36px 8px 12px',
-            fontSize: 13, color: '#fff', outline: 'none',
-          }}
+          className="h-9 w-full max-w-[360px] rounded-sm border border-paper-300 bg-paper-50 px-3 pr-9 text-[13px] text-ink-900 placeholder-ink-300 outline-none focus:border-vermilion-500 disabled:opacity-50"
         />
         {query && (
           <button
             onClick={() => { setQuery(''); setOpen(false); }}
             aria-label="清空搜索"
-            style={{
-              position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
-              border: 'none', background: 'transparent', color: '#718096',
-              cursor: 'pointer', fontSize: 12,
-            }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-[12px] text-ink-400 hover:text-ink-700"
           >✕</button>
         )}
       </div>
@@ -93,12 +83,8 @@ export default function CityCompareSelector({
         <div
           ref={listRef}
           role="listbox"
-          style={{
-            position: 'absolute', top: '100%', left: 0, zIndex: 50,
-            background: '#0d1b2a', border: '1px solid rgba(0,212,255,0.12)',
-            borderRadius: 6, maxHeight: 220, overflowY: 'auto',
-            minWidth: 260, boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-          }}
+          className="absolute left-0 top-full z-50 min-w-[260px] overflow-y-auto rounded-sm border border-paper-300 bg-paper-50 shadow-card-hover"
+          style={{ maxHeight: 220 }}
         >
           {results.map(c => {
             const isSelected = selectedSet.has(c.city);
@@ -110,17 +96,14 @@ export default function CityCompareSelector({
                 aria-selected={isSelected}
                 onClick={() => handleSelect(c.city)}
                 disabled={disabled}
-                style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  width: '100%', padding: '8px 12px', border: 'none',
-                  background: 'transparent', cursor: disabled ? 'default' : 'pointer',
-                  color: isSelected ? '#94a3b8' : maxReached ? '#4a5568' : '#e2e8f0',
-                  fontSize: 13, textAlign: 'left',
-                  opacity: disabled ? 0.5 : 1,
-                }}
+                className={`flex w-full items-center justify-between px-3 py-2 text-left text-[13px] ${
+                  disabled
+                    ? 'cursor-default text-ink-300 opacity-60'
+                    : 'cursor-pointer text-ink-900 hover:bg-paper-100'
+                }`}
               >
-                <span>{c.city_cn} <span style={{ fontSize: 11, color: '#64748b' }}>{c.city}</span></span>
-                {isSelected && <span style={{ color: '#22d3ee', fontSize: 12 }}>已选</span>}
+                <span>{c.city_cn} <span className="text-[11px] text-ink-400">{c.city}</span></span>
+                {isSelected && <span className="text-[12px] text-ink-400">已选</span>}
               </button>
             );
           })}
@@ -128,14 +111,14 @@ export default function CityCompareSelector({
       )}
 
       {/* Selected city tags */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-        <span style={{
-          fontSize: 12, color: maxReached ? '#fbbf24' : '#00d4ff',
-          padding: '2px 8px', borderRadius: 10,
-          background: maxReached ? 'rgba(251,191,36,0.1)' : 'rgba(0,212,255,0.08)',
-          border: `1px solid ${maxReached ? 'rgba(251,191,36,0.25)' : 'rgba(0,212,255,0.15)'}`,
-          fontWeight: 600,
-        }}>
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className={`rounded-full border px-2 py-0.5 text-[12px] font-semibold tabular-nums ${
+            maxReached
+              ? 'border-gold-600/30 bg-gold-600/10 text-gold-600'
+              : 'border-vermilion-500/25 bg-vermilion-50 text-vermilion-600'
+          }`}
+        >
           {selectedSlugs.length} / 5 城
         </span>
 
@@ -145,37 +128,24 @@ export default function CityCompareSelector({
           return (
             <span
               key={slug}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '4px 12px', borderRadius: 16,
-                background: 'rgba(0,212,255,0.08)',
-                border: '1px solid rgba(0,212,255,0.18)',
-                fontSize: 13, color: '#22d3ee',
-              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-vermilion-500/25 bg-vermilion-50 px-3 py-1 text-[13px] text-vermilion-600"
             >
               {c.city_cn}
               <button
                 onClick={() => onRemove(slug)}
                 aria-label={`移除${c.city_cn}`}
-                style={{
-                  border: 'none', background: 'transparent',
-                  color: '#94a3b8', cursor: 'pointer', fontSize: 12, padding: 0, lineHeight: 1,
-                }}
+                className="cursor-pointer p-0 text-[12px] leading-none text-ink-400 hover:text-vermilion-600"
               >✕</button>
             </span>
           );
         })}
         {maxReached && (
-          <span style={{
-            fontSize: 12, color: '#fbbf24', display: 'inline-flex', alignItems: 'center', gap: 4,
-            padding: '4px 10px', background: 'rgba(245,158,11,0.08)',
-            border: '1px solid rgba(245,158,11,0.2)', borderRadius: 6,
-          }}>
+          <span className="inline-flex items-center gap-1 rounded-sm border border-gold-600/25 bg-gold-600/10 px-2.5 py-1 text-[12px] text-gold-600">
             ⚠️ 已达到 5 个城市对比上限，移除旧城市后可继续添加
           </span>
         )}
         {!maxReached && selectedSlugs.length < 2 && (
-          <span style={{ fontSize: 12, color: '#94a3b8' }}>请至少选择 2 个城市开始对比</span>
+          <span className="text-[12px] text-ink-400">请至少选择 2 个城市开始对比</span>
         )}
       </div>
     </div>
