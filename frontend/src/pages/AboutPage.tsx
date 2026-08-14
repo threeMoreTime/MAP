@@ -3,7 +3,6 @@ import SectionTitle from '../components/common/SectionTitle';
 import { useMetroData } from '../hooks/useMetroData';
 import LastUpdatedBadge from '../components/common/LastUpdatedBadge';
 import { withBaseUrl } from '../utils/path';
-import s from './AboutPage.module.css';
 
 const FIELDS: { name: string; desc: string; unit?: string }[] = [
   { name: 'daily_ridership_wan', desc: '统计日期当日全线网进站客流总量', unit: '万人次' },
@@ -41,6 +40,13 @@ const LICENSE_NOTES = [
     text: '线路图/规划图均以公开学习之目的使用，版权归对应城市轨道交通官方及制作方所有',
   },
 ];
+
+const PILL_TONE: Record<string, string> = {
+  客流统计: 'border-vermilion-500/25 bg-vermilion-50 text-vermilion-600',
+  '线路图/规划图': 'border-ink-400/25 bg-ink-400/10 text-ink-700',
+  城市封面图: 'border-jade-600/25 bg-jade-600/10 text-jade-600',
+  地图底图: 'border-gold-600/25 bg-gold-600/10 text-gold-600',
+};
 
 export default function AboutPage() {
   const { merged, manifest } = useMetroData();
@@ -85,7 +91,6 @@ export default function AboutPage() {
   const dataSources = React.useMemo(() => [
     {
       pill: '客流统计',
-      pillClass: s.pillRidership,
       lines: [
         '数据来源：MetroDB.org 公开页面与 MetroMan 客流数据汇总整理',
         '获取机制：程序化解析与多渠道交叉核验，避免人工录入误差',
@@ -94,7 +99,6 @@ export default function AboutPage() {
     },
     {
       pill: '线路图/规划图',
-      pillClass: s.pillMap,
       lines: [
         '资源归属：由各城市轨道交通官方网站、热心志愿者及维基百科贡献者制作',
         '管理机制：存储于本地 /cities/ 资源目录，通过 index 配置文件索引',
@@ -103,7 +107,6 @@ export default function AboutPage() {
     },
     {
       pill: '城市封面图',
-      pillClass: s.pillCover,
       lines: [
         '图片来源：Wikimedia Commons、Wikidata 及 CC 共享授权图库',
         '管理与授权：完整溯源及 CC/BY-SA 等授权协议记录于封面 manifest 文件',
@@ -112,7 +115,6 @@ export default function AboutPage() {
     },
     {
       pill: '地图底图',
-      pillClass: s.pillGeo,
       lines: [
         '数据来源：中国行政区划 GeoJSON 地图底座（assets/china.json）',
         '容错机制：提供本地静态解析 → 远程高可用 CDN 加载 → 降级纯文本渲染三级保护',
@@ -121,45 +123,41 @@ export default function AboutPage() {
   ], [stats]);
 
   return (
-    <div className="page-container" style={{ paddingTop: 32, paddingBottom: 40 }}>
+    <div className="mx-auto w-full max-w-[1180px] px-4 pb-10 pt-8 sm:px-6">
       <SectionTitle icon="ⓘ" title="数据说明" />
 
-      <div className={s.hero}>
-        <p className={s.heroSubtitle}>
+      <div className="mb-5 rounded-lg bg-paper-100 px-5 py-6 text-center shadow-card">
+        <p className="text-[13px] text-ink-500">
           说明本项目的数据来源、资源来源、字段口径、更新机制与使用限制
         </p>
-        <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+        <div className="mt-4 flex flex-col items-center gap-2.5">
           <LastUpdatedBadge generatedAt={manifest?.generated_at} />
           <a
             href={withBaseUrl('data/latest/manifest.json')}
             download="manifest.json"
             title="下载原始数据快照 JSON"
             aria-label="下载原始数据快照 JSON"
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              fontSize: 12, color: '#00d4ff', padding: '6px 14px',
-              border: '1px solid rgba(0,212,255,0.3)', borderRadius: 6,
-              background: 'rgba(0,212,255,0.08)', textDecoration: 'none',
-              transition: 'all 0.2s', cursor: 'pointer',
-            }}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-sm border border-vermilion-500/30 bg-vermilion-50 px-3.5 py-1.5 text-[12px] text-vermilion-600 transition-colors duration-200 hover:bg-vermilion-100"
           >
             ⬇ 下载数据快照 JSON (manifest.json)
           </a>
         </div>
       </div>
 
-      <div className={s.cardsGrid}>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* 数据来源总览 */}
-        <div className={s.card}>
-          <div className={s.cardHeader}>
-            <span className={s.cardIcon}>📊</span>
-            <h3 className={s.cardTitle}>数据来源总览</h3>
+        <div className="rounded-lg bg-paper-100 p-5 shadow-card">
+          <div className="mb-3 flex items-center gap-2">
+            <span aria-hidden className="text-[16px]">📊</span>
+            <h3 className="font-serif text-[15px] font-semibold text-ink-900">数据来源总览</h3>
           </div>
-          <div className={s.sourceList}>
+          <div className="flex flex-col gap-3">
             {dataSources.map((src) => (
-              <div key={src.pill} className={s.sourceItem}>
-                <span className={`${s.sourcePill} ${src.pillClass}`}>{src.pill}</span>
-                <div className={s.sourceDesc}>
+              <div key={src.pill} className="flex flex-col gap-1.5 sm:flex-row sm:gap-3">
+                <span className={`h-fit shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${PILL_TONE[src.pill]}`}>
+                  {src.pill}
+                </span>
+                <div className="flex flex-col gap-0.5 text-[12px] leading-relaxed text-ink-700">
                   {src.lines.map((line) => (
                     <span key={line}>{line}</span>
                   ))}
@@ -170,19 +168,19 @@ export default function AboutPage() {
         </div>
 
         {/* 数据字段说明 */}
-        <div className={s.card}>
-          <div className={s.cardHeader}>
-            <span className={s.cardIcon}>🏷️</span>
-            <h3 className={s.cardTitle}>数据字段说明</h3>
+        <div className="rounded-lg bg-paper-100 p-5 shadow-card">
+          <div className="mb-3 flex items-center gap-2">
+            <span aria-hidden className="text-[16px]">🏷️</span>
+            <h3 className="font-serif text-[15px] font-semibold text-ink-900">数据字段说明</h3>
           </div>
-          <table className={s.fieldTable}>
+          <table className="w-full border-collapse text-[12px]">
             <tbody>
               {FIELDS.map((f) => (
-                <tr key={f.name} className={s.fieldRow}>
-                  <td className={s.fieldName}>{f.name}</td>
-                  <td className={s.fieldDesc}>
+                <tr key={f.name} className="border-b border-[rgba(33,29,22,0.06)]">
+                  <td className="w-[38%] py-2 pr-2 align-top font-mono text-[11px] text-vermilion-600">{f.name}</td>
+                  <td className="py-2 text-ink-700">
                     {f.desc}
-                    {f.unit && <span className={s.fieldUnit}>（{f.unit}）</span>}
+                    {f.unit && <span className="text-ink-400">（{f.unit}）</span>}
                   </td>
                 </tr>
               ))}
@@ -191,29 +189,20 @@ export default function AboutPage() {
         </div>
 
         {/* 资源覆盖 */}
-        <div className={s.card}>
-          <div className={s.cardHeader}>
-            <span className={s.cardIcon}>📦</span>
-            <h3 className={s.cardTitle}>基于当前快照动态计算的资源覆盖</h3>
+        <div className="rounded-lg bg-paper-100 p-5 shadow-card">
+          <div className="mb-3 flex items-center gap-2">
+            <span aria-hidden className="text-[16px]">📦</span>
+            <h3 className="font-serif text-[15px] font-semibold text-ink-900">基于当前快照动态计算的资源覆盖</h3>
           </div>
-          <div className={s.coverageGrid}>
+          <div className="grid grid-cols-3 gap-2.5">
             {coverageStats.map((item) => (
-              <div key={item.label} className={s.coverageItem}>
-                <span className={s.coverageNum}>{item.num}</span>
-                <span className={s.coverageLabel}>{item.label}</span>
+              <div key={item.label} className="flex flex-col items-center rounded-md bg-paper-50 px-2 py-2.5 text-center">
+                <span className="font-serif text-[20px] font-semibold text-ink-900 tabular-nums">{item.num}</span>
+                <span className="text-[10px] leading-tight text-ink-400">{item.label}</span>
               </div>
             ))}
           </div>
-          <div style={{
-            marginTop: '12px',
-            padding: '8px 10px',
-            background: 'rgba(15, 23, 42, 0.2)',
-            border: '1px dashed rgba(51, 65, 85, 0.3)',
-            borderRadius: '6px',
-            fontSize: '11px',
-            color: '#94a3b8',
-            lineHeight: '1.5'
-          }}>
+          <div className="mt-3 rounded-md border border-dashed border-paper-400 bg-paper-50 px-3 py-2 text-[11px] leading-relaxed text-ink-500">
             💡 统计口径说明：
             <br />
             1. 城市索引 ({stats.total} 城) = 有统计记录 ({stats.hasStats} 城) + 完全无统计记录 ({stats.noStats} 城)
@@ -225,15 +214,15 @@ export default function AboutPage() {
         </div>
 
         {/* 版权与署名 */}
-        <div className={s.card}>
-          <div className={s.cardHeader}>
-            <span className={s.cardIcon}>©️</span>
-            <h3 className={s.cardTitle}>版权与署名</h3>
+        <div className="rounded-lg bg-paper-100 p-5 shadow-card">
+          <div className="mb-3 flex items-center gap-2">
+            <span aria-hidden className="text-[16px]">©️</span>
+            <h3 className="font-serif text-[15px] font-semibold text-ink-900">版权与署名</h3>
           </div>
-          <ul className={s.licenseList}>
+          <ul className="m-0 flex flex-col gap-2 pl-0">
             {LICENSE_NOTES.map((note, i) => (
-              <li key={i} className={s.licenseItem}>
-                <span className={s.licenseIcon}>◆</span>
+              <li key={i} className="flex list-none items-start gap-2 text-[12px] leading-relaxed text-ink-700">
+                <span aria-hidden className="mt-0.5 shrink-0 text-[10px] text-vermilion-500">◆</span>
                 <span>{note.text}</span>
               </li>
             ))}
@@ -241,15 +230,15 @@ export default function AboutPage() {
         </div>
 
         {/* 使用限制 */}
-        <div className={`${s.card} ${s.cardFull}`}>
-          <div className={s.cardHeader}>
-            <span className={s.cardIcon}>⚠️</span>
-            <h3 className={s.cardTitle}>使用限制与免责声明</h3>
+        <div className="rounded-lg bg-paper-100 p-5 shadow-card lg:col-span-2">
+          <div className="mb-3 flex items-center gap-2">
+            <span aria-hidden className="text-[16px]">⚠️</span>
+            <h3 className="font-serif text-[15px] font-semibold text-ink-900">使用限制与免责声明</h3>
           </div>
-          <ul className={s.warningList}>
+          <ul className="m-0 grid grid-cols-1 gap-2 pl-0 sm:grid-cols-2">
             {LIMITATIONS.map((item) => (
-              <li key={item} className={s.warningItem}>
-                <span className={s.warningIcon}>▸</span>
+              <li key={item} className="flex list-none items-start gap-2 text-[12px] leading-relaxed text-ink-700">
+                <span aria-hidden className="mt-0.5 shrink-0 text-[10px] text-gold-600">▸</span>
                 <span>{item}</span>
               </li>
             ))}

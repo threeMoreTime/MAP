@@ -5,6 +5,41 @@ import type { QualityReportCity } from '../types/metro';
 
 type GroupKey = 'no_stats' | 'no_daily_ridership' | 'no_network_map' | 'no_plan_map' | 'cover_fallback';
 
+const LEVEL_STYLE: Record<string, { badge: string; score: string }> = {
+  high: {
+    badge: 'border-jade-600/25 bg-jade-600/10 text-jade-600',
+    score: 'text-jade-600',
+  },
+  medium: {
+    badge: 'border-gold-600/25 bg-gold-600/10 text-gold-600',
+    score: 'text-gold-600',
+  },
+  low: {
+    badge: 'border-ink-400/25 bg-ink-400/10 text-ink-500',
+    score: 'text-ink-500',
+  },
+};
+
+function levelOf(level: string) {
+  return LEVEL_STYLE[level] ?? LEVEL_STYLE.low;
+}
+
+function levelLabel(level: string) {
+  return level === 'high' ? '完整度高' : level === 'medium' ? '完整度中' : '完整度低';
+}
+
+function CheckDot({ ok }: { ok: boolean }) {
+  return (
+    <span
+      className={`inline-flex size-[22px] items-center justify-center rounded-full text-[12px] font-bold ${
+        ok ? 'bg-jade-600/12 text-jade-600' : 'bg-ink-400/10 text-ink-400'
+      }`}
+    >
+      {ok ? '✔' : '–'}
+    </span>
+  );
+}
+
 export default function DataQualityPage() {
   const { qualityReport, loading, error, merged } = useMetroData();
   const [activeGroup, setActiveGroup] = useState<GroupKey>('no_stats');
@@ -20,19 +55,10 @@ export default function DataQualityPage() {
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '60vh', display: 'flex', flexDirection: 'column',
-        justifyContent: 'center', alignItems: 'center', color: '#00d4ff'
-      }}>
-        <div className="loading-spinner" style={{
-          width: 40, height: 40, border: '3px solid rgba(0,212,255,0.1)',
-          borderTop: '3px solid #00d4ff', borderRadius: '50%',
-          animation: 'spin 1s linear infinite', marginBottom: 16
-        }} />
-        <div style={{ fontSize: 13, letterSpacing: 1.5 }}>数据质量报告载入中...</div>
-        <style>{`
-          @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        `}</style>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-ink-500">
+        <div className="loading-spinner size-10 rounded-full border-[3px] border-paper-200 border-t-vermilion-500 motion-safe:animate-[spin_1s_linear_infinite]" />
+        <div className="text-[13px]">数据质量报告载入中...</div>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -161,92 +187,79 @@ export default function DataQualityPage() {
   const assetIntegrity = Math.round((summary.network_map_count + summary.plan_map_count + summary.cover_downloaded_count) / (50 * 3) * 100);
 
   return (
-    <div style={{
-      maxWidth: 'var(--max-width)', margin: '0 auto', padding: '24px 16px',
-      color: '#fff', display: 'flex', flexDirection: 'column', gap: 24
-    }}>
-      
+    <div className="mx-auto flex max-w-[1180px] flex-col gap-6 px-4 py-6 text-ink-900 sm:px-6">
+
       {/* 顶部 Hero 区域 */}
-      <header className="card-glass" style={{
-        padding: '28px 24px', border: '1px solid rgba(0,212,255,0.08)',
-        borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 10
-      }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 600, margin: 0, color: '#00d4ff' }}>数据质量中心</h1>
-          <span style={{
-            fontSize: 11, background: 'rgba(0,212,255,0.1)', color: '#00d4ff',
-            padding: '2px 8px', borderRadius: 4, fontWeight: 500, letterSpacing: 0.5
-          }}>
+      <header className="flex flex-col gap-2.5 rounded-lg bg-paper-100 p-5 shadow-card sm:p-7">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="m-0 font-serif text-[22px] font-semibold text-ink-900">数据质量中心</h1>
+          <span className="rounded-sm border border-paper-300 bg-paper-200/60 px-2 py-0.5 text-[11px] font-medium text-ink-500">
             收录完整度大纲
           </span>
         </div>
-        <p style={{ fontSize: 13, color: '#a0aec0', lineHeight: 1.6, margin: 0 }}>
+        <p className="m-0 text-[13px] leading-relaxed text-ink-500">
           本页面展示本可视化项目对全国城市地铁各项统计数据和静态图片资源的<strong>收录完整程度</strong>。此完整度评分仅反映当前开源平台所收集并上线的资源齐备情况，<strong>绝不代表城市实际的地铁运营质量或经济发展水平</strong>。
         </p>
-        <div style={{
-          fontSize: 11, color: '#e53e3e', display: 'flex', alignItems: 'center',
-          gap: 6, padding: '6px 12px', background: 'rgba(229,62,62,0.08)',
-          borderLeft: '3.5px solid #e53e3e', borderRadius: '0 4px 4px 0'
-        }}>
-          💡 <strong>免责声明：</strong> 所有收录数据均为历史公开资料整理快照，非实时官方监测。部分城市被标为“收录完整度低”仅代表项目组暂未收集到相关客流或高清规划图，绝非城市未通地铁。
+        <div className="flex items-start gap-2 rounded-md border border-vermilion-500/20 bg-vermilion-50 px-3 py-2 text-[11px] leading-relaxed text-ink-700">
+          <span aria-hidden>💡</span>
+          <span><strong>免责声明：</strong> 所有收录数据均为历史公开资料整理快照，非实时官方监测。部分城市被标为“收录完整度低”仅代表项目组暂未收集到相关客流或高清规划图，绝非城市未通地铁。</span>
         </div>
         {isFallback && (
-          <div style={{
-            fontSize: 12, color: '#dd6b20', background: 'rgba(221,107,32,0.08)',
-            borderLeft: '3.5px solid #dd6b20', padding: '8px 12px', borderRadius: '0 4px 4px 0', marginTop: 4
-          }}>
-            ⚠️ <strong>降级警示：</strong> 质量报告加载失败（如 data/latest/quality_report.json 暂不存在或损坏）。已为您优雅降级为基于城市基础资源的内存完整度手算，页面功能依然完备，请放心查看。
+          <div className="flex items-start gap-2 rounded-md border border-gold-600/25 bg-gold-600/10 px-3 py-2 text-[12px] leading-relaxed text-ink-700">
+            <span aria-hidden>⚠️</span>
+            <span><strong>降级警示：</strong> 质量报告加载失败（如 data/latest/quality_report.json 暂不存在或损坏）。已为您优雅降级为基于城市基础资源的内存完整度手算，页面功能依然完备，请放心查看。</span>
           </div>
         )}
       </header>
 
       {/* 顶部大纲与质量指标卡片网格 */}
-      <section style={{
-        display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: 16
-      }}>
+      <section
+        className="grid gap-4"
+        style={{ gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)' }}
+      >
         {/* 卡片 1: 基础统计 */}
-        <div className="card-glass" style={{ padding: 18, borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ fontSize: 12, color: '#718096' }}>城市索引与收录统计</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#00d4ff' }}>
-            {summary.stats_city_count} <span style={{ fontSize: 13, fontWeight: 400, color: '#a0aec0' }}>/ {summary.city_count} 城</span>
+        <div className="flex flex-col gap-2 rounded-lg bg-paper-100 p-4 shadow-card">
+          <div className="text-[12px] text-ink-500">城市索引与收录统计</div>
+          <div className="font-serif text-[24px] font-semibold text-ink-900 tabular-nums">
+            {summary.stats_city_count} <span className="text-[13px] font-normal text-ink-400">/ {summary.city_count} 城</span>
           </div>
-          <div style={{ fontSize: 11, color: '#a0aec0', display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className="flex flex-col gap-0.5 text-[11px] text-ink-400">
             <span>• 有日客流展示值: {summary.daily_ridership_display_count} 城</span>
             <span>• 暂无日客流展示值: {summary.no_daily_display_count} 城</span>
           </div>
         </div>
 
         {/* 卡片 2: 图片资源 */}
-        <div className="card-glass" style={{ padding: 18, borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ fontSize: 12, color: '#718096' }}>图片及大图收录</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#00d4ff' }}>
-            {summary.network_map_count + summary.plan_map_count} <span style={{ fontSize: 13, fontWeight: 400, color: '#a0aec0' }}>/ 100 张</span>
+        <div className="flex flex-col gap-2 rounded-lg bg-paper-100 p-4 shadow-card">
+          <div className="text-[12px] text-ink-500">图片及大图收录</div>
+          <div className="font-serif text-[24px] font-semibold text-ink-900 tabular-nums">
+            {summary.network_map_count + summary.plan_map_count} <span className="text-[13px] font-normal text-ink-400">/ 100 张</span>
           </div>
-          <div style={{ fontSize: 11, color: '#a0aec0', display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className="flex flex-col gap-0.5 text-[11px] text-ink-400">
             <span>• 运营图收录: {summary.network_map_count} 城 (缺 {summary.city_count - summary.network_map_count})</span>
             <span>• 规划图收录: {summary.plan_map_count} 城 (缺 {summary.city_count - summary.plan_map_count})</span>
           </div>
         </div>
 
         {/* 卡片 3: 封面覆盖 */}
-        <div className="card-glass" style={{ padding: 18, borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ fontSize: 12, color: '#718096' }}>实景封面版权图</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#00d4ff' }}>
-            {summary.cover_downloaded_count} <span style={{ fontSize: 13, fontWeight: 400, color: '#a0aec0' }}>/ {summary.city_count} 城</span>
+        <div className="flex flex-col gap-2 rounded-lg bg-paper-100 p-4 shadow-card">
+          <div className="text-[12px] text-ink-500">实景封面版权图</div>
+          <div className="font-serif text-[24px] font-semibold text-ink-900 tabular-nums">
+            {summary.cover_downloaded_count} <span className="text-[13px] font-normal text-ink-400">/ {summary.city_count} 城</span>
           </div>
-          <div style={{ fontSize: 11, color: '#a0aec0', display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className="flex flex-col gap-0.5 text-[11px] text-ink-400">
             <span>• 真实封面下载: {summary.cover_downloaded_count} 城</span>
             <span>• fallback 降级封面: {summary.cover_fallback_count} 城</span>
           </div>
         </div>
 
         {/* 卡片 4: 平均分与等级 */}
-        <div className="card-glass" style={{ padding: 18, borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <div style={{ fontSize: 12, color: '#718096' }}>平均完整度评分</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#38a169' }}>
-            {avgScore} <span style={{ fontSize: 12, color: '#718096', fontWeight: 400 }}>/ 100 分</span>
+        <div className="flex flex-col gap-2 rounded-lg bg-paper-100 p-4 shadow-card">
+          <div className="text-[12px] text-ink-500">平均完整度评分</div>
+          <div className="font-serif text-[24px] font-semibold text-jade-600 tabular-nums">
+            {avgScore} <span className="text-[12px] font-normal text-ink-400">/ 100 分</span>
           </div>
-          <div style={{ fontSize: 11, color: '#a0aec0', display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <div className="flex flex-col gap-0.5 text-[11px] text-ink-400">
             <span>• 完整度高: {summary.high_quality_count} 城</span>
             <span>• 完整度中: {summary.medium_quality_count} 城</span>
             <span>• 完整度低: {summary.low_quality_count} 城</span>
@@ -255,44 +268,42 @@ export default function DataQualityPage() {
       </section>
 
       {/* 总体完整度占比条 */}
-      <section className="card-glass" style={{ padding: 18, borderRadius: 10, display: 'flex', flexWrap: 'wrap', gap: 24 }}>
-        <div style={{ flex: 1, minWidth: 200, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-            <span style={{ color: '#718096' }}>数据收录完整度 (stats + 客流量)</span>
-            <span style={{ color: '#00d4ff', fontWeight: 600 }}>{dataIntegrity}%</span>
+      <section className="flex flex-wrap gap-6 rounded-lg bg-paper-100 p-4 shadow-card">
+        <div className="flex min-w-[200px] flex-1 flex-col gap-1.5">
+          <div className="flex justify-between text-[12px]">
+            <span className="text-ink-500">数据收录完整度 (stats + 客流量)</span>
+            <span className="font-semibold text-ink-900 tabular-nums">{dataIntegrity}%</span>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.05)', height: 6, borderRadius: 3 }}>
-            <div style={{ background: '#00d4ff', width: `${dataIntegrity}%`, height: '100%', borderRadius: 3 }} />
+          <div className="h-1.5 overflow-hidden rounded-full bg-paper-200">
+            <div className="h-full rounded-full bg-vermilion-500" style={{ width: `${dataIntegrity}%` }} />
           </div>
         </div>
-        <div style={{ flex: 1, minWidth: 200, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-            <span style={{ color: '#718096' }}>大图资源覆盖度 (运营+规划+封面)</span>
-            <span style={{ color: '#38a169', fontWeight: 600 }}>{assetIntegrity}%</span>
+        <div className="flex min-w-[200px] flex-1 flex-col gap-1.5">
+          <div className="flex justify-between text-[12px]">
+            <span className="text-ink-500">大图资源覆盖度 (运营+规划+封面)</span>
+            <span className="font-semibold text-jade-600 tabular-nums">{assetIntegrity}%</span>
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.05)', height: 6, borderRadius: 3 }}>
-            <div style={{ background: '#38a169', width: `${assetIntegrity}%`, height: '100%', borderRadius: 3 }} />
+          <div className="h-1.5 overflow-hidden rounded-full bg-paper-200">
+            <div className="h-full rounded-full bg-jade-600" style={{ width: `${assetIntegrity}%` }} />
           </div>
         </div>
       </section>
 
       {/* 资源缺失城市快速索引网格 */}
-      <section className="card-glass" style={{ padding: 20, borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ fontSize: 15, fontWeight: 600, color: '#00d4ff' }}>缺失资源城市快速索引</div>
-        
+      <section className="flex flex-col gap-3.5 rounded-lg bg-paper-100 p-5 shadow-card">
+        <div className="font-serif text-[15px] font-semibold text-ink-900">缺失资源城市快速索引</div>
+
         {/* 分组切换选项卡 */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, background: 'rgba(255,255,255,0.02)', padding: 4, borderRadius: 6 }}>
+        <div className="flex flex-wrap gap-1 rounded-md bg-paper-50 p-1">
           {(Object.keys(groups) as GroupKey[]).map((key) => (
             <button
               key={key}
               onClick={() => setActiveGroup(key)}
-              style={{
-                border: 'none',
-                background: activeGroup === key ? 'rgba(0,212,255,0.1)' : 'transparent',
-                color: activeGroup === key ? '#00d4ff' : '#718096',
-                fontSize: 12, padding: '6px 12px', borderRadius: 4,
-                cursor: 'pointer', transition: 'all 0.3s', fontWeight: activeGroup === key ? 600 : 400
-              }}
+              className={`cursor-pointer rounded-sm px-3 py-1.5 text-[12px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
+                activeGroup === key
+                  ? 'bg-vermilion-500 font-semibold text-paper-50'
+                  : 'text-ink-500 hover:text-ink-900'
+              }`}
             >
               {groups[key].title} ({groups[key].count})
             </button>
@@ -300,11 +311,9 @@ export default function DataQualityPage() {
         </div>
 
         {/* 城市胶囊标签网格 */}
-        <div style={{
-          display: 'flex', flexWrap: 'wrap', gap: 8, padding: '8px 0', minHeight: 60
-        }}>
+        <div className="flex min-h-[60px] flex-wrap gap-2 py-2">
           {groups[activeGroup].cities.length === 0 ? (
-            <div style={{ fontSize: 12, color: '#718096', width: '100%', textAlign: 'center', padding: '16px 0' }}>
+            <div className="w-full py-4 text-center text-[12px] text-ink-400">
               🎉 完美对齐！当前组下没有任何缺失城市的资源。
             </div>
           ) : (
@@ -312,47 +321,28 @@ export default function DataQualityPage() {
               <Link
                 key={c.city}
                 to={`/city/${c.city}`}
-                className="city-capsule"
-                style={{
-                  textDecoration: 'none', color: '#a0aec0', fontSize: 12,
-                  padding: '4px 10px', background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16,
-                  transition: 'all 0.25s', display: 'inline-flex', alignItems: 'center', gap: 4
-                }}
+                className="city-capsule inline-flex items-center gap-1.5 rounded-full border border-paper-300 bg-paper-50 px-2.5 py-1 text-[12px] text-ink-700 transition-colors duration-200 hover:border-vermilion-500/40 hover:bg-vermilion-50 hover:text-vermilion-600"
               >
-                {c.city_cn} <span style={{ fontSize: 10, color: '#4a5568' }}>{c.city}</span>
+                {c.city_cn} <span className="text-[10px] text-ink-400">{c.city}</span>
               </Link>
             ))
           )}
         </div>
-        <style>{`
-          .city-capsule:hover {
-            color: #00d4ff !important;
-            border-color: rgba(0,212,255,0.24) !important;
-            background: rgba(0,212,255,0.04) !important;
-            transform: translateY(-1.5px);
-          }
-        `}</style>
       </section>
 
       {/* 50 城市大列表与精细化检索 */}
-      <section className="card-glass" style={{
-        padding: '24px 20px', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 16
-      }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: '#00d4ff' }}>城市收录完整度检索大表</div>
-          <span style={{ fontSize: 11, color: '#718096' }}>
+      <section className="flex flex-col gap-4 rounded-lg bg-paper-100 p-5 shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="font-serif text-[15px] font-semibold text-ink-900">城市收录完整度检索大表</div>
+          <span className="text-[11px] text-ink-400 tabular-nums">
             已过滤显示 {filteredCities.length} / 50 个城市
           </span>
         </div>
 
         {/* 筛选与搜索工具栏 */}
-        <div style={{
-          display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center',
-          borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: 16
-        }}>
+        <div className="flex flex-wrap items-center gap-3 border-b border-paper-300 pb-4">
           {/* 筛选胶囊组 */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, flex: 1, minWidth: 280 }}>
+          <div className="flex min-w-[280px] flex-1 flex-wrap gap-1.5">
             {[
               { id: 'all', label: '全部' },
               { id: 'high', label: '完整度高 (评分≥85)' },
@@ -365,13 +355,11 @@ export default function DataQualityPage() {
               <button
                 key={t.id}
                 onClick={() => setFilterTag(t.id)}
-                style={{
-                  border: 'none',
-                  background: filterTag === t.id ? '#00d4ff' : 'rgba(255,255,255,0.03)',
-                  color: filterTag === t.id ? '#060e1a' : '#a0aec0',
-                  fontSize: 11, padding: '4px 10px', borderRadius: 16,
-                  cursor: 'pointer', transition: 'all 0.3s', fontWeight: filterTag === t.id ? 600 : 400
-                }}
+                className={`cursor-pointer rounded-full border px-2.5 py-1 text-[11px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
+                  filterTag === t.id
+                    ? 'border-vermilion-500 bg-vermilion-500 font-semibold text-paper-50'
+                    : 'border-paper-300 bg-paper-50 text-ink-500 hover:text-ink-900'
+                }`}
               >
                 {t.label}
               </button>
@@ -379,26 +367,19 @@ export default function DataQualityPage() {
           </div>
 
           {/* 搜索框 */}
-          <div style={{ position: 'relative', width: isMobile ? '100%' : 200 }}>
+          <div className="relative" style={{ width: isMobile ? '100%' : 200 }}>
             <input
               type="text"
               placeholder="搜索城市拼音或中文..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                width: '100%', background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)', borderRadius: 6,
-                padding: '6px 12px', fontSize: 12, color: '#fff', outline: 'none',
-                boxSizing: 'border-box'
-              }}
+              className="h-9 w-full rounded-sm border border-paper-300 bg-paper-50 px-3 pr-8 text-[12px] text-ink-900 placeholder-ink-300 focus:border-vermilion-500 focus:outline-none"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                style={{
-                  position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
-                  border: 'none', background: 'transparent', color: '#718096', cursor: 'pointer', fontSize: 12
-                }}
+                aria-label="清空搜索"
+                className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-[12px] text-ink-400 hover:text-ink-700"
               >
                 ✕
               </button>
@@ -408,198 +389,123 @@ export default function DataQualityPage() {
 
         {/* 核心城市列表渲染 - 移动端自适应转换 */}
         {filteredCities.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#718096', fontSize: 13 }}>
+          <div className="py-10 text-center text-[13px] text-ink-400">
             🔍 未搜索到符合筛选条件的城市。
           </div>
         ) : isMobile ? (
           /* 📱 移动端自适应垂直卡片列表，无溢出 */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {filteredCities.map((c) => (
-              <div key={c.city} className="card-glass" style={{
-                padding: 14, borderRadius: 8, border: '1px solid rgba(255,255,255,0.04)',
-                display: 'flex', flexDirection: 'column', gap: 8
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Link to={`/city/${c.city}`} style={{ textDecoration: 'none', color: '#00d4ff', fontWeight: 600, fontSize: 14 }}>
-                    {c.city_cn} <span style={{ fontSize: 11, color: '#718096', fontWeight: 400 }}>{c.city}</span>
-                  </Link>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{
-                      fontSize: 13, fontWeight: 700,
-                      color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#94a3b8')
-                    }}>
-                      {c.quality_score}分
-                    </span>
-                    <span style={{
-                      fontSize: 11, padding: '2px 7px', borderRadius: 20, fontWeight: 500,
-                      background: c.quality_level === 'high' ? 'rgba(52,211,153,0.12)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.12)' : 'rgba(100,116,139,0.10)'),
-                      color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#94a3b8'),
-                      border: `1px solid ${c.quality_level === 'high' ? 'rgba(52,211,153,0.20)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.20)' : 'rgba(100,116,139,0.18)')}`
-                    }}>
-                      {c.quality_level === 'high' ? '完整度高' : (c.quality_level === 'medium' ? '完整度中' : '完整度低')}
-                    </span>
+          <div className="flex flex-col gap-3">
+            {filteredCities.map((c) => {
+              const tone = levelOf(c.quality_level);
+              return (
+                <div key={c.city} className="flex flex-col gap-2 rounded-md border border-paper-200 bg-paper-50 p-3.5">
+                  <div className="flex items-center justify-between">
+                    <Link to={`/city/${c.city}`} className="text-[14px] font-semibold text-vermilion-600">
+                      {c.city_cn} <span className="text-[11px] font-normal text-ink-400">{c.city}</span>
+                    </Link>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-[13px] font-bold tabular-nums ${tone.score}`}>
+                        {c.quality_score}分
+                      </span>
+                      <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${tone.badge}`}>
+                        {levelLabel(c.quality_level)}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                {/* 资源状态小表格 */}
-                <div style={{
-                  display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8,
-                  background: 'rgba(0,0,0,0.12)', padding: 8, borderRadius: 6, fontSize: 13
-                }}>
-                  <div style={{ color: c.has_stats ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_stats ? '✔' : '–'}</span> 统计记录
+                  {/* 资源状态小表格 */}
+                  <div className="grid grid-cols-3 gap-2 rounded-md bg-paper-100 p-2 text-[12px]">
+                    {[
+                      { ok: c.has_stats, label: '统计记录' },
+                      { ok: c.has_daily_ridership, label: '日客流' },
+                      { ok: c.has_yearly_trend, label: '年趋势' },
+                      { ok: c.has_network_map, label: '线路图' },
+                      { ok: c.has_plan_map, label: '规划图' },
+                      { ok: c.cover_status === 'downloaded', label: '封面图' },
+                    ].map((r) => (
+                      <div
+                        key={r.label}
+                        className={`flex items-center justify-center gap-1 text-center ${r.ok ? 'text-jade-600' : 'text-ink-400'}`}
+                      >
+                        <span className="font-bold">{r.ok ? '✔' : '–'}</span> {r.label}
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ color: c.has_daily_ridership ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_daily_ridership ? '✔' : '–'}</span> 日客流
-                  </div>
-                  <div style={{ color: c.has_yearly_trend ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_yearly_trend ? '✔' : '–'}</span> 年趋势
-                  </div>
-                  <div style={{ color: c.has_network_map ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_network_map ? '✔' : '–'}</span> 线路图
-                  </div>
-                  <div style={{ color: c.has_plan_map ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.has_plan_map ? '✔' : '–'}</span> 规划图
-                  </div>
-                  <div style={{ color: c.cover_status === 'downloaded' ? '#34d399' : '#64748b', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
-                    <span style={{ fontWeight: 700 }}>{c.cover_status === 'downloaded' ? '✔' : '–'}</span> 封面图
-                  </div>
-                </div>
 
-                {/* 缺失项目与警示说明 */}
-                {c.missing_items.length > 0 && (
-                  <div style={{ fontSize: 10, color: '#a0aec0' }}>
-                    <strong>收录缺失:</strong> {c.missing_items.join(', ')}
-                  </div>
-                )}
-                {c.risk_flags.length > 0 && (
-                  <div style={{ fontSize: 10, color: '#dd6b20' }}>
-                    <strong>警告:</strong> {c.risk_flags.join(', ')}
-                  </div>
-                )}
-              </div>
-            ))}
+                  {/* 缺失项目与警示说明 */}
+                  {c.missing_items.length > 0 && (
+                    <div className="text-[10px] text-ink-400">
+                      <strong>收录缺失:</strong> {c.missing_items.join(', ')}
+                    </div>
+                  )}
+                  {c.risk_flags.length > 0 && (
+                    <div className="text-[10px] text-gold-600">
+                      <strong>警告:</strong> {c.risk_flags.join(', ')}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ) : (
-          /* 🖥️ 桌面端科技风毛玻璃大表格 */
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{
-              width: '100%', borderCollapse: 'collapse', fontSize: 12,
-              textAlign: 'left', minWidth: 700
-            }}>
+          /* 🖥️ 桌面端纸墨大表格 */
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[700px] border-collapse text-left text-[12px]">
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(34, 211, 238, 0.10)', color: '#94a3b8' }}>
-                  <th style={{ padding: '12px 10px', fontWeight: 500 }}>城市</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>完整度分</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>完整度评级</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>有无统计</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>有客流值</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>客流趋势</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>线路图</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>规划图</th>
-                  <th style={{ padding: '12px 10px', textAlign: 'center', fontWeight: 500 }}>高清封面</th>
-                  <th style={{ padding: '12px 10px', fontWeight: 500 }}>收录缺失项</th>
+                <tr className="border-b border-paper-300 text-ink-500">
+                  <th className="px-2.5 py-3 font-medium">城市</th>
+                  <th className="px-2.5 py-3 text-center font-medium">完整度分</th>
+                  <th className="px-2.5 py-3 text-center font-medium">完整度评级</th>
+                  <th className="px-2.5 py-3 text-center font-medium">有无统计</th>
+                  <th className="px-2.5 py-3 text-center font-medium">有客流值</th>
+                  <th className="px-2.5 py-3 text-center font-medium">客流趋势</th>
+                  <th className="px-2.5 py-3 text-center font-medium">线路图</th>
+                  <th className="px-2.5 py-3 text-center font-medium">规划图</th>
+                  <th className="px-2.5 py-3 text-center font-medium">高清封面</th>
+                  <th className="px-2.5 py-3 font-medium">收录缺失项</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredCities.map((c) => (
-                  <tr
-                    key={c.city}
-                    className="table-row-hover"
-                    style={{
-                      borderBottom: '1px solid rgba(255,255,255,0.03)',
-                      transition: 'background 0.25s'
-                    }}
-                  >
-                    <td style={{ padding: '14px 10px' }}>
-                      <Link to={`/city/${c.city}`} style={{ textDecoration: 'none', color: '#22d3ee', fontWeight: 600 }}>
-                        {c.city_cn} <span style={{ fontSize: 11, color: '#64748b', fontWeight: 400 }}>{c.city}</span>
-                      </Link>
-                    </td>
-                    <td style={{ padding: '14px 10px', textAlign: 'center', fontWeight: 700 }}>
-                      <span style={{
-                        color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#94a3b8')
-                      }}>
-                        {c.quality_score}
-                      </span>
-                    </td>
-                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
-                      <span style={{
-                        fontSize: 11, padding: '3px 9px', borderRadius: 20,
-                        fontWeight: 500,
-                        background: c.quality_level === 'high' ? 'rgba(52,211,153,0.12)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.12)' : 'rgba(100,116,139,0.10)'),
-                        color: c.quality_level === 'high' ? '#34d399' : (c.quality_level === 'medium' ? '#fbbf24' : '#94a3b8'),
-                        border: `1px solid ${c.quality_level === 'high' ? 'rgba(52,211,153,0.20)' : (c.quality_level === 'medium' ? 'rgba(251,191,36,0.20)' : 'rgba(100,116,139,0.18)')}`
-                      }}>
-                        {c.quality_level === 'high' ? '完整度高' : (c.quality_level === 'medium' ? '完整度中' : '完整度低')}
-                      </span>
-                    </td>
-                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
-                        background: c.has_stats ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
-                        color: c.has_stats ? '#34d399' : '#64748b'
-                      }}>{c.has_stats ? '✔' : '–'}</span>
-                    </td>
-                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
-                        background: c.has_daily_ridership ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
-                        color: c.has_daily_ridership ? '#34d399' : '#64748b'
-                      }}>{c.has_daily_ridership ? '✔' : '–'}</span>
-                    </td>
-                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
-                        background: c.has_yearly_trend ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
-                        color: c.has_yearly_trend ? '#34d399' : '#64748b'
-                      }}>{c.has_yearly_trend ? '✔' : '–'}</span>
-                    </td>
-                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
-                        background: c.has_network_map ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
-                        color: c.has_network_map ? '#34d399' : '#64748b'
-                      }}>{c.has_network_map ? '✔' : '–'}</span>
-                    </td>
-                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
-                        background: c.has_plan_map ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
-                        color: c.has_plan_map ? '#34d399' : '#64748b'
-                      }}>{c.has_plan_map ? '✔' : '–'}</span>
-                    </td>
-                    <td style={{ padding: '14px 10px', textAlign: 'center' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: 22, height: 22, borderRadius: '50%', fontSize: 12, fontWeight: 700,
-                        background: c.cover_status === 'downloaded' ? 'rgba(52,211,153,0.12)' : 'rgba(100,116,139,0.10)',
-                        color: c.cover_status === 'downloaded' ? '#34d399' : '#64748b'
-                      }}>{c.cover_status === 'downloaded' ? '✔' : '–'}</span>
-                    </td>
-                    <td style={{ padding: '14px 10px', color: '#94a3b8', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {c.missing_items.length === 0 ? (
-                        <span style={{ color: '#475569' }}>—</span>
-                      ) : (
-                        <span title={c.missing_items.join(', ')} style={{ fontSize: 12 }}>
-                          {c.missing_items.join(', ')}
+                {filteredCities.map((c) => {
+                  const tone = levelOf(c.quality_level);
+                  return (
+                    <tr
+                      key={c.city}
+                      className="border-b border-[rgba(33,29,22,0.06)] transition-colors duration-200 hover:bg-paper-200/50"
+                    >
+                      <td className="px-2.5 py-3">
+                        <Link to={`/city/${c.city}`} className="font-semibold text-vermilion-600 hover:text-vermilion-700">
+                          {c.city_cn} <span className="text-[11px] font-normal text-ink-400">{c.city}</span>
+                        </Link>
+                      </td>
+                      <td className="px-2.5 py-3 text-center font-bold tabular-nums">
+                        <span className={tone.score}>{c.quality_score}</span>
+                      </td>
+                      <td className="px-2.5 py-3 text-center">
+                        <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${tone.badge}`}>
+                          {levelLabel(c.quality_level)}
                         </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-2.5 py-3 text-center"><CheckDot ok={c.has_stats} /></td>
+                      <td className="px-2.5 py-3 text-center"><CheckDot ok={c.has_daily_ridership} /></td>
+                      <td className="px-2.5 py-3 text-center"><CheckDot ok={c.has_yearly_trend} /></td>
+                      <td className="px-2.5 py-3 text-center"><CheckDot ok={c.has_network_map} /></td>
+                      <td className="px-2.5 py-3 text-center"><CheckDot ok={c.has_plan_map} /></td>
+                      <td className="px-2.5 py-3 text-center"><CheckDot ok={c.cover_status === 'downloaded'} /></td>
+                      <td className="max-w-[180px] truncate px-2.5 py-3 text-ink-400">
+                        {c.missing_items.length === 0 ? (
+                          <span className="text-ink-300">—</span>
+                        ) : (
+                          <span title={c.missing_items.join(', ')} className="text-[12px]">
+                            {c.missing_items.join(', ')}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
-            <style>{`
-              .table-row-hover:hover {
-                background: rgba(34, 211, 238, 0.025) !important;
-              }
-            `}</style>
           </div>
         )}
       </section>
