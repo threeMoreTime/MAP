@@ -7,7 +7,6 @@ import CityAssetPreview from '../components/city/CityAssetPreview';
 import CitySourceInfo from '../components/city/CitySourceInfo';
 import EmptyState from '../components/common/EmptyState';
 import CityDataCompleteness from '../components/city/CityDataCompleteness';
-import styles from './CityDetailPage.module.css';
 
 const CITY_DESCRIPTIONS: Record<string, string> = {
   beijing: '首都轨道交通网络，全国规模最大的地铁系统',
@@ -132,24 +131,27 @@ function CityDataNote({ city }: { city: MergedCity }) {
   const hasValidRidership = city.daily_ridership_wan > 0;
 
   return (
-    <div className={styles.noteCard}>
+    <div className="rounded-lg bg-paper-100 shadow-card">
       <button
-        className={styles.noteToggle}
+        className="flex w-full cursor-pointer items-center justify-between px-4 py-3 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-vermilion-500"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
-        <span>数据说明</span>
-        <span className={`${styles.noteArrow} ${open ? styles.noteArrowOpen : ''}`}>▾</span>
+        <span className="font-serif text-[14px] font-semibold text-ink-900">数据说明</span>
+        <span
+          aria-hidden
+          className={`text-[12px] text-ink-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        >▾</span>
       </button>
       {open && (
-        <div className={styles.noteContent}>
-          <ul>
+        <div className="border-t border-paper-300 px-4 py-3">
+          <ul className="ml-5 list-disc space-y-1.5 text-[13px] leading-relaxed text-ink-700">
             <li>日客流量数据来源于公开数据页面，统计口径可能因城市与来源页面不同存在差异。</li>
             <li>客流强度 = 日客流量 / 运营里程，用于粗略比较单位里程承载客流能力。</li>
             <li>峰值客流为该城市历史最高单日客流量记录，具体口径以数据来源页面为准。</li>
           </ul>
           {!hasValidRidership && (
-            <div className={styles.noteWarning}>
+            <div className="mt-2.5 rounded-sm border border-gold-600/25 bg-gold-600/10 px-3 py-2 text-[12px] text-gold-600">
               该城市暂无当日客流统计数据，页面仅展示基础运营信息和资源状态。
             </div>
           )}
@@ -183,7 +185,7 @@ export default function CityDetailPage() {
 
   if (!city) {
     return (
-      <div className="page-container city-detail-page">
+      <div className="city-detail-page mx-auto w-full max-w-[1180px] px-4 py-8 sm:px-6">
         <EmptyState icon="🔍" title="未找到城市" description={`未找到城市 "${id}" 的数据`} />
       </div>
     );
@@ -198,144 +200,118 @@ export default function CityDetailPage() {
   const currentMapType = hasNetworkMap ? '线路图' : hasPlanMap ? '规划图' : null;
   const currentMapPath = hasNetworkMap ? city.network_map_path : hasPlanMap ? city.plan_map_path : null;
 
+  const pillBase = 'rounded-full border px-2.5 py-0.5 text-[11px]';
+
   return (
-    <div className={styles.detailPage}>
+    <div className="mx-auto w-full max-w-[1180px] px-4 pb-8 sm:px-6">
       {/* Breadcrumb */}
-      <nav className={styles.breadcrumb}>
-        <Link to="/">首页</Link>
-        <span className={styles.breadcrumbSep}>/</span>
-        <Link to="/cities">城市资源</Link>
-        <span className={styles.breadcrumbSep}>/</span>
-        <span className={styles.breadcrumbCurrent}>{city.city_cn}地铁</span>
+      <nav className="flex items-center gap-2 py-4 text-[12px] text-ink-500" aria-label="面包屑">
+        <Link to="/" className="hover:text-vermilion-500">首页</Link>
+        <span aria-hidden className="text-ink-300">/</span>
+        <Link to="/cities" className="hover:text-vermilion-500">城市资源</Link>
+        <span aria-hidden className="text-ink-300">/</span>
+        <span className="text-ink-900">{city.city_cn}地铁</span>
       </nav>
 
       {/* Hero Section */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>{city.city_cn}地铁</h1>
-          <p className={styles.heroEn}>{cityEn} Metro</p>
-          <p className={styles.heroDesc}>{cityDesc}</p>
-          <div className={styles.heroPills}>
-            <span className={`${styles.pill} ${styles.pillOperating}`}>运营中</span>
-            <span className={`${styles.pill} ${styles.pillLines}`}>
+      <section className="rounded-lg bg-paper-100 px-5 py-6 shadow-card sm:px-7">
+        <div>
+          <h1 className="font-serif text-[26px] font-semibold text-ink-900">{city.city_cn}地铁</h1>
+          <p className="mt-0.5 text-[12px] tracking-[0.08em] text-ink-400">{cityEn} Metro</p>
+          <p className="mt-2 text-[13px] text-ink-500">{cityDesc}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className={`${pillBase} border-jade-600/25 bg-jade-600/10 text-jade-600`}>运营中</span>
+            <span className={`${pillBase} border-paper-300 bg-paper-50 text-ink-700 tabular-nums`}>
               {city.operating_lines} 条线路
             </span>
-            <span className={`${styles.pill} ${styles.pillData}`}>
+            <span className={`${pillBase} border-paper-300 bg-paper-50 text-ink-700 tabular-nums`}>
               {city.operating_stations} 座站点
             </span>
             {hasRidership ? (
-              <span className={`${styles.pill} ${styles.pillData}`}>有客流数据</span>
+              <span className={`${pillBase} border-paper-300 bg-paper-50 text-ink-700`}>有客流数据</span>
             ) : (
-              <span className={`${styles.pill} ${styles.pillWarning}`}>暂无客流</span>
+              <span className={`${pillBase} border-gold-600/25 bg-gold-600/10 text-gold-600`}>暂无客流</span>
             )}
           </div>
         </div>
       </section>
 
       {/* 6 Metrics Cards */}
-      <section className={styles.metricsGrid} data-testid="metrics-grid">
-        <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>🛤️</span>
-          <div className={styles.metricValue}>
-            {city.operating_lines}<span className={styles.metricUnit}>条</span>
+      <section className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6" data-testid="metrics-grid">
+        {[
+          { icon: '🛤️', value: city.operating_lines, unit: '条', label: '运营线路', show: true },
+          { icon: '🏪', value: city.operating_stations, unit: '座', label: '运营站点', show: true },
+          { icon: '📏', value: city.operating_mileage_km, unit: '公里', label: '运营里程', show: true },
+          { icon: '👥', value: formatDaily(city), unit: '万人次', label: '日客流量', show: hasRidership },
+          { icon: '📊', value: formatIntensity(city), unit: '', label: '客流强度', show: true },
+          { icon: '📈', value: formatPeak(city), unit: '万人次', label: '峰值客流', show: city.peak_ridership_wan > 0 },
+        ].map((m) => (
+          <div key={m.label} className="flex flex-col items-center justify-center gap-1 rounded-lg bg-paper-100 px-3 py-4 text-center shadow-card">
+            <span aria-hidden className="text-[18px] leading-none opacity-80">{m.icon}</span>
+            <div className="font-serif text-[24px] font-semibold leading-tight text-ink-900 tabular-nums">
+              {m.value}{m.show && m.unit && <span className="ml-0.5 text-[11px] font-normal text-ink-400">{m.unit}</span>}
+            </div>
+            <div className="text-[11px] text-ink-500">{m.label}</div>
           </div>
-          <div className={styles.metricLabel}>运营线路</div>
-        </div>
-        <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>🏪</span>
-          <div className={styles.metricValue}>
-            {city.operating_stations}<span className={styles.metricUnit}>座</span>
-          </div>
-          <div className={styles.metricLabel}>运营站点</div>
-        </div>
-        <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>📏</span>
-          <div className={styles.metricValue}>
-            {city.operating_mileage_km}<span className={styles.metricUnit}>公里</span>
-          </div>
-          <div className={styles.metricLabel}>运营里程</div>
-        </div>
-        <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>👥</span>
-          <div className={styles.metricValue}>
-            {formatDaily(city)}
-            {hasRidership && <span className={styles.metricUnit}>万人次</span>}
-          </div>
-          <div className={styles.metricLabel}>日客流量</div>
-        </div>
-        <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>📊</span>
-          <div className={styles.metricValue}>{formatIntensity(city)}</div>
-          <div className={styles.metricLabel}>客流强度</div>
-        </div>
-        <div className={styles.metricCard}>
-          <span className={styles.metricIcon}>📈</span>
-          <div className={styles.metricValue}>
-            {formatPeak(city)}
-            {city.peak_ridership_wan > 0 && <span className={styles.metricUnit}>万人次</span>}
-          </div>
-          <div className={styles.metricLabel}>峰值客流</div>
-        </div>
+        ))}
       </section>
 
       {/* Main Content — 2 Column */}
-      <section className={styles.mainContent}>
+      <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
         {/* Left: Map Viewer */}
-        <div className={styles.mapSection}>
-          <h2 className={styles.mapSectionTitle}>线路网络</h2>
+        <div className="min-w-0">
+          <h2 className="mb-2.5 border-b border-paper-300 pb-2 font-serif text-lg font-semibold text-ink-900">线路网络</h2>
           <CityAssetPreview city={city} />
         </div>
 
         {/* Right: Info Panel */}
-        <div className={styles.infoPanel}>
+        <div className="flex min-w-0 flex-col gap-4">
           {/* Resource Status */}
           <CityDataCompleteness city={city} />
 
           {/* Usage Tips */}
-          <div className={styles.infoCard} data-testid="usage-tips">
-            <h4 className={styles.infoCardTitle}>使用提示</h4>
-            <div className={styles.tipItem}>
-              <span className={styles.tipKey}>滚轮</span>
-              <span>以当前图中心缩放</span>
-            </div>
-            <div className={styles.tipItem}>
-              <span className={styles.tipKey}>拖拽</span>
-              <span>按住左键移动地图</span>
-            </div>
-            <div className={styles.tipItem}>
-              <span className={styles.tipKey}>单击</span>
-              <span>放大一档</span>
-            </div>
-            <div className={styles.tipItem}>
-              <span className={styles.tipKey}>全屏</span>
-              <span>获得更大查看区域</span>
-            </div>
+          <div className="rounded-lg bg-paper-100 p-4 shadow-card" data-testid="usage-tips">
+            <h4 className="mb-2.5 font-serif text-[14px] font-semibold text-ink-900">使用提示</h4>
+            {[
+              ['滚轮', '以当前图中心缩放'],
+              ['拖拽', '按住左键移动地图'],
+              ['单击', '放大一档'],
+              ['全屏', '获得更大查看区域'],
+            ].map(([k, v]) => (
+              <div key={k} className="flex items-center gap-2.5 py-1 text-[12px] text-ink-700">
+                <span className="rounded-sm border border-paper-300 bg-paper-50 px-1.5 py-0.5 font-medium text-ink-900">{k}</span>
+                <span>{v}</span>
+              </div>
+            ))}
           </div>
 
           {/* Current Resource Info */}
-          <div className={styles.infoCard} data-testid="current-resource-info">
-            <h4 className={styles.infoCardTitle}>当前资源信息</h4>
-            <div className={styles.infoRow}>
-              <span className={styles.infoField}>图名</span>
-              <span className={styles.infoValue}>
+          <div className="rounded-lg bg-paper-100 p-4 shadow-card" data-testid="current-resource-info">
+            <h4 className="mb-2.5 font-serif text-[14px] font-semibold text-ink-900">当前资源信息</h4>
+            <div className="flex justify-between gap-3 border-b border-[rgba(33,29,22,0.06)] py-2 text-[12px]">
+              <span className="shrink-0 text-ink-500">图名</span>
+              <span className="text-right text-ink-900">
                 {currentMapType ? `${city.city_cn}地铁${currentMapType}` : '--'}
               </span>
             </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoField}>类型</span>
-              <span className={styles.infoValue}>{currentMapType || '--'}</span>
+            <div className="flex justify-between gap-3 border-b border-[rgba(33,29,22,0.06)] py-2 text-[12px]">
+              <span className="shrink-0 text-ink-500">类型</span>
+              <span className="text-right text-ink-900">{currentMapType || '--'}</span>
             </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoField}>路径</span>
-              <span className={styles.infoValue} style={{ fontSize: '11px', wordBreak: 'break-all' }}>
+            <div className="flex justify-between gap-3 border-b border-[rgba(33,29,22,0.06)] py-2 text-[12px]">
+              <span className="shrink-0 text-ink-500">路径</span>
+              <span className="break-all text-right text-[11px] text-ink-700">
                 {currentMapPath || '--'}
               </span>
             </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoField}>来源</span>
-              <span className={styles.infoValue}>本地资源目录</span>
+            <div className="flex justify-between gap-3 border-b border-[rgba(33,29,22,0.06)] py-2 text-[12px]">
+              <span className="shrink-0 text-ink-500">来源</span>
+              <span className="text-right text-ink-900">本地资源目录</span>
             </div>
-            <button className={styles.resourceLink} onClick={scrollToSource}>
+            <button
+              className="mt-2 cursor-pointer rounded-sm border border-paper-300 bg-paper-50 px-3 py-1.5 text-[12px] text-vermilion-600 transition-colors duration-200 hover:bg-vermilion-50 hover:border-vermilion-500/40 focus-visible:outline-2 focus-visible:outline-vermilion-500"
+              onClick={scrollToSource}
+            >
               查看资源详情 ↓
             </button>
           </div>
@@ -343,12 +319,12 @@ export default function CityDetailPage() {
       </section>
 
       {/* Bottom Section — 2 Column */}
-      <section className={styles.bottomSection}>
+      <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Left: Trend Chart */}
-        <div className={styles.trendSection}>
-          <div className={styles.trendHeader}>
-            <h2 className={styles.trendTitle}>年度客流趋势</h2>
-            {yearRange && <span className={styles.trendRange}>{yearRange}</span>}
+        <div className="rounded-lg bg-paper-100 p-4 shadow-card">
+          <div className="mb-2.5 flex items-baseline justify-between border-b border-paper-300 pb-2">
+            <h2 className="font-serif text-lg font-semibold text-ink-900">年度客流趋势</h2>
+            {yearRange && <span className="text-[11px] text-ink-400 tabular-nums">{yearRange}</span>}
           </div>
           {yearly && yearly.years.length > 0 ? (
             <CityTrendAreaChart yearly={yearly} />
@@ -358,14 +334,16 @@ export default function CityDetailPage() {
         </div>
 
         {/* Right: Source Info */}
-        <div className={styles.sourceSection} ref={sourceInfoRef}>
-          <h2 className={styles.sourceTitle}>数据来源</h2>
+        <div className="rounded-lg bg-paper-100 p-4 shadow-card" ref={sourceInfoRef}>
+          <h2 className="mb-2.5 border-b border-paper-300 pb-2 font-serif text-lg font-semibold text-ink-900">数据来源</h2>
           <CitySourceInfo city={city} />
         </div>
       </section>
 
       {/* Data Note */}
-      <CityDataNote city={city} />
+      <div className="mt-4">
+        <CityDataNote city={city} />
+      </div>
     </div>
   );
 }

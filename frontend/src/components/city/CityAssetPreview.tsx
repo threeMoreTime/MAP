@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import type { MergedCity } from '../../hooks/useMetroData';
 import { withBaseUrl } from '../../utils/path';
 import EmptyState from '../common/EmptyState';
-import styles from './CityAssetPreview.module.css';
 
 interface Props {
   city: MergedCity;
@@ -120,7 +119,7 @@ export default function CityAssetPreview({ city }: Props) {
   const handleMouseDown = useCallback((e: MouseEvent) => {
     if (e.button !== 0) return;
     const target = e.target as HTMLElement;
-    if (target.closest(`.${styles.toolbar}`) || target.closest(`.${styles.viewOriginal}`) || target.closest('button') || target.closest('a')) {
+    if (target.closest('.viewer-toolbar') || target.closest('.viewer-view-original') || target.closest('button') || target.closest('a')) {
       return;
     }
     e.preventDefault();
@@ -231,7 +230,7 @@ export default function CityAssetPreview({ city }: Props) {
     };
   }, [hasRealImage]);
 
-  // === Fullscreen drag/wheel ===
+  // === Fullscreen mode listeners ===
   useEffect(() => {
     if (!isFullscreen || !hasRealImage) return;
 
@@ -307,53 +306,68 @@ export default function CityAssetPreview({ city }: Props) {
 
   const zoomPercent = Math.round(scale * 100);
 
+  const toolbarCls = 'viewer-toolbar absolute left-2 top-2 z-10 flex items-center gap-0.5 rounded-sm border border-paper-300 bg-paper-100/95 p-1 shadow-card';
+  const fullscreenToolbarCls = 'viewer-toolbar fullscreenToolbar fixed left-3 top-3 z-20 flex items-center gap-0.5 rounded-sm border border-paper-300 bg-paper-100/95 p-1 shadow-card-hover';
+  const toolBtnCls = 'flex size-7 cursor-pointer items-center justify-center rounded-sm text-[14px] text-ink-700 transition-colors duration-150 hover:bg-paper-200 active:scale-95 focus-visible:outline-2 focus-visible:outline-vermilion-500';
+  const zoomValueCls = 'zoomValue px-1 text-[11px] text-ink-500 tabular-nums';
+
   // === Render toolbar (shared between normal & fullscreen) ===
-  const renderToolbar = (classNames: { toolbar: string; toolBtn: string; zoomValue: string }, showFullscreen = true) => (
-    <div className={classNames.toolbar} onClick={(e) => e.stopPropagation()}>
-      <button className={classNames.toolBtn} onClick={handleToolbarZoomIn} aria-label="放大">+</button>
-      <button className={classNames.toolBtn} onClick={handleToolbarZoomOut} aria-label="缩小">−</button>
-      <button className={classNames.toolBtn} onClick={handleToolbarReset} aria-label="重置视图">⌂</button>
+  const renderToolbar = (position: 'normal' | 'fullscreen', showFullscreen = true) => (
+    <div className={position === 'normal' ? toolbarCls : fullscreenToolbarCls} onClick={(e) => e.stopPropagation()}>
+      <button className={toolBtnCls} onClick={handleToolbarZoomIn} aria-label="放大">+</button>
+      <button className={toolBtnCls} onClick={handleToolbarZoomOut} aria-label="缩小">−</button>
+      <button className={toolBtnCls} onClick={handleToolbarReset} aria-label="重置视图">⌂</button>
       {showFullscreen && (
-        <button className={classNames.toolBtn} onClick={handleToolbarFullscreen} aria-label="全屏预览">⛶</button>
+        <button className={toolBtnCls} onClick={handleToolbarFullscreen} aria-label="全屏预览">⛶</button>
       )}
-      <span className={classNames.zoomValue}>{zoomPercent}%</span>
+      <span className={zoomValueCls}>{zoomPercent}%</span>
     </div>
   );
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.tabs}>
+    <div className="overflow-hidden rounded-lg border border-paper-300 bg-paper-50">
+      <div className="flex border-b border-paper-300">
         <button
-          className={`${styles.tab} ${activeTab === 'network' ? styles.tabActive : ''}`}
+          className={`flex-1 cursor-pointer border-b-2 py-2 text-[13px] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-vermilion-500 ${
+            activeTab === 'network'
+              ? 'border-vermilion-500 bg-paper-100 font-semibold text-ink-900'
+              : 'border-transparent text-ink-500 hover:text-ink-900'
+          }`}
           onClick={() => handleTabChange('network')}
         >
           线路图
         </button>
         <button
-          className={`${styles.tab} ${activeTab === 'plan' ? styles.tabActive : ''}`}
+          className={`flex-1 cursor-pointer border-b-2 py-2 text-[13px] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-vermilion-500 ${
+            activeTab === 'plan'
+              ? 'border-vermilion-500 bg-paper-100 font-semibold text-ink-900'
+              : 'border-transparent text-ink-500 hover:text-ink-900'
+          }`}
           onClick={() => handleTabChange('plan')}
         >
           规划图
         </button>
       </div>
 
-      <div className={styles.content}>
+      <div className="p-3">
         {hasRealImage ? (
           <div
-            className={styles.imageArea}
+            className="imageArea relative h-[460px] cursor-grab overflow-hidden rounded-md bg-paper-200 active:cursor-grabbing"
             ref={viewportRef}
             data-wheel-zoom-origin="center"
           >
             {imageLoading && (
-              <div className={styles.loading}>图片加载中...</div>
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-paper-200/80 text-[13px] text-ink-400">
+                图片加载中...
+              </div>
             )}
 
             {/* Toolbar - fixed top-left inside imageArea */}
-            {renderToolbar({ toolbar: styles.toolbar, toolBtn: styles.toolBtn, zoomValue: styles.zoomValue }, true)}
+            {renderToolbar('normal', true)}
 
             {/* Image with transform */}
             <div
-              className={styles.imageTransform}
+              className="imageTransform absolute will-change-transform"
               style={{
                 transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
                 transformOrigin: '0 0',
@@ -364,7 +378,7 @@ export default function CityAssetPreview({ city }: Props) {
                 src={imageUrl || ''}
                 alt={alt}
                 decoding="async"
-                className={styles.image}
+                className="block max-w-none select-none"
                 style={{
                   opacity: imageLoading ? 0 : 1,
                   visibility: imageLoading ? 'hidden' : 'visible',
@@ -379,29 +393,24 @@ export default function CityAssetPreview({ city }: Props) {
               href={imageUrl}
               target="_blank"
               rel="noreferrer"
-              className={styles.viewOriginal}
+              className="viewer-view-original absolute bottom-2 right-2 rounded-sm border border-paper-300 bg-paper-100/95 px-2 py-1 text-[11px] text-vermilion-600 shadow-card hover:bg-vermilion-50"
               onClick={(e) => e.stopPropagation()}
             >
               查看原图
             </a>
           </div>
         ) : has && imageUrl && imageError ? (
-          <div className={styles.empty} style={{ textAlign: 'center', padding: '24px 16px' }}>
+          <div className="p-4 text-center">
             <EmptyState icon="⚠️" title={`${label}加载失败`} description="图片资源网络加载中断或无法响应" />
             <button
               onClick={() => { setImageError(false); setImageLoading(true); }}
-              style={{
-                marginTop: 12, padding: '6px 16px', fontSize: 12,
-                color: '#00d4ff', border: '1px solid rgba(0,212,255,0.3)',
-                borderRadius: 6, background: 'rgba(0,212,255,0.08)',
-                cursor: 'pointer', transition: 'all 0.2s',
-              }}
+              className="mt-3 cursor-pointer rounded-sm border border-vermilion-500/30 bg-vermilion-50 px-4 py-1.5 text-[12px] text-vermilion-600 transition-colors duration-200 hover:bg-vermilion-100"
             >
               ↻ 重新加载
             </button>
           </div>
         ) : (
-          <div className={styles.empty}>
+          <div className="py-4">
             <EmptyState icon="📁" title={`${label}资源正在收集整理中`} description={`暂无${label}资源`} />
           </div>
         )}
@@ -410,30 +419,27 @@ export default function CityAssetPreview({ city }: Props) {
       {/* Fullscreen overlay */}
       {isFullscreen && hasRealImage && (
         <div
-          className={styles.fullscreenOverlay}
+          className="fullscreenOverlay fixed inset-0 z-[2000] bg-[rgba(250,248,241,0.97)]"
           onClick={handleOverlayClick}
           role="dialog"
           aria-modal="true"
           aria-label={`${city.city_cn}${label}全屏预览`}
         >
           {/* Fullscreen toolbar - fixed top-left */}
-          {renderToolbar(
-            { toolbar: styles.fullscreenToolbar, toolBtn: styles.fsToolBtn, zoomValue: styles.fsZoomValue },
-            false
-          )}
+          {renderToolbar('fullscreen', false)}
 
           {/* Fullscreen title */}
-          <div className={styles.fullscreenTitle}>
+          <div className="absolute left-1/2 top-4 -translate-x-1/2 font-serif text-[16px] font-semibold text-ink-900">
             {city.city_cn} · {label}
           </div>
 
           {/* Fullscreen image viewport */}
           <div
-            className={styles.fullscreenViewport}
+            className="fullscreenViewport absolute inset-0 cursor-grab active:cursor-grabbing"
             ref={fullscreenViewportRef}
           >
             <div
-              className={styles.fullscreenImageTransform}
+              className="fullscreenImageTransform absolute will-change-transform"
               style={{
                 transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
                 transformOrigin: '0 0',
@@ -442,7 +448,7 @@ export default function CityAssetPreview({ city }: Props) {
               <img
                 src={imageUrl}
                 alt={alt}
-                className={styles.fullscreenImage}
+                className="block max-w-none select-none"
                 draggable={false}
               />
             </div>
@@ -450,7 +456,7 @@ export default function CityAssetPreview({ city }: Props) {
 
           {/* Fullscreen close button */}
           <button
-            className={styles.fullscreenClose}
+            className="fixed right-3 top-3 z-20 flex size-9 cursor-pointer items-center justify-center rounded-sm border border-paper-300 bg-paper-100 text-[14px] text-ink-700 shadow-card-hover transition-colors duration-150 hover:bg-paper-200 focus-visible:outline-2 focus-visible:outline-vermilion-500"
             onClick={handleFullscreenClose}
             aria-label="关闭全屏预览"
           >
@@ -462,7 +468,7 @@ export default function CityAssetPreview({ city }: Props) {
             href={imageUrl}
             target="_blank"
             rel="noreferrer"
-            className={styles.fullscreenViewOriginal}
+            className="viewer-view-original fixed bottom-3 right-3 z-20 rounded-sm border border-paper-300 bg-paper-100 px-3 py-1.5 text-[12px] text-vermilion-600 shadow-card hover:bg-vermilion-50"
             onClick={(e) => e.stopPropagation()}
           >
             查看原图
