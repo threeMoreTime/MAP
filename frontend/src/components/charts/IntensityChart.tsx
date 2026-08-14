@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import * as echarts from 'echarts';
+import { echarts, type EChartsOption } from '../../lib/echarts';
 import { useEChart } from '../../hooks/useEChart';
 import { tooltipShadow, CHART_GRID, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, Y_CATEGORY_LABEL } from './chartUtils';
 import type { MergedCity } from '../../hooks/useMetroData';
@@ -19,7 +19,7 @@ export default function IntensityChart({ data, topN }: Props) {
     return topN > 0 ? filtered.slice(0, topN) : filtered;
   }, [data, topN]);
 
-  const option = useMemo<echarts.EChartsOption>(() => {
+  const option = useMemo<EChartsOption>(() => {
     const cityNames = sliced.map((d) => d.city_cn).reverse();
     const vals = sliced.map((d) => d.ridership_intensity).reverse();
 

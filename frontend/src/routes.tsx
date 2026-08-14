@@ -1,11 +1,13 @@
+import { lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
-import DashboardPage from './pages/DashboardPage';
-import CitiesPage from './pages/CitiesPage';
-import CityDetailPage from './pages/CityDetailPage';
-import AboutPage from './pages/AboutPage';
-import DataQualityPage from './pages/DataQualityPage';
-import ComparePage from './pages/ComparePage';
+
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const CitiesPage = lazy(() => import('./pages/CitiesPage'));
+const CityDetailPage = lazy(() => import('./pages/CityDetailPage'));
+const ComparePage = lazy(() => import('./pages/ComparePage'));
+const DataQualityPage = lazy(() => import('./pages/DataQualityPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
 
 export default function AppRoutes() {
   return (

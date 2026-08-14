@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import * as echarts from 'echarts';
+import { echarts, type EChartsOption } from '../lib/echarts';
 
 export interface UseEChartOptions {
   loading?: boolean;
@@ -8,7 +8,7 @@ export interface UseEChartOptions {
 
 export function useEChart(
   containerRef: React.RefObject<HTMLDivElement | null>,
-  option: echarts.EChartsOption | null,
+  option: EChartsOption | null,
   deps: unknown[],
   opts?: UseEChartOptions,
 ) {

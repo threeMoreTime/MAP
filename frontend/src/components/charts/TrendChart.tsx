@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import * as echarts from 'echarts';
+import type { EChartsOption } from '../../lib/echarts';
 import { useEChart } from '../../hooks/useEChart';
 import { COLOR_PALETTE, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE } from './chartUtils';
 import { hasValidDailyRidership } from '../../hooks/useDashboardFilters';
@@ -19,7 +19,7 @@ export default function TrendChart({ data }: Props) {
       .slice(0, 8);
   }, [data]);
 
-  const option = useMemo<echarts.EChartsOption | null>(() => {
+  const option = useMemo<EChartsOption | null>(() => {
     if (top8.length === 0) return null;
 
     // Merge all years into a unified sorted axis

@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import * as echarts from 'echarts';
+import { echarts, type EChartsOption } from '../../lib/echarts';
 import { useEChart } from '../../hooks/useEChart';
 import { tooltipShadow, CHART_GRID, AXIS_LABEL_STYLE, SPLIT_LINE_STYLE, Y_CATEGORY_LABEL, METRIC_COLORS } from './chartUtils';
 import { getMetricValue, isMetricValid } from '../../hooks/useDashboardFilters';
@@ -26,7 +26,7 @@ export default function RankChart({ data, metric, topN }: Props) {
   const ml = METRIC_LABELS[metric];
   const colors = METRIC_COLORS[metric] ?? METRIC_COLORS.daily_ridership_wan;
 
-  const option = useMemo<echarts.EChartsOption>(() => {
+  const option = useMemo<EChartsOption>(() => {
     const cityNames = sliced.map((d) => d.city_cn).reverse();
     const vals = sliced.map((d) => getMetricValue(d, metric)).reverse();
 

@@ -1,5 +1,5 @@
 import { useRef, useMemo, useEffect, useState, useCallback } from 'react';
-import * as echarts from 'echarts';
+import { echarts, type EChartsOption } from '../../lib/echarts';
 import { CITY_COORDS } from '../../data/cityCoords';
 import { getMetricValue, isMetricValid, formatMetricValue } from '../../hooks/useDashboardFilters';
 import type { MergedCity } from '../../hooks/useMetroData';
@@ -52,7 +52,7 @@ export default function MetroMapChart({ data, metric, onCitySelect, keyword }: P
     return { bubble, ripple };
   }, [data, metric, keyword]);
 
-  const getMapOption = useCallback((): echarts.EChartsOption => {
+  const getMapOption = useCallback((): EChartsOption => {
     const maxVal = Math.max(...mapData.bubble.map((d) => d.value[2] ?? 0), 1);
 
     return {
