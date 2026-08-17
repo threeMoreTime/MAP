@@ -159,7 +159,7 @@ export default function CitySourceInfo({ city }: Props) {
                   <StatusBadge type="info">{coverItem.license}</StatusBadge>
                 </div>
               )}
-              {coverItem.attribution && (
+              {coverItem.attribution && coverItem.attribution !== coverItem.author && (
                 <div className={rowCls}>
                   <span className={fieldCls}>署名</span>
                   <span className="text-ink-900">{coverItem.attribution}</span>

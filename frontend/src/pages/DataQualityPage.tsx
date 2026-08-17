@@ -30,11 +30,7 @@ function levelLabel(level: string) {
 
 function CheckDot({ ok }: { ok: boolean }) {
   return (
-    <span
-      className={`inline-flex size-[22px] items-center justify-center rounded-full text-[12px] font-bold ${
-        ok ? 'bg-jade-600/12 text-jade-600' : 'bg-ink-400/10 text-ink-400'
-      }`}
-    >
+    <span className={`text-[13px] font-bold leading-none ${ok ? 'text-jade-600' : 'text-ink-300'}`}>
       {ok ? '✔' : '–'}
     </span>
   );
@@ -400,7 +396,7 @@ export default function DataQualityPage() {
               return (
                 <div key={c.city} className="flex flex-col gap-2 rounded-md border border-paper-200 bg-paper-50 p-3.5">
                   <div className="flex items-center justify-between">
-                    <Link to={`/city/${c.city}`} className="text-[14px] font-semibold text-vermilion-600">
+                    <Link to={`/city/${c.city}`} className="text-[14px] font-semibold text-ink-900 hover:text-vermilion-600">
                       {c.city_cn} <span className="text-[11px] font-normal text-ink-400">{c.city}</span>
                     </Link>
                     <div className="flex items-center gap-1.5">
@@ -448,21 +444,21 @@ export default function DataQualityPage() {
             })}
           </div>
         ) : (
-          /* 🖥️ 桌面端纸墨大表格 */
-          <div className="overflow-x-auto">
+          /* 🖥️ 桌面端纸墨大表格（sticky 表头 + 限高滚动区） */
+          <div className="max-h-[70vh] overflow-auto rounded-md">
             <table className="w-full min-w-[700px] border-collapse text-left text-[12px]">
               <thead>
                 <tr className="border-b border-paper-300 text-ink-500">
-                  <th className="px-2.5 py-3 font-medium">城市</th>
-                  <th className="px-2.5 py-3 text-center font-medium">完整度分</th>
-                  <th className="px-2.5 py-3 text-center font-medium">完整度评级</th>
-                  <th className="px-2.5 py-3 text-center font-medium">有无统计</th>
-                  <th className="px-2.5 py-3 text-center font-medium">有客流值</th>
-                  <th className="px-2.5 py-3 text-center font-medium">客流趋势</th>
-                  <th className="px-2.5 py-3 text-center font-medium">线路图</th>
-                  <th className="px-2.5 py-3 text-center font-medium">规划图</th>
-                  <th className="px-2.5 py-3 text-center font-medium">高清封面</th>
-                  <th className="px-2.5 py-3 font-medium">收录缺失项</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 font-medium">城市</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 text-center font-medium">完整度分</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 text-center font-medium">完整度评级</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 text-center font-medium">有无统计</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 text-center font-medium">有客流值</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 text-center font-medium">客流趋势</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 text-center font-medium">线路图</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 text-center font-medium">规划图</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 text-center font-medium">高清封面</th>
+                  <th className="sticky top-0 z-10 bg-paper-100 px-2.5 py-3 font-medium">收录缺失项</th>
                 </tr>
               </thead>
               <tbody>
@@ -474,7 +470,7 @@ export default function DataQualityPage() {
                       className="border-b border-[rgba(33,29,22,0.06)] transition-colors duration-200 hover:bg-paper-200/50"
                     >
                       <td className="px-2.5 py-3">
-                        <Link to={`/city/${c.city}`} className="font-semibold text-vermilion-600 hover:text-vermilion-700">
+                        <Link to={`/city/${c.city}`} className="font-semibold text-ink-900 hover:text-vermilion-600">
                           {c.city_cn} <span className="text-[11px] font-normal text-ink-400">{c.city}</span>
                         </Link>
                       </td>

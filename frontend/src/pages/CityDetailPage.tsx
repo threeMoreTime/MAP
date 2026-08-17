@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useMetroData } from '../hooks/useMetroData';
 import type { MergedCity } from '../hooks/useMetroData';
@@ -166,10 +166,22 @@ export default function CityDetailPage() {
   const { merged, loading, error } = useMetroData();
   const sourceInfoRef = useRef<HTMLDivElement>(null);
 
+  // 查看器当前标签（与 CityAssetPreview 双向同步，驱动"当前资源信息"展示）
+  const [viewerTab, setViewerTab] = useState<'network' | 'plan'>('network');
+  const viewerTabInitialized = useRef(false);
+
   const city = useMemo(
     () => merged.find((c) => c.city === id) ?? null,
     [merged, id],
   );
+
+  // 首次数据就绪后对齐查看器的缺省标签（有线路图选线路图，否则规划图）
+  useEffect(() => {
+    if (city && !viewerTabInitialized.current) {
+      viewerTabInitialized.current = true;
+      setViewerTab(city.has_network_map ? 'network' : 'plan');
+    }
+  }, [city]);
 
   const yearly = city?.stats?.yearly_avg_ridership;
   const yearRange = yearly && yearly.years.length > 0
@@ -194,11 +206,13 @@ export default function CityDetailPage() {
   const cityEn = CITY_EN_NAMES[city.city] || city.city;
   const cityDesc = CITY_DESCRIPTIONS[city.city] || `${city.city_cn}城市轨道交通网络`;
   const hasRidership = city.daily_ridership_wan > 0;
-  const hasNetworkMap = city.has_network_map;
-  const hasPlanMap = city.has_plan_map;
 
-  const currentMapType = hasNetworkMap ? '线路图' : hasPlanMap ? '规划图' : null;
-  const currentMapPath = hasNetworkMap ? city.network_map_path : hasPlanMap ? city.plan_map_path : null;
+  // 跟随查看器标签派生当前资源信息（修复：切换规划图后信息面板仍显示线路图）
+  const activeMapAvailable = viewerTab === 'network' ? city.has_network_map : city.has_plan_map;
+  const currentMapType = activeMapAvailable ? (viewerTab === 'network' ? '线路图' : '规划图') : null;
+  const currentMapPath = activeMapAvailable
+    ? (viewerTab === 'network' ? city.network_map_path : city.plan_map_path)
+    : null;
 
   const pillBase = 'rounded-full border px-2.5 py-0.5 text-[11px]';
 
@@ -261,7 +275,7 @@ export default function CityDetailPage() {
         {/* Left: Map Viewer */}
         <div className="min-w-0">
           <h2 className="mb-2.5 border-b border-paper-300 pb-2 font-serif text-lg font-semibold text-ink-900">线路网络</h2>
-          <CityAssetPreview city={city} />
+          <CityAssetPreview city={city} initialTab={viewerTab} onTabChange={setViewerTab} />
         </div>
 
         {/* Right: Info Panel */}
@@ -320,17 +334,19 @@ export default function CityDetailPage() {
 
       {/* Bottom Section — 2 Column */}
       <section className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {/* Left: Trend Chart */}
-        <div className="rounded-lg bg-paper-100 p-4 shadow-card">
+        {/* Left: Trend Chart（flex 拉伸与右侧来源卡等高） */}
+        <div className="flex flex-col rounded-lg bg-paper-100 p-4 shadow-card">
           <div className="mb-2.5 flex items-baseline justify-between border-b border-paper-300 pb-2">
             <h2 className="font-serif text-lg font-semibold text-ink-900">年度客流趋势</h2>
             {yearRange && <span className="text-[11px] text-ink-400 tabular-nums">{yearRange}</span>}
           </div>
-          {yearly && yearly.years.length > 0 ? (
-            <CityTrendAreaChart yearly={yearly} />
-          ) : (
-            <EmptyState icon="📊" title="该城市暂无客流趋势数据" description="仅展示基础运营信息" />
-          )}
+          <div className="min-h-[320px] flex-1">
+            {yearly && yearly.years.length > 0 ? (
+              <CityTrendAreaChart yearly={yearly} />
+            ) : (
+              <EmptyState icon="📊" title="该城市暂无客流趋势数据" description="仅展示基础运营信息" />
+            )}
+          </div>
         </div>
 
         {/* Right: Source Info */}

@@ -42,7 +42,7 @@ export default function CompareTable({ cities, isMobile }: Props) {
         <div className="flex flex-col gap-4">
           {cities.map(c => (
             <div key={c.city} className="rounded-md border border-paper-200 bg-paper-50 p-3.5">
-              <div className="mb-2.5 font-serif text-[15px] font-semibold text-vermilion-600">
+              <div className="mb-2.5 font-serif text-[15px] font-semibold text-ink-900">
                 {c.city_cn}
               </div>
               <div className="flex flex-col gap-1.5">

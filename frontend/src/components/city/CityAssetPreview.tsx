@@ -5,6 +5,10 @@ import EmptyState from '../common/EmptyState';
 
 interface Props {
   city: MergedCity;
+  /** 初始激活的标签页，缺省按资源可用性自动选择 */
+  initialTab?: TabKey;
+  /** 标签页切换回调（供父级同步"当前资源信息"等展示） */
+  onTabChange?: (tab: TabKey) => void;
 }
 
 type TabKey = 'network' | 'plan';
@@ -23,9 +27,9 @@ function getActiveData(city: MergedCity, tab: TabKey) {
   return { has: city.has_plan_map, mapPath: city.plan_map_path, label: '规划图' };
 }
 
-export default function CityAssetPreview({ city }: Props) {
-  const defaultTab: TabKey = city.has_network_map ? 'network' : city.has_plan_map ? 'plan' : 'network';
-  const [activeTab, setActiveTab] = useState<TabKey>(defaultTab);
+export default function CityAssetPreview({ city, initialTab, onTabChange }: Props) {
+  const autoTab: TabKey = city.has_network_map ? 'network' : city.has_plan_map ? 'plan' : 'network';
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab ?? autoTab);
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -36,6 +40,8 @@ export default function CityAssetPreview({ city }: Props) {
 
   const viewportRef = useRef<HTMLDivElement>(null);
   const fullscreenViewportRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const pendingFitRef = useRef(true);
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const dragMovedRef = useRef(false);
@@ -53,11 +59,30 @@ export default function CityAssetPreview({ city }: Props) {
     setImageError(false);
   }
 
-  const resetView = useCallback(() => {
-    setScale(1);
-    setTranslateX(0);
-    setTranslateY(0);
+  /** 适屏视图：整图 contain 居中，作为初始态与 ⌂ 重置的基准 */
+  const applyFitView = useCallback(() => {
+    const container = viewportRef.current;
+    const img = imgRef.current;
+    if (!container || !img || !img.naturalWidth || !img.naturalHeight) {
+      setScale(1);
+      setTranslateX(0);
+      setTranslateY(0);
+      return;
+    }
+    const fitScale = Math.min(
+      container.clientWidth / img.naturalWidth,
+      container.clientHeight / img.naturalHeight,
+      1,
+    );
+    const scale = Math.max(fitScale, MIN_SCALE);
+    setScale(scale);
+    setTranslateX((container.clientWidth - img.naturalWidth * scale) / 2);
+    setTranslateY((container.clientHeight - img.naturalHeight * scale) / 2);
   }, []);
+
+  const resetView = useCallback(() => {
+    applyFitView();
+  }, [applyFitView]);
 
   const handleTabChange = useCallback((tab: TabKey) => {
     setActiveTab(tab);
@@ -65,7 +90,9 @@ export default function CityAssetPreview({ city }: Props) {
     setImageLoading(true);
     resetView();
     setIsFullscreen(false);
-  }, [resetView]);
+    pendingFitRef.current = true;
+    onTabChange?.(tab);
+  }, [resetView, onTabChange]);
 
   // === Toolbar actions ===
   const handleToolbarZoomIn = useCallback((e?: React.MouseEvent) => {
@@ -375,6 +402,7 @@ export default function CityAssetPreview({ city }: Props) {
             >
               <img
                 key={imageUrl || ''}
+                ref={imgRef}
                 src={imageUrl || ''}
                 alt={alt}
                 decoding="async"
@@ -383,7 +411,13 @@ export default function CityAssetPreview({ city }: Props) {
                   opacity: imageLoading ? 0 : 1,
                   visibility: imageLoading ? 'hidden' : 'visible',
                 }}
-                onLoad={() => setImageLoading(false)}
+                onLoad={() => {
+                  setImageLoading(false);
+                  if (pendingFitRef.current) {
+                    pendingFitRef.current = false;
+                    applyFitView();
+                  }
+                }}
                 onError={() => { setImageError(true); setImageLoading(false); }}
                 draggable={false}
               />

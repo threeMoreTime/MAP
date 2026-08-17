@@ -822,6 +822,13 @@ async function runTests(baseUrl) {
     };
   });
 
+  // Capture the initial fit-view zoom as the reset baseline
+  // (viewer resets to fit-to-view, which may not be exactly 100%)
+  const t22baselineZoom = await page.evaluate(() => {
+    const zoomVal = document.querySelector('[class*="zoomValue"]');
+    return zoomVal ? zoomVal.textContent.trim() : '';
+  });
+
   // 3. Test wheel zoom (center-based)
   const t22wheelZoom = await page.evaluate(async () => {
     const imageArea = document.querySelector('[class*="imageArea"]');
@@ -937,10 +944,10 @@ async function runTests(baseUrl) {
   });
   await wait(300);
 
-  const t22resetOk = await page.evaluate(() => {
+  const t22resetOk = await page.evaluate((baseline) => {
     const zoomVal = document.querySelector('[class*="zoomValue"]');
-    return zoomVal ? zoomVal.textContent.includes('100%') : false;
-  });
+    return zoomVal ? zoomVal.textContent.trim() === baseline : false;
+  }, t22baselineZoom);
 
   // 7. Test fullscreen
   const t22fullscreenOpen = await page.evaluate(() => {
@@ -1047,10 +1054,10 @@ async function runTests(baseUrl) {
   });
   await wait(1500);
 
-  const t22tabReset = await page.evaluate(() => {
+  const t22tabReset = await page.evaluate((baseline) => {
     const zoomVal = document.querySelector('[class*="zoomValue"]');
-    return zoomVal ? zoomVal.textContent.includes('100%') : false;
-  });
+    return zoomVal ? zoomVal.textContent.trim() === baseline : false;
+  }, t22baselineZoom);
 
   // 9. Check 375px no horizontal scroll
   await page.setViewport({ width: 375, height: 812 });
@@ -1083,7 +1090,7 @@ async function runTests(baseUrl) {
   } else if (!t22reset) {
     t22detail = 'reset button not found';
   } else if (!t22resetOk) {
-    t22detail = 'zoom not back to 100% after reset';
+    t22detail = 'zoom not back to fit baseline after reset';
   } else if (!t22fullscreenOpen) {
     t22detail = 'fullscreen button not found';
   } else if (!t22fullscreenVisible) {

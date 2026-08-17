@@ -70,7 +70,7 @@ export default function CityTrendAreaChart({ yearly }: Props) {
   return (
     <div
       ref={containerRef}
-      className="city-trend-chart h-[300px] w-full"
+      className="city-trend-chart h-full min-h-[300px] w-full"
     />
   );
 }

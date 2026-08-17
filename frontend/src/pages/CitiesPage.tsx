@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMetroData } from '../hooks/useMetroData';
 import { useDashboardFilters, hasValidDailyRidership } from '../hooks/useDashboardFilters';
@@ -6,6 +6,9 @@ import { withBaseUrl } from '../utils/path';
 import type { CityFilterTag } from '../types/metro';
 import type { MergedCity } from '../hooks/useMetroData';
 import SectionTitle from '../components/common/SectionTitle';
+import PaperSelect from '../components/common/PaperSelect';
+
+type SortKey = 'name' | 'mileage' | 'ridership';
 
 const FILTER_OPTIONS: { key: CityFilterTag; label: string }[] = [
   { key: 'all', label: '全部城市' },
@@ -69,7 +72,11 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
       ? { cls: 'bg-gold-600', text: '⚠ 封面降级' }
       : !hasDaily
         ? { cls: 'bg-ink-500', text: '✗ 暂无客流' }
-        : { cls: 'bg-vermilion-500', text: '▣ 有数据' };
+        : { cls: 'bg-ink-700', text: '▣ 有数据' };
+
+  // 零运营数据城市：指标区静默化，避免三个 0 的噪音
+  const noOpsData = city.operating_lines === 0 && city.operating_stations === 0
+    && city.operating_mileage_km === 0 && !hasDaily;
 
   const tag = (ok: boolean) =>
     `rounded-full border px-2 py-0.5 text-[10px] leading-5 ${
@@ -120,29 +127,35 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
 
       {/* Body */}
       <div className="p-3.5">
-        {/* 3-column metrics */}
-        <div className="grid gap-2 text-center" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-          <div>
-            <div className="font-serif text-[16px] font-semibold text-ink-900 tabular-nums">
-              {city.operating_mileage_km}
-              <span className="ml-0.5 text-[10px] font-normal text-ink-400">km</span>
-            </div>
-            <div className="text-[10px] text-ink-500">运营里程</div>
+        {/* 3-column metrics（零数据城市静默展示） */}
+        {noOpsData ? (
+          <div className="py-3.5 text-center text-[12px] text-ink-400">
+            暂无运营统计数据 · 资源整理中
           </div>
-          <div>
-            <div className={`font-serif text-[16px] font-semibold tabular-nums ${hasDaily ? 'text-ink-900' : 'text-ink-300'}`}>
-              {hasDaily ? city.daily_ridership_wan.toFixed(1) : '暂无'}
-              {hasDaily && <span className="ml-0.5 text-[10px] font-normal text-ink-400">万</span>}
+        ) : (
+          <div className="grid gap-2 text-center" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+            <div>
+              <div className="font-serif text-[16px] font-semibold text-ink-900 tabular-nums">
+                {city.operating_mileage_km}
+                <span className="ml-0.5 text-[10px] font-normal text-ink-400">km</span>
+              </div>
+              <div className="text-[10px] text-ink-500">运营里程</div>
             </div>
-            <div className="text-[10px] text-ink-500">日客流</div>
-          </div>
-          <div>
-            <div className={`font-serif text-[16px] font-semibold tabular-nums ${city.ridership_intensity > 0 ? 'text-ink-900' : 'text-ink-300'}`}>
-              {city.ridership_intensity > 0 ? city.ridership_intensity.toFixed(2) : '--'}
+            <div>
+              <div className={`font-serif text-[16px] font-semibold tabular-nums ${hasDaily ? 'text-ink-900' : 'text-ink-300'}`}>
+                {hasDaily ? city.daily_ridership_wan.toFixed(1) : '暂无'}
+                {hasDaily && <span className="ml-0.5 text-[10px] font-normal text-ink-400">万</span>}
+              </div>
+              <div className="text-[10px] text-ink-500">日客流</div>
             </div>
-            <div className="text-[10px] text-ink-500">客流强度</div>
+            <div>
+              <div className={`font-serif text-[16px] font-semibold tabular-nums ${city.ridership_intensity > 0 ? 'text-ink-900' : 'text-ink-300'}`}>
+                {city.ridership_intensity > 0 ? city.ridership_intensity.toFixed(2) : '--'}
+              </div>
+              <div className="text-[10px] text-ink-500">客流强度</div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Resource status tags */}
         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -164,6 +177,17 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
 export default function CitiesPage() {
   const { merged, loading, error } = useMetroData();
   const { keyword, setKeyword, cityFilter, setCityFilter, allFilteredCities } = useDashboardFilters(merged);
+  const [sortBy, setSortBy] = useState<SortKey>('name');
+
+  const sortedCities = useMemo(() => {
+    if (sortBy === 'mileage') {
+      return [...allFilteredCities].sort((a, b) => b.operating_mileage_km - a.operating_mileage_km);
+    }
+    if (sortBy === 'ridership') {
+      return [...allFilteredCities].sort((a, b) => b.daily_ridership_wan - a.daily_ridership_wan);
+    }
+    return allFilteredCities;
+  }, [allFilteredCities, sortBy]);
 
   if (loading) return <div className="state-message state-message--loading">加载数据中...</div>;
   if (error) return <div className="state-message state-message--error">加载失败：{error}</div>;
@@ -220,22 +244,21 @@ export default function CitiesPage() {
             </div>
           </div>
 
-          {/* Footer: count + legend */}
+          {/* Footer: count + sort */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-paper-300 pt-2.5 text-[11px] text-ink-400">
             <span className="tabular-nums">共 {allFilteredCities.length} 个城市</span>
-            <div className="flex flex-wrap gap-4">
-              <span className="flex items-center gap-1.5">
-                <span aria-hidden className="size-2 rounded-full bg-ink-500" />
-                有线路图
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span aria-hidden className="size-2 rounded-full bg-jade-600" />
-                有规划图
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span aria-hidden className="size-2 rounded-full bg-vermilion-500" />
-                有客流数据
-              </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-ink-400">排序</span>
+              <PaperSelect
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortKey)}
+                aria-label="选择城市排序方式"
+                className="h-7 text-[11px]"
+              >
+                <option value="name">按名称</option>
+                <option value="mileage">按运营里程</option>
+                <option value="ridership">按日客流</option>
+              </PaperSelect>
             </div>
           </div>
         </div>
@@ -244,7 +267,7 @@ export default function CitiesPage() {
       {/* Masonry Cards */}
       {allFilteredCities.length > 0 ? (
         <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4">
-          {allFilteredCities.map((c, i) => (
+          {sortedCities.map((c, i) => (
             <CityCard key={c.city} city={c} index={i} />
           ))}
         </div>
