@@ -161,7 +161,9 @@ async function runBuild() {
 async function gotoHash(baseUrl, hash) {
   const url = `${baseUrl}/${hash}`;
   consoleErrors = [];
-  await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+  // 'load' 而非 networkidle0：3D hero 的持续动画会让 networkIdle lifecycle 事件
+  // 在软件渲染（headless --disable-gpu）下饿死，networkidle0 永不达成
+  await page.goto(url, { waitUntil: 'load', timeout: 30000 });
   await wait(2000);
 }
 

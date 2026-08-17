@@ -9,8 +9,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // echarts 按需引入（echarts/core 等子路径）后，按包路径归类，
-          // 避免 object 形式把 echarts 整包入口重新拉进产物
+          // echarts-gl 仅由 HeroMap3D 动态 import，独立分包避免拉入首屏
+          if (id.includes('node_modules/echarts-gl')) {
+            return 'echarts-gl';
+          }
           if (id.includes('node_modules/echarts') || id.includes('node_modules/zrender')) {
             return 'echarts';
           }

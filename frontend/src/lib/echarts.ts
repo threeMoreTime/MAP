@@ -36,7 +36,7 @@ import type {
   TitleComponentOption,
   TooltipComponentOption,
 } from 'echarts/components';
-import type { ComposeOption } from 'echarts/core';
+import type { ComposeOption, EChartsCoreOption } from 'echarts/core';
 
 echarts.use([
   BarChart,
@@ -70,3 +70,5 @@ export type EChartsOption = ComposeOption<
 >;
 
 export { echarts };
+/** echarts-gl 扩展（geo3D/lines3D 等）不在 ComposeOption 组合内，用 core 宽松类型 */
+export type { EChartsCoreOption };

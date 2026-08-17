@@ -57,6 +57,20 @@
   --ease-paper: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* === 夜墨 · 全屏 3D hero 专用（与纸墨页面形成卷首墨底对比） === */
+:root {
+  --night-bg: #0b1016;          /* 夜墨底 */
+  --night-terrain: #16202e;     /* 3D 地形面 */
+  --night-terrain-edge: #2b3a4e; /* 地形描边 */
+  --night-emphasis: #1f2d3f;    /* 地形悬浮态 */
+  --night-text: #e8e4d8;        /* 纸白文字（承纸墨系） */
+  --night-text-dim: #8a94a3;    /* 弱文字 */
+  --night-accent: #d0553f;      /* 朱砂（深底提亮一档） */
+  --night-accent-glow: rgba(208, 85, 63, 0.55);
+  --night-node: #cfd8e3;        /* 常规城市节点 */
+  --night-grid: rgba(232, 228, 216, 0.06); /* 经纬网格线 */
+}
+
 /* === ECharts 墨阶调色板（普通变量，供图表消费） === */
 :root {
   /* 墨阶序列：单城市/低强调系列，从深到浅 */
