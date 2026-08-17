@@ -49,6 +49,10 @@ export const AUTOROTATE_RESUME_MS = 900;
 /** 全国总览视角下 viewControl 的旋转参数 */
 export const AUTOROTATE = {
   speed: 0.55,
-  /** 拖拽后永不自动恢复（只有重置视角 / controls 开关可再起转） */
-  afterStill: Infinity,
+  /**
+   * 拖拽后永不自动恢复（只有重置视角 / controls 开关经 React 通道再起转）。
+   * 取 0：OrbitControl._startCountingStill 对 0/非法值不安排恢复倒计时；
+   * 不能用 Infinity（option 归一化后变 null，且 setTimeout(fn, Infinity) 被浏览器视为立即触发）。
+   */
+  afterStill: 0,
 } as const;

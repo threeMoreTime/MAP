@@ -161,7 +161,12 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
       const inst = instanceRef.current;
       if (!inst) return;
       try {
-        inst.setOption({ series: payload });
+        // 每次系列更新都显式中和相机动画标志：否则 geo3D 重渲染会拿上一次
+        // 相机命令残留的 animation/duration 把镜头 animate 回飞行中的中间值
+        inst.setOption({
+          series: payload,
+          geo3D: { viewControl: { animation: false, animationDurationUpdate: 0 } },
+        });
       } catch {
         goToFallback();
       }
@@ -423,7 +428,10 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
         };
       });
       try {
-        inst.setOption({ series: [nodesSeriesOption(data)] });
+        inst.setOption({
+          series: [nodesSeriesOption(data)],
+          geo3D: { viewControl: { animation: false, animationDurationUpdate: 0 } },
+        });
       } catch {
         /* pulse 失败不致命 */
       }
@@ -431,13 +439,15 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
     return () => clearInterval(id);
   }, [phase, pulse, pulseIntervalMs]);
 
-  // autoRotate 开关（payload 附 duration 0，避免残留的相机插值时长造成无谓动画）
+  // autoRotate 开关（animation:false 走直设路径，不打断进行中的相机动画）
   useEffect(() => {
     const inst = instanceRef.current;
     if (phase !== 'ready' || !inst) return;
     try {
       inst.setOption({
-        geo3D: { viewControl: { autoRotate, animationDurationUpdate: 0 } },
+        geo3D: {
+          viewControl: { autoRotate, animation: false, animationDurationUpdate: 0 },
+        },
       });
     } catch {
       /* 旋转开关失败不致命 */
@@ -484,18 +494,23 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
     };
   }, [phase]);
 
-  // 用户拖拽/缩放判定：位移超阈值或滚轮 → 挂起自动旋转（点击不受影响）
+  // 用户拖拽/缩放判定：位移超阈值或滚轮 → 挂起自动旋转（点击不受影响）。
+  // 上报发生在拖拽过程中（阈值一过即报），而非 pointerup：
+  // echarts-gl 每次 setOption 都会用 model.autoRotate 重放控制层旋转态，
+  // React 不尽快把 model 置 false，pulse 周期渲染会在拖拽中途复活旋转。
   useEffect(() => {
     const el = containerRef.current;
     if (phase !== 'ready' || !el) return;
     let down = false;
     let moved = 0;
+    let reported = false;
     let lastX = 0;
     let lastY = 0;
 
     const onPointerDown = (e: PointerEvent) => {
       down = true;
       moved = 0;
+      reported = false;
       lastX = e.clientX;
       lastY = e.clientY;
     };
@@ -504,9 +519,12 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
       moved += Math.hypot(e.clientX - lastX, e.clientY - lastY);
       lastX = e.clientX;
       lastY = e.clientY;
+      if (moved > DRAG_THRESHOLD && !reported) {
+        reported = true;
+        handlersRef.current.onCameraDrag();
+      }
     };
     const onPointerUp = () => {
-      if (down && moved > DRAG_THRESHOLD) handlersRef.current.onCameraDrag();
       down = false;
     };
     const onWheel = () => handlersRef.current.onCameraDrag();
