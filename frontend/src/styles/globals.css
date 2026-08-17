@@ -45,3 +45,20 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .state-message--error {
   color: var(--color-vermilion-600);
 }
+
+/* === 夜墨 3D Hero 过渡动画（仅 transform/opacity，ease 走 --ease-paper） === */
+@utility hero-panel-enter {
+  animation: heroPanelEnter 0.35s var(--ease-paper) both;
+}
+@utility hero-panel-exit {
+  animation: heroPanelExit 0.28s ease-in both;
+}
+
+@keyframes heroPanelEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroPanelExit {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

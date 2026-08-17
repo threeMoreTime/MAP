@@ -86,22 +86,21 @@ export function heroSceneReducer(
       };
     }
     case 'RESET_VIEW': {
-      // 有选中城市时等价于关闭详情回全国；否则仅重置镜头并解除旋转挂起
-      if (state.selectedCity) {
-        return {
-          ...state,
-          mode: 'transitioning',
-          selectedCity: null,
-          hoveredCity: null,
-          transition: { to: 'reset', city: null },
-          autoRotateSuspended: false,
-        };
-      }
-      return { ...state, autoRotateSuspended: false };
+      // 重置视角：清选中（走回全国过渡）、解除旋转挂起，并总是发出相机重置信号
+      return {
+        ...state,
+        mode: state.selectedCity ? 'transitioning' : 'overview',
+        selectedCity: null,
+        hoveredCity: null,
+        transition: { to: 'reset', city: null },
+        autoRotateSuspended: false,
+      };
     }
     case 'TRANSITION_END': {
-      if (state.mode !== 'transitioning') return state;
-      if (state.transition?.to === 'focus' && state.selectedCity) {
+      if (!state.transition) return state;
+      // 相机命令（如无选中的重置视角）不经过 transitioning 模式，只清过渡信号
+      if (state.mode !== 'transitioning') return { ...state, transition: null };
+      if (state.transition.to === 'focus' && state.selectedCity) {
         return { ...state, mode: 'focused', transition: null };
       }
       return { ...state, mode: 'overview', transition: null };
