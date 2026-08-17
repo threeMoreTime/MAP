@@ -17,17 +17,19 @@ export function createHeroSceneState(
 ): HeroSceneState {
   // URL ?city= 直达：数据就绪前即进入 focused（面板先行，镜头由场景层在 ready 后补聚焦）
   const selected = init?.selectedCity ?? null;
+  const quality = init?.quality ?? 'medium';
   return {
     mode: selected ? 'focused' : 'overview',
     metric: init?.metric ?? ('daily_ridership_wan' as MetricKey),
     selectedCity: selected,
     hoveredCity: null,
-    autoRotateEnabled: true,
+    // 移动端 / 弱设备（low 档）默认不起转，节省 GPU；用户可用 controls 打开
+    autoRotateEnabled: quality !== 'low',
     autoRotateSuspended: false,
     showLines: true,
     showLabels: true,
     reducedMotion: init?.reducedMotion ?? false,
-    quality: init?.quality ?? 'medium',
+    quality,
     visible: true,
     introDone: false,
     transition: null,

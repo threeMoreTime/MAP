@@ -156,4 +156,13 @@ describe('heroSceneReducer 场景状态机', () => {
     expect(selectAmbientAnimation(low).ambience).toBe(false);
     expect(selectAmbientAnimation(low).pulse).toBe(false);
   });
+
+  it('low 档（移动端/弱设备）默认不起转，controls 可打开', () => {
+    const s = createHeroSceneState({ quality: 'low' });
+    expect(s.autoRotateEnabled).toBe(false);
+    expect(selectAutoRotateActive(s)).toBe(false);
+    const on = run(s, { type: 'TOGGLE_AUTOROTATE' });
+    expect(on.autoRotateEnabled).toBe(true);
+    expect(selectAutoRotateActive(on)).toBe(true);
+  });
 });

@@ -138,6 +138,23 @@ export default function DashboardHero3D({
     };
   }, [state.hoveredCity, state.metric, ranked]);
 
+  // ---- 滚动生命周期：Hero 大部分离开视口 → 暂停旋转/飞线 effect/pulse/墨尘；
+  // 回到视口按状态恢复（不销毁 ECharts 实例，压低滚到下方数据区后的 GPU 占用）----
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = (entries[0]?.intersectionRatio ?? 1) >= 0.35;
+        dispatch({ type: 'SET_VISIBILITY', visible });
+      },
+      { threshold: [0, 0.35, 0.75] },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [dispatch]);
+
   // ---- 面板可见性与过渡姿态 ----
   const exiting = state.mode === 'transitioning' && state.transition?.to === 'reset';
   const panelOpen = exiting || (!!state.selectedCity && !!cityDetail);
@@ -156,7 +173,10 @@ export default function DashboardHero3D({
   );
 
   return (
-    <section className="relative h-screen min-h-[560px] w-full overflow-hidden bg-[#0b1016]">
+    <section
+      ref={sectionRef}
+      className="relative h-screen min-h-[560px] w-full overflow-hidden bg-[#0b1016]"
+    >
       <div className="absolute inset-0">
         <HeroMap3D
           ref={heroRef}
