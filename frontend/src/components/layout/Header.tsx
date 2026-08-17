@@ -17,7 +17,7 @@ export default function Header() {
           className="mr-auto flex items-center gap-2.5 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion-500"
         >
           {/* 朱印 · 站点签章 */}
-          <span className="flex size-5 items-center justify-center rounded-[3px] bg-vermilion-500 font-serif text-[12px] font-semibold leading-none text-paper-50">
+          <span className="flex size-5 items-center justify-center rounded-[3px] bg-vermilion-600 font-serif text-[12px] font-semibold leading-none text-paper-50">
             铁
           </span>
           <span className="font-serif text-[15px] font-semibold text-ink-900">MetroViz</span>

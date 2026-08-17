@@ -297,7 +297,7 @@ export default function DataQualityPage() {
               onClick={() => setActiveGroup(key)}
               className={`cursor-pointer rounded-sm px-3 py-1.5 text-[12px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
                 activeGroup === key
-                  ? 'bg-vermilion-500 font-semibold text-paper-50'
+                  ? 'bg-vermilion-600 font-semibold text-paper-50'
                   : 'text-ink-500 hover:text-ink-900'
               }`}
             >
@@ -353,7 +353,7 @@ export default function DataQualityPage() {
                 onClick={() => setFilterTag(t.id)}
                 className={`cursor-pointer rounded-full border px-2.5 py-1 text-[11px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
                   filterTag === t.id
-                    ? 'border-vermilion-500 bg-vermilion-500 font-semibold text-paper-50'
+                    ? 'border-vermilion-600 bg-vermilion-600 font-semibold text-paper-50'
                     : 'border-paper-300 bg-paper-50 text-ink-500 hover:text-ink-900'
                 }`}
               >

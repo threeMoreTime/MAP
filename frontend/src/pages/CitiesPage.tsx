@@ -85,17 +85,17 @@ function CityCard({ city, index }: { city: MergedCity; index: number }) {
 
   return (
     <div
-      className="city-card mb-4 break-inside-avoid overflow-hidden rounded-lg bg-paper-100 shadow-card transition-shadow duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 hover:shadow-card-hover"
+      className="city-card group mb-4 break-inside-avoid overflow-hidden rounded-lg bg-paper-100 shadow-card transition-shadow duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 hover:shadow-card-hover"
       role="button"
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       aria-label={`查看${city.city_cn}城市详情`}
     >
-      {/* Cover */}
+      {/* Cover（悬浮时封面轻微放大，仅限指针设备） */}
       <div className={`city-card-cover relative ${tall ? 'city-card-cover--tall' : ''}`} style={{ height: tall ? 240 : 180 }}>
         <div
-          className="city-cover-image absolute inset-0 bg-cover bg-center"
+          className="city-cover-image absolute inset-0 bg-cover bg-center transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [@media(hover:hover)]:group-hover:scale-[1.05]"
           data-city={city.city}
           data-has-cover={coverUrl ? 'true' : 'false'}
           style={{ backgroundImage }}
@@ -232,7 +232,7 @@ export default function CitiesPage() {
                   key={key}
                   className={`cursor-pointer rounded-full border px-2.5 py-1 text-[12px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
                     cityFilter === key
-                      ? 'border-vermilion-500 bg-vermilion-500 font-medium text-paper-50'
+                      ? 'border-vermilion-600 bg-vermilion-600 font-medium text-paper-50'
                       : 'border-paper-300 bg-paper-50 text-ink-500 hover:text-ink-900'
                   }`}
                   onClick={() => setCityFilter(key)}

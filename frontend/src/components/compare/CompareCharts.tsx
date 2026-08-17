@@ -118,6 +118,10 @@ function RadarChart({ cities }: { cities: ComparableCity[] }) {
         areaStyle: { color: COLOR_PALETTE[i % COLOR_PALETTE.length], opacity: 0.08 },
         itemStyle: { color: COLOR_PALETTE[i % COLOR_PALETTE.length] },
       })),
+      // 各城市错峰展开，强调"逐城铺开"的阅读节奏
+      animationDuration: 700,
+      animationEasing: 'cubicOut' as const,
+      animationDelay: (idx: number) => idx * 150,
     }],
   };
 
@@ -192,7 +196,7 @@ export default function CompareCharts({ cities }: Props) {
               onClick={() => setActiveMetric(i)}
               className={`cursor-pointer rounded-full px-3 py-1 text-[12px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
                 activeMetric === i
-                  ? 'bg-vermilion-500 font-semibold text-paper-50'
+                  ? 'bg-vermilion-600 font-semibold text-paper-50'
                   : 'border border-paper-300 bg-paper-50 text-ink-500 hover:text-ink-900'
               }`}
             >
@@ -205,9 +209,13 @@ export default function CompareCharts({ cities }: Props) {
 
       {/* Radar chart */}
       <section className="rounded-lg bg-paper-100 p-5 shadow-card">
-        <div className="mb-3 font-serif text-[15px] font-semibold text-ink-900">
-          多维归一化对比
+        <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
+          <div className="font-serif text-[15px] font-semibold text-ink-900">多维归一化对比</div>
+          <div className="text-[11px] leading-relaxed text-ink-400">
+            各维度按已选城市中的最大值归一化为 100%，覆盖面积越大综合越强
+          </div>
         </div>
+        <div className="mb-3 border-b border-paper-300" />
         <RadarChart cities={cities} />
         {cities.some(c => c.dailyRidershipWan === null || c.operatingMileageKm === null) && (
           <div className="mt-2 text-center text-[11px] text-ink-400">

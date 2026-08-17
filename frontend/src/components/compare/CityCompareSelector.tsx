@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import type { ComparableCity } from '../../types/metro';
 
 interface Props {
@@ -13,104 +13,48 @@ export default function CityCompareSelector({
   allCities, selectedSlugs, maxReached, onAdd, onRemove,
 }: Props) {
   const [query, setQuery] = useState('');
-  const [open, setOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
 
   const selectedSet = new Set(selectedSlugs);
 
-  const results = query.trim()
-    ? allCities.filter(c =>
-        c.city_cn.includes(query.trim()) ||
-        c.city.toLowerCase().includes(query.trim().toLowerCase()),
-      ).slice(0, 12)
-    : [];
+  // 搜索框兼作 chips 过滤器：直接点选或输入过滤后点选
+  const visibleCities = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return allCities;
+    return allCities.filter(c =>
+      c.city_cn.includes(query.trim()) || c.city.toLowerCase().includes(q)
+    );
+  }, [allCities, query]);
 
-  useEffect(() => {
-    if (!open) return;
-    const handler = (e: MouseEvent) => {
-      if (listRef.current && !listRef.current.contains(e.target as Node) &&
-          inputRef.current && !inputRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setQuery('');
-      setOpen(false);
-      inputRef.current?.blur();
-    }
-  };
-
-  const handleSelect = (slug: string) => {
-    if (selectedSet.has(slug) || maxReached) return;
-    onAdd(slug);
-    setQuery('');
-    setOpen(false);
+  const chip = (city: string) => {
+    const isSelected = selectedSet.has(city);
+    const disabled = isSelected || maxReached;
+    return { isSelected, disabled };
   };
 
   return (
-    <div className="relative flex flex-col gap-2.5">
-      {/* Search input */}
+    <div className="flex flex-col gap-2.5">
+      {/* 过滤输入 + 已选标签 */}
       <div className="relative">
         <input
-          ref={inputRef}
           type="text"
           value={query}
-          onChange={e => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => query.trim() && setOpen(true)}
-          onKeyDown={handleKeyDown}
-          placeholder="搜索城市中文名或拼音..."
+          onChange={e => setQuery(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Escape') setQuery(''); }}
+          placeholder="输入城市名过滤，或直接点选下方城市..."
           aria-label="搜索城市"
           disabled={maxReached}
           className="h-9 w-full max-w-[360px] rounded-sm border border-paper-300 bg-paper-50 px-3 pr-9 text-[13px] text-ink-900 placeholder-ink-300 outline-none focus:border-vermilion-500 disabled:opacity-50"
         />
         {query && (
           <button
-            onClick={() => { setQuery(''); setOpen(false); }}
-            aria-label="清空搜索"
+            onClick={() => setQuery('')}
+            aria-label="清空过滤"
             className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-[12px] text-ink-400 hover:text-ink-700"
           >✕</button>
         )}
       </div>
 
-      {/* Search results dropdown */}
-      {open && results.length > 0 && (
-        <div
-          ref={listRef}
-          role="listbox"
-          className="absolute left-0 top-full z-50 min-w-[260px] overflow-y-auto rounded-sm border border-paper-300 bg-paper-50 shadow-card-hover"
-          style={{ maxHeight: 220 }}
-        >
-          {results.map(c => {
-            const isSelected = selectedSet.has(c.city);
-            const disabled = isSelected || maxReached;
-            return (
-              <button
-                key={c.city}
-                role="option"
-                aria-selected={isSelected}
-                onClick={() => handleSelect(c.city)}
-                disabled={disabled}
-                className={`flex w-full items-center justify-between px-3 py-2 text-left text-[13px] ${
-                  disabled
-                    ? 'cursor-default text-ink-300 opacity-60'
-                    : 'cursor-pointer text-ink-900 hover:bg-paper-100'
-                }`}
-              >
-                <span>{c.city_cn} <span className="text-[11px] text-ink-400">{c.city}</span></span>
-                {isSelected && <span className="text-[12px] text-ink-400">已选</span>}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Selected city tags */}
+      {/* 已选城市标签 */}
       <div className="flex flex-wrap items-center gap-2">
         <span
           className={`rounded-full border px-2 py-0.5 text-[12px] font-semibold tabular-nums ${
@@ -146,6 +90,40 @@ export default function CityCompareSelector({
         )}
         {!maxReached && selectedSlugs.length < 2 && (
           <span className="text-[12px] text-ink-400">请至少选择 2 个城市开始对比</span>
+        )}
+      </div>
+
+      {/* 全量城市点选墙（搜索过滤） */}
+      <div
+        className="flex max-h-[132px] flex-wrap gap-1.5 overflow-y-auto rounded-md border border-paper-200 bg-paper-50 p-2"
+        role="listbox"
+        aria-label="可选城市列表"
+      >
+        {visibleCities.length === 0 ? (
+          <span className="w-full py-2 text-center text-[12px] text-ink-400">没有匹配的城市</span>
+        ) : (
+          visibleCities.map(c => {
+            const { isSelected, disabled } = chip(c.city);
+            return (
+              <button
+                key={c.city}
+                role="option"
+                aria-selected={isSelected}
+                disabled={disabled}
+                onClick={() => onAdd(c.city)}
+                className={`rounded-full border px-2.5 py-1 text-[12px] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-vermilion-500 ${
+                  isSelected
+                    ? 'cursor-default border-ink-400/25 bg-ink-400/10 text-ink-400'
+                    : maxReached
+                      ? 'cursor-default border-paper-200 bg-paper-50 text-ink-300'
+                      : 'cursor-pointer border-paper-300 bg-paper-50 text-ink-700 hover:border-vermilion-500/50 hover:bg-vermilion-50 hover:text-vermilion-600'
+                }`}
+              >
+                {c.city_cn}
+                {isSelected && <span className="ml-1 text-[10px]">已选</span>}
+              </button>
+            );
+          })
         )}
       </div>
     </div>
