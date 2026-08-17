@@ -16,3 +16,6 @@ output/
 .claudeignore
 # Playwright MCP debug artifacts
 .playwright-mcp/
+
+# Local debug screenshots
+.tmp/
