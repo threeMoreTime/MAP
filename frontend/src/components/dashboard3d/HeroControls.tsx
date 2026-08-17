@@ -2,6 +2,8 @@ interface Props {
   autoRotateEnabled: boolean;
   showLines: boolean;
   showLabels: boolean;
+  /** intro 完成后阶梯显影 */
+  revealed: boolean;
   onToggleAutoRotate: () => void;
   onToggleLines: () => void;
   onToggleLabels: () => void;
@@ -24,6 +26,7 @@ export default function HeroControls({
   autoRotateEnabled,
   showLines,
   showLabels,
+  revealed,
   onToggleAutoRotate,
   onToggleLines,
   onToggleLabels,
@@ -33,7 +36,10 @@ export default function HeroControls({
     <div
       role="group"
       aria-label="3D 场景控制"
-      className="absolute z-20 flex gap-2 max-lg:right-3 max-lg:top-24 max-lg:flex-col lg:bottom-6 lg:right-4"
+      className={`absolute z-20 flex gap-2 max-lg:right-3 max-lg:top-24 max-lg:flex-col lg:bottom-6 lg:right-4 ${
+        revealed ? 'motion-safe:hero-fade-in' : 'opacity-0'
+      }`}
+      style={revealed ? { animationDelay: '260ms' } : undefined}
     >
       <button
         type="button"

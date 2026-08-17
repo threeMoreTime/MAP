@@ -9,6 +9,8 @@ interface Props {
   hoveredCity: string | null;
   selectedCity: string | null;
   count: number;
+  /** intro 完成后阶梯显影 */
+  revealed: boolean;
   onHover: (city: string | null) => void;
   onSelect: (city: string) => void;
 }
@@ -24,6 +26,7 @@ export default function HeroRanking({
   hoveredCity,
   selectedCity,
   count,
+  revealed,
   onHover,
   onSelect,
 }: Props) {
@@ -34,7 +37,10 @@ export default function HeroRanking({
   return (
     <nav
       aria-label={`${ml.name} Top ${top.length}`}
-      className="absolute right-4 top-1/2 z-20 hidden w-[212px] -translate-y-1/2 flex-col rounded-lg border border-[#2b3a4e] bg-[#0b1016]/60 p-2.5 backdrop-blur-[2px] lg:flex"
+      className={`absolute right-4 top-1/2 z-20 hidden w-[212px] -translate-y-1/2 flex-col rounded-lg border border-[#2b3a4e] bg-[#0b1016]/60 p-2.5 backdrop-blur-[2px] lg:flex ${
+        revealed ? 'motion-safe:hero-fade-in' : 'opacity-0'
+      }`}
+      style={revealed ? { animationDelay: '260ms' } : undefined}
     >
       <div
         className="mb-1.5 px-1 font-serif text-[13px] font-semibold"

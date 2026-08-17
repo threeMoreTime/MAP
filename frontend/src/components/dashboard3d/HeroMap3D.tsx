@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { echarts, type EChartsCoreOption } from '../../lib/echarts';
 import { withBaseUrl } from '../../utils/path';
 import { NIGHT } from '../../lib/hero3d/palette';
@@ -11,8 +11,8 @@ import MetroMapChart from '../charts/MetroMapChart';
 /**
  * 夜墨 3D 场景画布（geo3D + scatter3D + lines3D）。
  *
- * 职责边界：只管 WebGL 世界（GL 生命周期 / option 应用 / 事件桥 / 相机命令 / 2D 回退），
- * 场景状态机、overlay、排行、面板都在 DashboardHero3D 层。
+ * 职责边界：只管 WebGL 世界（GL 生命周期 / option 应用 / 事件桥 / 相机命令 /
+ * 一次性 intro / Top 城市 pulse / 2D 回退），场景状态机与 UI 在 DashboardHero3D 层。
  *
  * 相机纪律：
  * - 数据/样式更新只走 series merge（id 定位），不带 viewControl 相机字段，
@@ -26,6 +26,14 @@ export interface HeroMap3DHandle {
   resetView(durationMs: number): void;
 }
 
+/** pulse 目标城市（Top N，由 quality 档决定） */
+export interface PulseCity {
+  city: string;
+  lng: number;
+  lat: number;
+  rank: number;
+}
+
 interface Props {
   data: MergedCity[];
   metric: MetricKey;
@@ -36,10 +44,16 @@ interface Props {
   flylineEffect: boolean;
   reducedMotion: boolean;
   dprCap: number | null;
+  pulse: boolean;
+  pulseCities: PulseCity[];
+  pulseIntervalMs: number;
+  /** URL 直达等场景跳过整套 intro */
+  skipIntro: boolean;
   onCityHover: (city: string | null) => void;
   onCitySelect: (city: string) => void;
   onCameraDrag: () => void;
   onSceneReady: () => void;
+  onIntroDone: () => void;
 }
 
 /** geo3D 组件的内部坐标系逃逸口（echarts-gl 无官方类型，收敛在此处） */
@@ -65,6 +79,33 @@ const DRAG_THRESHOLD = 6;
 /** hover 命中半径（px）：鼠标远离节点屏幕位置即视为离开 */
 const HOVER_LEAVE_RADIUS = 30;
 
+/** intro 时间线（ms）：灯光显影 → 节点分批点亮 → 飞线 → 收尾 */
+const INTRO_LIGHT_UP_MS = 140;
+const INTRO_NODE_BATCHES = [380, 490, 600, 710, 820];
+const INTRO_NODE_BATCH_SIZE = 12;
+const INTRO_LINES_MS = 1080;
+const INTRO_FINISH_MS = 1280;
+
+function linesSeriesOption(lines: HeroLineDatum[], effect: boolean) {
+  return {
+    id: 'hero-lines',
+    effect: {
+      show: effect,
+      trailWidth: 1.6,
+      trailLength: 0.4,
+      trailColor: NIGHT.accent,
+      trailOpacity: 0.9,
+      constantSpeed: 22,
+    },
+    lineStyle: { color: NIGHT.accent, opacity: effect ? 0.16 : 0, width: 1 },
+    data: lines,
+  };
+}
+
+function nodesSeriesOption(nodes: HeroNodeDatum[]) {
+  return { id: 'hero-nodes', data: nodes };
+}
+
 const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
   {
     data,
@@ -76,10 +117,15 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
     flylineEffect,
     reducedMotion,
     dprCap,
+    pulse,
+    pulseCities,
+    pulseIntervalMs,
+    skipIntro,
     onCityHover,
     onCitySelect,
     onCameraDrag,
     onSceneReady,
+    onIntroDone,
   },
   ref,
 ) {
@@ -90,9 +136,55 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
   const instanceRef = useRef<echarts.ECharts | null>(null);
   const hoverRef = useRef<{ city: string; x: number; y: number } | null>(null);
 
-  // 最新回调引用（事件绑定一次，回调保持最新闭包）
-  const handlersRef = useRef({ onCityHover, onCitySelect, onCameraDrag });
-  handlersRef.current = { onCityHover, onCitySelect, onCameraDrag };
+  // 最新 props/回调引用（事件与定时器绑定一次，读取保持最新值）
+  const handlersRef = useRef({ onCityHover, onCitySelect, onCameraDrag, onIntroDone });
+  handlersRef.current = { onCityHover, onCitySelect, onCameraDrag, onIntroDone };
+  const propsRef = useRef({ nodes, lines, flylineEffect });
+  propsRef.current = { nodes, lines, flylineEffect };
+  const pulseCitiesRef = useRef(pulseCities);
+  pulseCitiesRef.current = pulseCities;
+
+  // intro / 指标过渡进行中：pump 类动画暂停，避免互相踩
+  const introActiveRef = useRef(false);
+  const introPlayedRef = useRef(false);
+  const metricTransitionRef = useRef(false);
+  const introTimersRef = useRef<number[]>([]);
+
+  const goToFallback = useCallback(() => {
+    instanceRef.current?.dispose();
+    instanceRef.current = null;
+    setPhase('fallback');
+  }, []);
+
+  const applySeriesPayload = useCallback(
+    (payload: object[]) => {
+      const inst = instanceRef.current;
+      if (!inst) return;
+      try {
+        inst.setOption({ series: payload });
+      } catch {
+        goToFallback();
+      }
+    },
+    [goToFallback],
+  );
+
+  const applyScene = useCallback(
+    (applyNodes: HeroNodeDatum[], applyLines: HeroLineDatum[], effect: boolean) => {
+      applySeriesPayload([linesSeriesOption(applyLines, effect), nodesSeriesOption(applyNodes)]);
+    },
+    [applySeriesPayload],
+  );
+
+  /** intro 收尾：立即呈现最终状态（主动完成或被用户交互打断） */
+  const finishIntro = useCallback(() => {
+    introTimersRef.current.forEach((t) => clearTimeout(t));
+    introTimersRef.current = [];
+    introActiveRef.current = false;
+    const current = propsRef.current;
+    applyScene(current.nodes, current.lines, current.flylineEffect);
+    handlersRef.current.onIntroDone();
+  }, [applyScene]);
 
   useImperativeHandle(
     ref,
@@ -106,33 +198,41 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
         const project = (lngLat: [number, number]) =>
           geo3D?.coordinateSystem?.dataToPoint?.(lngLat) ?? [0, 0, 0];
         const pose = cityFocusPose(project, city);
-        inst.setOption({
-          geo3D: {
-            viewControl: {
-              ...pose,
-              animation: true,
-              animationDurationUpdate: durationMs,
-              animationEasingUpdate: 'cubicOut',
+        try {
+          inst.setOption({
+            geo3D: {
+              viewControl: {
+                ...pose,
+                animation: true,
+                animationDurationUpdate: durationMs,
+                animationEasingUpdate: 'cubicOut',
+              },
             },
-          },
-        });
+          });
+        } catch {
+          goToFallback();
+        }
       },
       resetView(durationMs: number) {
         const inst = instanceRef.current;
         if (!inst) return;
-        inst.setOption({
-          geo3D: {
-            viewControl: {
-              ...OVERVIEW_POSE,
-              animation: true,
-              animationDurationUpdate: durationMs,
-              animationEasingUpdate: 'cubicOut',
+        try {
+          inst.setOption({
+            geo3D: {
+              viewControl: {
+                ...OVERVIEW_POSE,
+                animation: true,
+                animationDurationUpdate: durationMs,
+                animationEasingUpdate: 'cubicOut',
+              },
             },
-          },
-        });
+          });
+        } catch {
+          goToFallback();
+        }
       },
     }),
-    [],
+    [goToFallback],
   );
 
   // GL 扩展与地图 GeoJSON 加载（失败一律回退 2D，不白屏）
@@ -149,9 +249,7 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
         echarts.registerMap('china', geoJson);
         setPhase('ready');
       } catch {
-        if (!cancelled) {
-          setPhase('fallback');
-        }
+        if (!cancelled) setPhase('fallback');
       }
     })();
     return () => {
@@ -159,7 +257,7 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
     };
   }, [phase]);
 
-  // 建实例 + 应用基础 option（一次性；相机异常时回退 2D）
+  // 建实例 + 基础 option + 一次性 intro（相机异常时回退 2D）
   useEffect(() => {
     if (phase !== 'ready') return;
     const el = containerRef.current;
@@ -171,31 +269,78 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
         instanceRef.current =
           existing ||
           echarts.init(el, undefined, {
-            devicePixelRatio: dprCap ? Math.min(window.devicePixelRatio ?? 1, dprCap) : undefined,
+            devicePixelRatio: dprCap
+              ? Math.min(window.devicePixelRatio ?? 1, dprCap)
+              : undefined,
           });
       }
-      instanceRef.current.setOption(buildBaseOption(autoRotate) satisfies EChartsCoreOption);
-      onSceneReady();
+      instanceRef.current?.setOption(buildBaseOption(autoRotate) satisfies EChartsCoreOption);
     } catch {
-      instanceRef.current?.dispose();
-      instanceRef.current = null;
-      // 错误处理路径：GL 上下文创建失败时同步转入 2D 回退，避免白屏
-      setPhase('fallback');
+      goToFallback();
       return;
     }
+
+    let introInterrupt: (() => void) | null = null;
+    if (!reducedMotion && !skipIntro && !introPlayedRef.current) {
+      introPlayedRef.current = true;
+      introActiveRef.current = true;
+      const timers = introTimersRef.current;
+      try {
+        // 0ms：暗场 + 空场景（夜墨底先行）
+        instanceRef.current?.setOption({
+          geo3D: { light: { main: { intensity: 0.3 }, ambient: { intensity: 0.2 } } },
+        });
+        applyScene([], [], false);
+      } catch {
+        goToFallback();
+        return;
+      }
+      // 140ms：灯光显影（light intensity 是契约允许的动画通道）
+      timers.push(
+        window.setTimeout(() => {
+          instanceRef.current?.setOption({
+            geo3D: { light: { main: { intensity: 1.25 }, ambient: { intensity: 0.45 } } },
+          });
+        }, INTRO_LIGHT_UP_MS),
+      );
+      // 380ms+：城市节点分批点亮（stagger）
+      INTRO_NODE_BATCHES.forEach((ms, i) => {
+        timers.push(
+          window.setTimeout(() => {
+            applySeriesPayload([
+              nodesSeriesOption(propsRef.current.nodes.slice(0, INTRO_NODE_BATCH_SIZE * (i + 1))),
+            ]);
+          }, ms),
+        );
+      });
+      // 1080ms：Top 城市飞线建立
+      timers.push(
+        window.setTimeout(() => {
+          applySeriesPayload([
+            linesSeriesOption(propsRef.current.lines, propsRef.current.flylineEffect),
+          ]);
+        }, INTRO_LINES_MS),
+      );
+      // 1280ms：收尾（完整状态 + overlay 阶梯开始）
+      timers.push(window.setTimeout(finishIntro, INTRO_FINISH_MS));
+      // 用户交互立即打断 intro，允许马上操作
+      introInterrupt = () => finishIntro();
+      el.addEventListener('pointerdown', introInterrupt);
+    }
+
+    onSceneReady();
 
     const canvas = el.querySelector('canvas');
     const onContextLost = (e: Event) => {
       e.preventDefault();
-      instanceRef.current?.dispose();
-      instanceRef.current = null;
-      setPhase('fallback');
+      goToFallback();
     };
     canvas?.addEventListener('webglcontextlost', onContextLost);
     return () => {
+      if (introInterrupt) el.removeEventListener('pointerdown', introInterrupt);
       canvas?.removeEventListener('webglcontextlost', onContextLost);
     };
-    // 基础 option 只应用一次；autoRotate 变化由专门 effect 处理
+    // 基础 option 与 intro 只在 ready 时执行一次；autoRotate/数据由专门 effect 处理
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
@@ -206,74 +351,85 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
   const prevNodesRef = useRef(nodes);
   const appliedOnceRef = useRef(false);
   useEffect(() => {
-    const inst = instanceRef.current;
-    if (phase !== 'ready' || !inst) return;
+    if (phase !== 'ready' || !instanceRef.current) return;
+    // intro 进行中不应用：收尾时会以最新 props 全量呈现
+    if (introActiveRef.current) return;
 
     const timers: number[] = [];
     const schedule = (ms: number, fn: () => void) => {
       timers.push(window.setTimeout(fn, ms));
     };
-    const applySeries = (payload: object[]) => {
-      try {
-        inst.setOption({ series: payload });
-      } catch {
-        // GL 运行时异常：回退 2D
-        instanceRef.current?.dispose();
-        instanceRef.current = null;
-        setPhase('fallback');
-      }
-    };
-    const linesSeries = (opacity: number, effect: boolean, data: HeroLineDatum[]) => ({
-      id: 'hero-lines',
-      effect: {
-        show: effect,
-        trailWidth: 1.6,
-        trailLength: 0.4,
-        trailColor: NIGHT.accent,
-        trailOpacity: 0.9,
-        constantSpeed: 22,
-      },
-      lineStyle: { color: NIGHT.accent, opacity, width: 1 },
-      data,
-    });
 
     const metricChanged = appliedOnceRef.current && prevMetricRef.current !== metric;
     if (!metricChanged || reducedMotion) {
-      applySeries([
-        linesSeries(flylineEffect ? 0.16 : 0, flylineEffect, lines),
-        { id: 'hero-nodes', data: nodes },
-      ]);
+      applyScene(nodes, lines, flylineEffect);
     } else {
+      metricTransitionRef.current = true;
       // 0ms：旧飞线淡出、旧节点视觉降弱
-      applySeries([
-        linesSeries(0, false, []),
+      applySeriesPayload([
+        linesSeriesOption([], false),
         {
-          id: 'hero-nodes',
-          data: prevNodesRef.current.map((n) => ({
-            ...n,
-            itemStyle: { ...n.itemStyle, opacity: n.itemStyle.opacity * 0.55 },
-            label: { show: false },
-          })),
+          ...nodesSeriesOption(
+            prevNodesRef.current.map((n) => ({
+              ...n,
+              itemStyle: { ...n.itemStyle, opacity: n.itemStyle.opacity * 0.55 },
+              label: { show: false },
+            })),
+          ),
         },
       ]);
       // 180ms：新指标节点（尺寸重排）
-      schedule(180, () => applySeries([{ id: 'hero-nodes', data: nodes }]));
+      schedule(180, () => applySeriesPayload([nodesSeriesOption(nodes)]));
       // 280ms：新飞线以全透明数据就位
-      schedule(280, () => applySeries([linesSeries(0, false, lines)]));
-      // 460ms：渐进显影至目标透明度
-      schedule(460, () =>
-        applySeries([linesSeries(flylineEffect ? 0.16 : 0, flylineEffect, lines)]),
-      );
+      schedule(280, () => applySeriesPayload([linesSeriesOption(lines, false)]));
+      // 460ms：渐进显影至目标状态
+      schedule(460, () => {
+        applyScene(nodes, lines, flylineEffect);
+        metricTransitionRef.current = false;
+      });
     }
 
     prevNodesRef.current = nodes;
     prevMetricRef.current = metric;
     appliedOnceRef.current = true;
     return () => {
-      // 新一轮变化或卸载时清掉未执行的分拍
       timers.forEach((t) => clearTimeout(t));
+      metricTransitionRef.current = false;
     };
-  }, [phase, nodes, lines, flylineEffect, metric, reducedMotion]);
+  }, [phase, nodes, lines, flylineEffect, metric, reducedMotion, applyScene, applySeriesPayload]);
+
+  // Top 城市错峰呼吸：低频 setOption 调制 symbolSize/opacity（幅度 ≤10%），
+  // 相位按 rank 错开；intro / 指标过渡 / 不可见 / reduced motion 时暂停。
+  useEffect(() => {
+    if (phase !== 'ready' || !pulse || pulseIntervalMs <= 0) return;
+    const id = window.setInterval(() => {
+      if (introActiveRef.current || metricTransitionRef.current) return;
+      const inst = instanceRef.current;
+      if (!inst) return;
+      const targets = new Map(pulseCitiesRef.current.map((c) => [c.city, c.rank]));
+      if (targets.size === 0) return;
+      const t = Date.now() / 1000;
+      const data = propsRef.current.nodes.map((n) => {
+        const rank = targets.get(n.city);
+        if (rank == null) return n;
+        const wave = 0.5 + 0.5 * Math.sin(t * 1.7 + rank * 1.9);
+        return {
+          ...n,
+          symbolSize: Math.round(n.symbolSize * (1 + 0.1 * wave) * 10) / 10,
+          itemStyle: {
+            ...n.itemStyle,
+            opacity: Math.min(0.95, n.itemStyle.opacity + 0.05 * wave),
+          },
+        };
+      });
+      try {
+        inst.setOption({ series: [nodesSeriesOption(data)] });
+      } catch {
+        /* pulse 失败不致命 */
+      }
+    }, pulseIntervalMs);
+    return () => clearInterval(id);
+  }, [phase, pulse, pulseIntervalMs]);
 
   // autoRotate 开关（payload 附 duration 0，避免残留的相机插值时长造成无谓动画）
   useEffect(() => {
@@ -284,7 +440,7 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
         geo3D: { viewControl: { autoRotate, animationDurationUpdate: 0 } },
       });
     } catch {
-      /* 旋转开关失败不致命，相机命令与数据通道会再次尝试 */
+      /* 旋转开关失败不致命 */
     }
   }, [phase, autoRotate]);
 
@@ -304,11 +460,7 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
       };
       const city = p.data?.city;
       if (!city) return;
-      hoverRef.current = {
-        city,
-        x: p.event?.offsetX ?? 0,
-        y: p.event?.offsetY ?? 0,
-      };
+      hoverRef.current = { city, x: p.event?.offsetX ?? 0, y: p.event?.offsetY ?? 0 };
       handlersRef.current.onCityHover(city);
     };
     const onZrMouseMove = (e: { offsetX?: number; offsetY?: number }) => {
@@ -392,6 +544,7 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
   // 卸载释放
   useEffect(() => {
     return () => {
+      introTimersRef.current.forEach((t) => clearTimeout(t));
       instanceRef.current?.dispose();
       instanceRef.current = null;
     };

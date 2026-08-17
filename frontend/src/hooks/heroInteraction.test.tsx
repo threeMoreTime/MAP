@@ -50,6 +50,7 @@ describe('HeroRanking（地图/排行双向联动入口）', () => {
         metric="daily_ridership_wan"
         hoveredCity={null}
         selectedCity={null}
+        revealed={true}
         count={2}
         onHover={() => {}}
         onSelect={() => {}}
@@ -70,6 +71,7 @@ describe('HeroRanking（地图/排行双向联动入口）', () => {
         metric="daily_ridership_wan"
         hoveredCity="beijing"
         selectedCity={null}
+        revealed={true}
         count={3}
         onHover={onHover}
         onSelect={onSelect}
@@ -94,6 +96,7 @@ describe('HeroRanking（地图/排行双向联动入口）', () => {
         metric="daily_ridership_wan"
         hoveredCity={null}
         selectedCity={null}
+        revealed={true}
         count={3}
         onHover={onHover}
         onSelect={() => {}}

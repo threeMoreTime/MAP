@@ -13,6 +13,7 @@ import HeroRanking from './HeroRanking';
 import HeroCityTooltip from './HeroCityTooltip';
 import HeroControls from './HeroControls';
 import HeroCityPanel from './HeroCityPanel';
+import HeroAmbience from './HeroAmbience';
 
 /** 桌面排行行数（任务决策：Top 5） */
 const RANKING_COUNT = 5;
@@ -62,6 +63,14 @@ export default function DashboardHero3D({
   const heroRef = useRef<HeroMap3DHandle>(null);
   const [sceneReady, setSceneReady] = useState(false);
   const handleSceneReady = useCallback(() => setSceneReady(true), []);
+
+  // ---- intro 生命周期：reduced motion / URL 直达 → 跳过整套序列直接就绪 ----
+  const [skipIntro] = useState(() => !!selectedCity);
+  const handleIntroDone = useCallback(() => dispatch({ type: 'INTRO_DONE' }), [dispatch]);
+  useEffect(() => {
+    if (!sceneReady) return;
+    if (reducedMotion || skipIntro) dispatch({ type: 'INTRO_DONE' });
+  }, [sceneReady, reducedMotion, skipIntro, dispatch]);
 
   // ---- 镜头过渡：transition 信号 → 相机命令 + 计时收尾 ----
   useEffect(() => {
@@ -133,6 +142,19 @@ export default function DashboardHero3D({
   const exiting = state.mode === 'transitioning' && state.transition?.to === 'reset';
   const panelOpen = exiting || (!!state.selectedCity && !!cityDetail);
 
+  // ---- intro 后才起转 / 起 pulse / 起墨尘（overlay 显影阶梯同源）----
+  const sceneSettled = state.introDone;
+  const pulseCities = useMemo(
+    () =>
+      ranked.slice(0, profile.pulse.topN).map(({ city, lng, lat, rank }) => ({
+        city,
+        lng,
+        lat,
+        rank,
+      })),
+    [ranked, profile.pulse.topN],
+  );
+
   return (
     <section className="relative h-screen min-h-[560px] w-full overflow-hidden bg-[#0b1016]">
       <div className="absolute inset-0">
@@ -143,22 +165,30 @@ export default function DashboardHero3D({
           selectedCity={state.selectedCity}
           nodes={nodes}
           lines={lines}
-          autoRotate={rotationApplied}
+          autoRotate={rotationApplied && sceneSettled}
           flylineEffect={ambient.flylineEffect}
           reducedMotion={reducedMotion}
           dprCap={profile.dprCap}
+          pulse={ambient.pulse && sceneSettled}
+          pulseCities={pulseCities}
+          pulseIntervalMs={profile.pulse.intervalMs}
+          skipIntro={skipIntro}
           onCityHover={hoverCity}
           onCitySelect={handleCitySelect}
           onCameraDrag={handleCameraDrag}
           onSceneReady={handleSceneReady}
+          onIntroDone={handleIntroDone}
         />
       </div>
+
+      <HeroAmbience active={ambient.ambience && sceneSettled} />
 
       <HeroOverlay
         citiesCount={citiesCount}
         statsCount={statsCount}
         metric={state.metric}
         onMetricChange={onMetricChange}
+        revealed={sceneSettled}
       />
 
       {!panelOpen && (
@@ -170,6 +200,7 @@ export default function DashboardHero3D({
           count={RANKING_COUNT}
           onHover={hoverCity}
           onSelect={handleCitySelect}
+          revealed={sceneSettled}
         />
       )}
 
@@ -191,12 +222,16 @@ export default function DashboardHero3D({
         onToggleLines={() => dispatch({ type: 'TOGGLE_LINES' })}
         onToggleLabels={() => dispatch({ type: 'TOGGLE_LABELS' })}
         onResetView={handleResetView}
+        revealed={sceneSettled}
       />
 
       {/* 下滚锚点 */}
       <button
         onClick={onScrollToOverview}
-        className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 cursor-pointer rounded-full border border-[#2b3a4e] bg-[#0b1016]/60 px-4 py-1.5 text-[12px] text-[#8a94a3] backdrop-blur-[2px] transition-colors duration-200 hover:border-[#d0553f]/60 hover:text-[#e8e4d8] focus-visible:outline-2 focus-visible:outline-[#d0553f]"
+        className={`absolute bottom-6 left-1/2 z-10 -translate-x-1/2 cursor-pointer rounded-full border border-[#2b3a4e] bg-[#0b1016]/60 px-4 py-1.5 text-[12px] text-[#8a94a3] backdrop-blur-[2px] transition-colors duration-200 hover:border-[#d0553f]/60 hover:text-[#e8e4d8] focus-visible:outline-2 focus-visible:outline-[#d0553f] ${
+          sceneSettled ? 'motion-safe:hero-fade-in' : 'opacity-0'
+        }`}
+        style={sceneSettled ? { animationDelay: '320ms' } : undefined}
       >
         ↓ 查看数据总览
       </button>
