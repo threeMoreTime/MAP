@@ -9,13 +9,18 @@ import type { MergedCity } from '../../hooks/useMetroData';
 import type { MetricKey } from '../../types/metro';
 import HeroMap3D, { type HeroMap3DHandle } from './HeroMap3D';
 import HeroOverlay from './HeroOverlay';
+import HeroRanking from './HeroRanking';
 import HeroCityTooltip from './HeroCityTooltip';
 import HeroControls from './HeroControls';
 import HeroCityPanel from './HeroCityPanel';
 
+/** 桌面排行行数（任务决策：Top 5） */
+const RANKING_COUNT = 5;
+
 interface Props {
   data: MergedCity[];
   metric: MetricKey;
+  onMetricChange: (metric: MetricKey) => void;
   selectedCity: string | null;
   onCitySelect: (city: string | null) => void;
   /** 页面侧已解析的选中城市对象（驱动详情面板） */
@@ -32,6 +37,7 @@ interface Props {
 export default function DashboardHero3D({
   data,
   metric,
+  onMetricChange,
   selectedCity,
   onCitySelect,
   cityDetail,
@@ -139,6 +145,7 @@ export default function DashboardHero3D({
           lines={lines}
           autoRotate={rotationApplied}
           flylineEffect={ambient.flylineEffect}
+          reducedMotion={reducedMotion}
           dprCap={profile.dprCap}
           onCityHover={hoverCity}
           onCitySelect={handleCitySelect}
@@ -147,7 +154,24 @@ export default function DashboardHero3D({
         />
       </div>
 
-      <HeroOverlay citiesCount={citiesCount} statsCount={statsCount} />
+      <HeroOverlay
+        citiesCount={citiesCount}
+        statsCount={statsCount}
+        metric={state.metric}
+        onMetricChange={onMetricChange}
+      />
+
+      {!panelOpen && (
+        <HeroRanking
+          ranked={ranked}
+          metric={state.metric}
+          hoveredCity={state.hoveredCity}
+          selectedCity={state.selectedCity}
+          count={RANKING_COUNT}
+          onHover={hoverCity}
+          onSelect={handleCitySelect}
+        />
+      )}
 
       <HeroCityTooltip info={tooltipInfo} />
 

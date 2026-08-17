@@ -1,13 +1,18 @@
+import HeroMetricSwitcher from './HeroMetricSwitcher';
+import type { MetricKey } from '../../types/metro';
+
 interface Props {
   citiesCount: number;
   statsCount: number;
+  metric: MetricKey;
+  onMetricChange: (metric: MetricKey) => void;
 }
 
 /**
- * Hero 顶部标题叠加层：徽标 / 站名 / 数据口径声明。
- * pointer-events-none，不拦截地图交互；口径文案受 DESIGN.md 契约保护不可删除。
+ * Hero 顶部标题叠加层：徽标 / 站名 / 指标切换 / 数据口径声明。
+ * 除切换器外 pointer-events-none，不拦截地图交互；口径文案受 DESIGN.md 契约保护不可删除。
  */
-export default function HeroOverlay({ citiesCount, statsCount }: Props) {
+export default function HeroOverlay({ citiesCount, statsCount, metric, onMetricChange }: Props) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-col items-center px-4 pt-16 text-center sm:pt-20">
       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -30,6 +35,9 @@ export default function HeroOverlay({ citiesCount, statsCount }: Props) {
           数据来源：MetroDB.org · 公开数据快照，非官方实时发布 · 飞线为视觉示意，非实际客流
         </span>
       </p>
+      <div className="pointer-events-auto mt-1">
+        <HeroMetricSwitcher metric={metric} onMetricChange={onMetricChange} />
+      </div>
     </div>
   );
 }

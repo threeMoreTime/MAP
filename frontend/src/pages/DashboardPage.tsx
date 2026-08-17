@@ -77,6 +77,7 @@ export default function DashboardPage() {
       <DashboardHero3D
         data={filteredCities}
         metric={metric}
+        onMetricChange={setMetric}
         selectedCity={selectedCityName}
         onCitySelect={handleCitySelect}
         cityDetail={selectedCity}

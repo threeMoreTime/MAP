@@ -34,6 +34,7 @@ interface Props {
   lines: HeroLineDatum[];
   autoRotate: boolean;
   flylineEffect: boolean;
+  reducedMotion: boolean;
   dprCap: number | null;
   onCityHover: (city: string | null) => void;
   onCitySelect: (city: string) => void;
@@ -73,6 +74,7 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
     lines,
     autoRotate,
     flylineEffect,
+    reducedMotion,
     dprCap,
     onCityHover,
     onCitySelect,
@@ -197,36 +199,81 @@ const HeroMap3D = forwardRef<HeroMap3DHandle, Props>(function HeroMap3D(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
-  // 数据/视觉更新：仅 series merge（id 定位），不带相机字段
+  // 数据/视觉更新：仅 series merge（id 定位），不带相机字段。
+  // 指标切换时分拍过渡（约 800ms）：旧飞线淡出+节点降弱 → 节点重排 → 新飞线渐进显影；
+  // 其余变化（hover/选中/开关）即时应用；reduced motion 直接呈现最终状态。
+  const prevMetricRef = useRef(metric);
+  const prevNodesRef = useRef(nodes);
+  const appliedOnceRef = useRef(false);
   useEffect(() => {
     const inst = instanceRef.current;
     if (phase !== 'ready' || !inst) return;
-    try {
-      inst.setOption({
-        series: [
-          {
-            id: 'hero-lines',
-            effect: {
-              show: flylineEffect,
-              trailWidth: 1.6,
-              trailLength: 0.4,
-              trailColor: NIGHT.accent,
-              trailOpacity: 0.9,
-              constantSpeed: 22,
-            },
-            lineStyle: { color: NIGHT.accent, opacity: flylineEffect ? 0.16 : 0, width: 1 },
-            data: lines,
-          },
-          { id: 'hero-nodes', data: nodes },
-        ],
-      });
-    } catch {
-      // GL 运行时异常：回退 2D
-      instanceRef.current?.dispose();
-      instanceRef.current = null;
-      setPhase('fallback');
+
+    const timers: number[] = [];
+    const schedule = (ms: number, fn: () => void) => {
+      timers.push(window.setTimeout(fn, ms));
+    };
+    const applySeries = (payload: object[]) => {
+      try {
+        inst.setOption({ series: payload });
+      } catch {
+        // GL 运行时异常：回退 2D
+        instanceRef.current?.dispose();
+        instanceRef.current = null;
+        setPhase('fallback');
+      }
+    };
+    const linesSeries = (opacity: number, effect: boolean, data: HeroLineDatum[]) => ({
+      id: 'hero-lines',
+      effect: {
+        show: effect,
+        trailWidth: 1.6,
+        trailLength: 0.4,
+        trailColor: NIGHT.accent,
+        trailOpacity: 0.9,
+        constantSpeed: 22,
+      },
+      lineStyle: { color: NIGHT.accent, opacity, width: 1 },
+      data,
+    });
+
+    const metricChanged = appliedOnceRef.current && prevMetricRef.current !== metric;
+    if (!metricChanged || reducedMotion) {
+      applySeries([
+        linesSeries(flylineEffect ? 0.16 : 0, flylineEffect, lines),
+        { id: 'hero-nodes', data: nodes },
+      ]);
+    } else {
+      // 0ms：旧飞线淡出、旧节点视觉降弱
+      applySeries([
+        linesSeries(0, false, []),
+        {
+          id: 'hero-nodes',
+          data: prevNodesRef.current.map((n) => ({
+            ...n,
+            itemStyle: { ...n.itemStyle, opacity: n.itemStyle.opacity * 0.55 },
+            label: { show: false },
+          })),
+        },
+      ]);
+      // 180ms：新指标节点（尺寸重排）
+      schedule(180, () => applySeries([{ id: 'hero-nodes', data: nodes }]));
+      // 280ms：新飞线以全透明数据就位
+      schedule(280, () => applySeries([linesSeries(0, false, lines)]));
+      // 460ms：渐进显影至目标透明度
+      schedule(460, () =>
+        applySeries([linesSeries(flylineEffect ? 0.16 : 0, flylineEffect, lines)]),
+      );
     }
-  }, [phase, nodes, lines, flylineEffect]);
+
+    prevNodesRef.current = nodes;
+    prevMetricRef.current = metric;
+    appliedOnceRef.current = true;
+    return () => {
+      // 新一轮变化或卸载时清掉未执行的分拍
+      timers.forEach((t) => clearTimeout(t));
+    };
+  }, [phase, nodes, lines, flylineEffect, metric, reducedMotion]);
 
   // autoRotate 开关（payload 附 duration 0，避免残留的相机插值时长造成无谓动画）
   useEffect(() => {
