@@ -99,9 +99,12 @@ def build_manifest(stats: dict, assets: dict) -> dict:
     net_count = sum(1 for i in assets["items"] if i["has_network_map"])
     plan_count = sum(1 for i in assets["items"] if i["has_plan_map"])
     trend_count = sum(1 for i in assets["items"] if i["has_yearly_trend"])
+    # 数据实际采集日（区别于本文件的 generated_at 构建时间），供前端如实展示陈旧度
+    scrape_dates = [i.get("scrape_date") for i in stats.get("items", []) if i.get("scrape_date")]
     return {
         "generated_at": iso_now(),
         "version": "v1.0.0",
+        "stats_scrape_date": max(scrape_dates) if scrape_dates else None,
         "stats_city_count": stats["city_count"],
         "asset_city_count": assets["city_count"],
         "network_map_count": net_count,

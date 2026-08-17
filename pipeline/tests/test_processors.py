@@ -60,6 +60,8 @@ class TestIndexBuilder:
         assert manifest["stats_city_count"] == 2
         assert manifest["asset_city_count"] == 2
         assert manifest["plan_map_count"] == 1
+        # 数据采集日取各城市 scrape_date 最大值（诚实层：区别于 generated_at）
+        assert manifest["stats_scrape_date"] == "2026-01-01"
 
         items = {i["city"]: i for i in assets["items"]}
         assert items["xiamen"]["city_cn"] == "厦门"

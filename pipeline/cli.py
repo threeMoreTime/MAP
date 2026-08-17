@@ -12,7 +12,7 @@ import os
 import sys
 
 from pipeline.config import DATA_LATEST_DIR, ROOT
-from pipeline.processors import image_optimizer, index_builder, quality_auditor
+from pipeline.processors import archiver, image_optimizer, index_builder, quality_auditor
 from pipeline.validators import schema_validator
 
 
@@ -95,6 +95,19 @@ def cmd_optimize_images(args) -> int:
     return 0
 
 
+def cmd_archive(args) -> int:
+    data_dir = args.data_dir or os.path.join(ROOT, "data", "latest")
+    result = archiver.archive_latest(data_dir, root=ROOT)
+    if result["month"] is None:
+        print("[WARN] 无法从 manifest 解析 stats_scrape_date，跳过归档")
+        return 1
+    if result["archived"]:
+        print(f"已归档 {result['month']} 快照 → {result['dest']}")
+    else:
+        print(f"{result['month']} 快照已存在，跳过（幂等）")
+    return 0
+
+
 def cmd_all(args) -> int:
     rc = cmd_build_index(args)
     if rc != 0:
@@ -121,6 +134,9 @@ def main(argv=None) -> int:
     p_optimize.add_argument("--quality", type=int, default=85)
     p_optimize.add_argument("--dry-run", action="store_true")
 
+    p_archive = sub.add_parser("archive", help="按采集月归档 data/latest 到 data/history/")
+    p_archive.add_argument("--data-dir", default=None)
+
     sub.add_parser("all", help="build-index + validate")
 
     args = parser.parse_args(argv)
@@ -130,6 +146,7 @@ def main(argv=None) -> int:
         "validate": cmd_validate,
         "quality-report": cmd_quality_report,
         "optimize-images": cmd_optimize_images,
+        "archive": cmd_archive,
         "all": cmd_all,
     }
     return handlers[args.command](args)

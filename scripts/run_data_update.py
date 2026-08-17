@@ -132,6 +132,19 @@ def main():
         assets = index_builder.build_city_assets_index(cities_list, staging_cities_dir, ROOT)
         manifest = index_builder.build_manifest(stats, assets)
 
+        # 5.1 城市骤降熔断：上游改版/反爬导致大面积解析失败时，阻止坏数据进入后续流程
+        current_stats_path = os.path.join(DATA_LATEST_DIR, "metro_stats.json")
+        if os.path.exists(current_stats_path):
+            with open(current_stats_path, "r", encoding="utf-8") as f:
+                old_count = json.load(f).get("city_count", 0)
+            new_count = stats["city_count"]
+            if old_count > 0 and new_count < old_count * 0.8:
+                log(f"[FATAL] 城市骤降熔断触发：新数据仅 {new_count} 城（原有 {old_count} 城，"
+                    f"保留率 {new_count / old_count * 100:.0f}% < 80%）。疑似上游结构变更或大面积反爬，"
+                    f"本次更新强制阻断，请人工检查爬虫解析逻辑。")
+                sys.exit(30)
+            log(f"[PASS] 城市数量门禁: {new_count}/{old_count} 城")
+
         # 将内存中计算的 Staging 汇总写入到沙盒
         with open(os.path.join(staging_dir, "metro_stats.json"), "w", encoding="utf-8") as f:
             json.dump(stats, f, ensure_ascii=False, indent=2)

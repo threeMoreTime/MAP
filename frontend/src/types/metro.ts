@@ -35,6 +35,8 @@ export interface CityAsset {
 export interface Manifest {
   generated_at: string;
   version: string;
+  /** 数据实际采集日（各城市 scrape_date 的最大值），区别于 generated_at 构建时间 */
+  stats_scrape_date?: string | null;
   stats_city_count: number;
   asset_city_count: number;
   network_map_count: number;

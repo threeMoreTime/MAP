@@ -3,6 +3,7 @@ import SectionTitle from '../components/common/SectionTitle';
 import { useMetroData } from '../hooks/useMetroData';
 import LastUpdatedBadge from '../components/common/LastUpdatedBadge';
 import { withBaseUrl } from '../utils/path';
+import { daysSince, freshnessLevel } from '../utils/dataFreshness';
 
 const FIELDS: { name: string; desc: string; unit?: string }[] = [
   { name: 'daily_ridership_wan', desc: '统计日期当日全线网进站客流总量', unit: '万人次' },
@@ -132,6 +133,23 @@ export default function AboutPage() {
         </p>
         <div className="mt-4 flex flex-col items-center gap-2.5">
           <LastUpdatedBadge generatedAt={manifest?.generated_at} />
+          {(() => {
+            const days = daysSince(manifest?.stats_scrape_date);
+            const level = freshnessLevel(days);
+            return (
+              <div
+                className={`rounded-sm border px-3 py-1.5 text-[11px] leading-relaxed ${
+                  level === 'stale'
+                    ? 'border-gold-600/25 bg-gold-600/10 text-gold-600'
+                    : 'border-paper-300 bg-paper-50 text-ink-500'
+                }`}
+              >
+                数据采集日：{manifest?.stats_scrape_date ?? '未知'}
+                {days !== null && <> · 距今 {days} 天</>}
+                {level === 'stale' && <> · 快照已较陈旧，仅供历史参考</>}
+              </div>
+            );
+          })()}
           <a
             href={withBaseUrl('data/latest/manifest.json')}
             download="manifest.json"

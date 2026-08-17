@@ -19,6 +19,7 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  issues: write
 
 jobs:
   scheduled-update:
@@ -69,12 +70,22 @@ jobs:
         if [ "$UPDATE_EXIT" = "0" ]; then
           echo "has_changes=false" >> "$GITHUB_OUTPUT"
           echo "[CI] 数据无变动或对齐完毕。"
+          # 心跳留痕：无变化也写明数据实际年龄，避免"成功"掩盖静默停摆
+          SCRAPE=$(python -c "import json;m=json.load(open('data/latest/manifest.json'));print(m.get('stats_scrape_date') or 'unknown')" 2>/dev/null || echo unknown)
+          echo "## 📅 数据更新心跳" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 结果：数据无实质变动" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 最近采集日：${SCRAPE}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- 判定来源：data/latest/manifest.json 的 stats_scrape_date" >> "$GITHUB_STEP_SUMMARY"
         elif [ "$UPDATE_EXIT" = "10" ]; then
           echo "has_changes=true" >> "$GITHUB_OUTPUT"
           echo "[CI] 数据发现实质性变动。"
         elif [ "$UPDATE_EXIT" = "20" ]; then
           echo "::error::Staging validation failed or data anomaly threshold triggered."
           exit 20
+        elif [ "$UPDATE_EXIT" = "30" ]; then
+          echo "::error::城市骤降熔断触发：新数据城市数不足原有的 80%，疑似上游结构变更或大面积反爬，已阻断本次更新。"
+          exit 30
         else
           echo "::error::Unexpected exit code from run_data_update: $UPDATE_EXIT"
           exit "$UPDATE_EXIT"
@@ -107,6 +118,12 @@ jobs:
         echo "month=$(date +'%Y-%m')" >> "$GITHUB_OUTPUT"
       shell: bash
 
+    - name: Archive Snapshot to data/history
+      if: steps.update-step.outputs.has_changes == 'true' && (github.event.inputs.mode || 'write') == 'write'
+      run: |
+        python -m pipeline.cli archive
+      shell: bash
+
     - name: Create Automated Pull Request
       if: steps.update-step.outputs.has_changes == 'true' && (github.event.inputs.mode || 'write') == 'write'
       uses: peter-evans/create-pull-request@v6
@@ -120,3 +137,53 @@ jobs:
           data-pipeline
           automated-pr
         draft: false
+
+  alert-on-failure:
+    name: Open Failure Alert Issue
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: scheduled-update
+    permissions:
+      issues: write
+
+    steps:
+    - name: Create or Update Alert Issue
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const label = 'data-pipeline-alert';
+          const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+          const title = '数据更新流水线运行失败，需要人工排查';
+          const body = [
+            '月度数据更新 workflow 失败，可能原因：',
+            '- 爬虫被上游（MetroDB.org）反爬或页面结构变更',
+            '- 城市骤降熔断触发（新数据不足原有 80%）',
+            '- Staging 校验失败（exit 20）',
+            '- PR 创建所需 DATA_UPDATE_BOT_TOKEN 缺失或失效',
+            '',
+            `失败运行: ${runUrl}`,
+            '',
+            '排查手册: docs/DATA_UPDATE_RUNBOOK.md',
+          ].join('\n');
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: label,
+          });
+          if (issues.data.length > 0) {
+            await github.rest.issues.addComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issues.data[0].number,
+              body: `再次失败。${runUrl}`,
+            });
+          } else {
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: [label],
+            });
+          }

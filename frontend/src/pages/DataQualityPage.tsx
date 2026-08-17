@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useMetroData } from '../hooks/useMetroData';
+import { daysSince, freshnessLevel } from '../utils/dataFreshness';
 import type { QualityReportCity } from '../types/metro';
 
 type GroupKey = 'no_stats' | 'no_daily_ridership' | 'no_network_map' | 'no_plan_map' | 'cover_fallback';
@@ -37,7 +38,7 @@ function CheckDot({ ok }: { ok: boolean }) {
 }
 
 export default function DataQualityPage() {
-  const { qualityReport, loading, error, merged } = useMetroData();
+  const { qualityReport, loading, error, merged, manifest } = useMetroData();
   const [activeGroup, setActiveGroup] = useState<GroupKey>('no_stats');
   const [filterTag, setFilterTag] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -206,6 +207,26 @@ export default function DataQualityPage() {
             <span><strong>降级警示：</strong> 质量报告加载失败（如 data/latest/quality_report.json 暂不存在或损坏）。已为您优雅降级为基于城市基础资源的内存完整度手算，页面功能依然完备，请放心查看。</span>
           </div>
         )}
+        {(() => {
+          const days = daysSince(manifest?.stats_scrape_date);
+          const level = freshnessLevel(days);
+          return (
+            <div
+              className={`flex items-start gap-2 rounded-md border px-3 py-2 text-[11px] leading-relaxed ${
+                level === 'stale'
+                  ? 'border-gold-600/25 bg-gold-600/10 text-gold-600'
+                  : 'border-paper-300 bg-paper-50 text-ink-500'
+              }`}
+            >
+              <span aria-hidden>📅</span>
+              <span>
+                数据采集日：{manifest?.stats_scrape_date ?? '未知'}
+                {days !== null && <> · 距今 {days} 天</>}
+                {level === 'stale' && <> · 快照已较陈旧，完整度与指标仅供历史参考，非当前运营状态</>}
+              </span>
+            </div>
+          );
+        })()}
       </header>
 
       {/* 顶部大纲与质量指标卡片网格 */}

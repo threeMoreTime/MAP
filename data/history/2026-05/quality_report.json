@@ -1,0 +1,930 @@
+{
+  "schema_version": "quality-report.v1",
+  "generated_at": "2026-05-23T09:01:34Z",
+  "summary": {
+    "city_count": 50,
+    "stats_city_count": 34,
+    "daily_ridership_display_count": 23,
+    "no_daily_display_count": 27,
+    "stats_without_daily_count": 11,
+    "no_stats_count": 16,
+    "network_map_count": 48,
+    "plan_map_count": 41,
+    "cover_downloaded_count": 49,
+    "cover_fallback_count": 1,
+    "high_quality_count": 23,
+    "medium_quality_count": 10,
+    "low_quality_count": 17
+  },
+  "cities": [
+    {
+      "city": "beijing",
+      "city_cn": "北京",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "changchun",
+      "city_cn": "长春",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "changzhou",
+      "city_cn": "常州",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "chengdu",
+      "city_cn": "成都",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "chongqing",
+      "city_cn": "重庆",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "guangzhou",
+      "city_cn": "广州",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "guiyang",
+      "city_cn": "贵阳",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "hefei",
+      "city_cn": "合肥",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "kunming",
+      "city_cn": "昆明",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "nanchang",
+      "city_cn": "南昌",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "nanjing",
+      "city_cn": "南京",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "shanghai",
+      "city_cn": "上海",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "shenyang",
+      "city_cn": "沈阳",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "shenzhen",
+      "city_cn": "深圳",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "shijiazhuang",
+      "city_cn": "石家庄",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "suzhou",
+      "city_cn": "苏州",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "tianjin",
+      "city_cn": "天津",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "wuhan",
+      "city_cn": "武汉",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "xiamen",
+      "city_cn": "厦门",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "xian",
+      "city_cn": "西安",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "zhengzhou",
+      "city_cn": "郑州",
+      "quality_score": 100,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "harbin",
+      "city_cn": "哈尔滨",
+      "quality_score": 85,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": false,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "地铁规划图"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "lanzhou",
+      "city_cn": "兰州",
+      "quality_score": 85,
+      "quality_level": "high",
+      "has_stats": true,
+      "has_daily_ridership": true,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": false,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "地铁规划图"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "changsha",
+      "city_cn": "长沙",
+      "quality_score": 80,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "dalian",
+      "city_cn": "大连",
+      "quality_score": 80,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "dongguan",
+      "city_cn": "东莞",
+      "quality_score": 80,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "hangzhou",
+      "city_cn": "杭州",
+      "quality_score": 80,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "nanning",
+      "city_cn": "南宁",
+      "quality_score": 80,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "qingdao",
+      "city_cn": "青岛",
+      "quality_score": 80,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "taiyuan",
+      "city_cn": "太原",
+      "quality_score": 80,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "wuxi",
+      "city_cn": "无锡",
+      "quality_score": 80,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "nantong",
+      "city_cn": "南通",
+      "quality_score": 65,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": false,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据",
+        "地铁规划图"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "wuhu",
+      "city_cn": "芜湖",
+      "quality_score": 65,
+      "quality_level": "medium",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": false,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "日客流展示数据",
+        "地铁规划图"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": []
+    },
+    {
+      "city": "hohhot",
+      "city_cn": "呼和浩特",
+      "quality_score": 55,
+      "quality_level": "low",
+      "has_stats": true,
+      "has_daily_ridership": false,
+      "has_yearly_trend": true,
+      "has_network_map": true,
+      "has_plan_map": false,
+      "cover_status": "fallback",
+      "missing_items": [
+        "日客流展示数据",
+        "地铁规划图",
+        "高清封面图片"
+      ],
+      "warnings": [
+        "暂无日客流展示值，处于日常采集中"
+      ],
+      "risk_flags": [
+        "封面图片缺损降级"
+      ]
+    },
+    {
+      "city": "fuzhou",
+      "city_cn": "福州",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "hongkong",
+      "city_cn": "香港",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "jinan",
+      "city_cn": "济南",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "luoyang",
+      "city_cn": "洛阳",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "macau",
+      "city_cn": "澳门",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "ningbo",
+      "city_cn": "宁波",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "taichung",
+      "city_cn": "台中",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "taipei",
+      "city_cn": "台北",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "taizhou",
+      "city_cn": "台州",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "urumqi",
+      "city_cn": "乌鲁木齐",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "wenzhou",
+      "city_cn": "温州",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "xuzhou",
+      "city_cn": "徐州",
+      "quality_score": 40,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": true,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "jinhua",
+      "city_cn": "金华",
+      "quality_score": 25,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": false,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据",
+        "地铁规划图"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "kaohsiung",
+      "city_cn": "高雄",
+      "quality_score": 25,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": true,
+      "has_plan_map": false,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据",
+        "地铁规划图"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "foshan",
+      "city_cn": "佛山",
+      "quality_score": 10,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": false,
+      "has_plan_map": false,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据",
+        "地铁线路图",
+        "地铁规划图"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    },
+    {
+      "city": "shaoxing",
+      "city_cn": "绍兴",
+      "quality_score": 10,
+      "quality_level": "low",
+      "has_stats": false,
+      "has_daily_ridership": false,
+      "has_yearly_trend": false,
+      "has_network_map": false,
+      "has_plan_map": false,
+      "cover_status": "downloaded",
+      "missing_items": [
+        "收录统计数据",
+        "地铁线路图",
+        "地铁规划图"
+      ],
+      "warnings": [],
+      "risk_flags": []
+    }
+  ],
+  "missing_groups": {
+    "no_stats": [
+      "foshan",
+      "fuzhou",
+      "hongkong",
+      "jinan",
+      "jinhua",
+      "kaohsiung",
+      "luoyang",
+      "macau",
+      "ningbo",
+      "shaoxing",
+      "taichung",
+      "taipei",
+      "taizhou",
+      "urumqi",
+      "wenzhou",
+      "xuzhou"
+    ],
+    "no_daily_ridership": [
+      "changsha",
+      "dalian",
+      "dongguan",
+      "foshan",
+      "fuzhou",
+      "hangzhou",
+      "hohhot",
+      "hongkong",
+      "jinan",
+      "jinhua",
+      "kaohsiung",
+      "luoyang",
+      "macau",
+      "nanning",
+      "nantong",
+      "ningbo",
+      "qingdao",
+      "shaoxing",
+      "taichung",
+      "taipei",
+      "taiyuan",
+      "taizhou",
+      "urumqi",
+      "wenzhou",
+      "wuhu",
+      "wuxi",
+      "xuzhou"
+    ],
+    "no_network_map": [
+      "foshan",
+      "shaoxing"
+    ],
+    "no_plan_map": [
+      "foshan",
+      "harbin",
+      "hohhot",
+      "jinhua",
+      "kaohsiung",
+      "lanzhou",
+      "nantong",
+      "shaoxing",
+      "wuhu"
+    ],
+    "cover_fallback": [
+      "hohhot"
+    ]
+  }
+}
