@@ -276,10 +276,10 @@ async function runTests(baseUrl) {
     t07.ok && t07errors.length === 0,
     t07.ok ? `errors=${t07errors.length}` : t07.detail);
 
-  // T08: Metric switching
+  // T08: Metric switching (segmented pill buttons)
   await gotoHash(BASE, '#/dashboard');
   const metricTests = [
-    { value: 'daily_ridership_wan', label: '日客流' },
+    { value: 'daily_ridership_wan', label: '日客流量' },
     { value: 'operating_mileage_km', label: '运营里程' },
     { value: 'operating_stations', label: '运营站点' },
     { value: 'ridership_intensity', label: '客流强度' },
@@ -288,17 +288,14 @@ async function runTests(baseUrl) {
   let t08detail = [];
   for (const mt of metricTests) {
     const errBefore = consoleErrors.length;
-    const changed = await page.evaluate((val) => {
-      const selects = document.querySelectorAll('select');
-      for (const sel of selects) {
-        if (sel.querySelector(`option[value="${val}"]`)) {
-          sel.value = val;
-          sel.dispatchEvent(new Event('change', { bubbles: true }));
-          return true;
-        }
-      }
+    const changed = await page.evaluate((label) => {
+      const group = document.querySelector('[role="group"][aria-label="选择主指标"]');
+      const btn = group
+        ? Array.from(group.querySelectorAll('button')).find(b => b.textContent.trim() === label)
+        : null;
+      if (btn) { btn.click(); return true; }
       return false;
-    }, mt.value);
+    }, mt.label);
     await wait(1000);
     const newErrors = consoleErrors.slice(errBefore).filter(isCriticalError);
     if (!changed || newErrors.length > 0) {
@@ -309,28 +306,25 @@ async function runTests(baseUrl) {
   record('T08', '指标切换（日客流/运营里程/运营站点/客流强度）无错误',
     t08pass, t08pass ? 'OK' : t08detail.join('; '));
 
-  // T09: TopN switching
+  // T09: TopN switching (segmented pill buttons)
   await gotoHash(BASE, '#/dashboard');
   const topNTests = [
-    { value: '10', label: 'Top 10' },
-    { value: '20', label: 'Top 20' },
-    { value: '0', label: '全部' },
+    { label: 'Top 10' },
+    { label: 'Top 20' },
+    { label: '全部' },
   ];
   let t09pass = true;
   let t09detail = [];
   for (const tn of topNTests) {
     const errBefore = consoleErrors.length;
-    const changed = await page.evaluate((val) => {
-      const selects = document.querySelectorAll('select');
-      for (const sel of selects) {
-        if (sel.querySelector(`option[value="${val}"]`)) {
-          sel.value = val;
-          sel.dispatchEvent(new Event('change', { bubbles: true }));
-          return true;
-        }
-      }
+    const changed = await page.evaluate((label) => {
+      const group = document.querySelector('[role="group"][aria-label="选择排行范围"]');
+      const btn = group
+        ? Array.from(group.querySelectorAll('button')).find(b => b.textContent.trim() === label)
+        : null;
+      if (btn) { btn.click(); return true; }
       return false;
-    }, tn.value);
+    }, tn.label);
     await wait(1000);
     const newErrors = consoleErrors.slice(errBefore).filter(isCriticalError);
     if (!changed || newErrors.length > 0) {

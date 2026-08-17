@@ -120,6 +120,7 @@ export default function DashboardPage() {
           onMetricChange={setMetric}
           topN={topN}
           onTopNChange={setTopN}
+          matchCount={filteredCities.length}
         />
 
         {/* Row 1: Map + Detail Panel */}
