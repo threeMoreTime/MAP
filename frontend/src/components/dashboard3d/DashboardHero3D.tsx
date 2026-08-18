@@ -14,6 +14,7 @@ import HeroCityTooltip from './HeroCityTooltip';
 import HeroControls from './HeroControls';
 import HeroCityPanel from './HeroCityPanel';
 import HeroAmbience from './HeroAmbience';
+import HeroHint from './HeroHint';
 
 /** 桌面排行行数（任务决策：Top 5） */
 const RANKING_COUNT = 5;
@@ -28,6 +29,8 @@ interface Props {
   cityDetail: MergedCity | null;
   citiesCount: number;
   statsCount: number;
+  /** manifest.stats_scrape_date（数据实际采集日） */
+  dataDate: string | null;
   onScrollToOverview: () => void;
 }
 
@@ -44,6 +47,7 @@ export default function DashboardHero3D({
   cityDetail,
   citiesCount,
   statsCount,
+  dataDate,
   onScrollToOverview,
 }: Props) {
   const reducedMotion = useReducedMotion();
@@ -111,15 +115,20 @@ export default function DashboardHero3D({
   }, [sceneReady, state.selectedCity, state.reducedMotion, ranked]);
 
   // ---- 交互动作 ----
+  // 首次交互提示：首次拖拽/缩放或城市点击后即永久隐藏（组件生命周期内）
+  const [hintDismissed, setHintDismissed] = useState(false);
   const handleCitySelect = useCallback(
-    (city: string) => onCitySelect(city),
+    (city: string) => {
+      setHintDismissed(true);
+      onCitySelect(city);
+    },
     [onCitySelect],
   );
   const handleClosePanel = useCallback(() => onCitySelect(null), [onCitySelect]);
-  const handleCameraDrag = useCallback(
-    () => dispatch({ type: 'USER_CAMERA_DRAG' }),
-    [dispatch],
-  );
+  const handleCameraDrag = useCallback(() => {
+    setHintDismissed(true);
+    dispatch({ type: 'USER_CAMERA_DRAG' });
+  }, [dispatch]);
   const handleResetView = useCallback(() => {
     dispatch({ type: 'RESET_VIEW' });
     if (state.selectedCity) onCitySelect(null);
@@ -175,7 +184,7 @@ export default function DashboardHero3D({
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen min-h-[560px] w-full overflow-hidden bg-[#0b1016]"
+      className="hero-viewport relative w-full overflow-hidden bg-[#0b1016]"
     >
       <div className="absolute inset-0">
         <HeroMap3D
@@ -203,12 +212,16 @@ export default function DashboardHero3D({
 
       <HeroAmbience active={ambient.ambience && sceneSettled} />
 
+      <HeroHint visible={sceneSettled && !hintDismissed} />
+
       <HeroOverlay
         citiesCount={citiesCount}
         statsCount={statsCount}
+        dataDate={dataDate}
         metric={state.metric}
         onMetricChange={onMetricChange}
         revealed={sceneSettled}
+        focused={state.mode === 'focused'}
       />
 
       {!panelOpen && (

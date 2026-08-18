@@ -36,7 +36,7 @@ function StatsRow({ cities }: { cities: MergedCity[] }) {
 }
 
 export default function DashboardPage() {
-  const { merged, loading, error } = useMetroData();
+  const { merged, loading, error, manifest } = useMetroData();
   const { keyword, setKeyword, metric, setMetric, topN, setTopN, filteredCities } = useDashboardFilters(merged);
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCityName = searchParams.get('city');
@@ -83,6 +83,7 @@ export default function DashboardPage() {
         cityDetail={selectedCity}
         citiesCount={merged.length}
         statsCount={statsCount}
+        dataDate={manifest?.stats_scrape_date ?? null}
         onScrollToOverview={scrollToOverview}
       />
 

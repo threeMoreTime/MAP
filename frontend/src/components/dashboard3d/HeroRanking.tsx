@@ -17,8 +17,9 @@ interface Props {
 
 /**
  * Hero 右侧 Top 排行（桌面 lg+，移动端隐藏）。
+ * 标题带指标单位（无单位不加分隔符）；行底层极弱比例条（相对 Top1，
+ * 非实心 bar chart：极低 opacity，Top1 用淡朱砂、其余用夜墨 grid 系）。
  * 与地图共享 hovered/selected 状态实现双向联动；朱砂只给第一名与 hover/selected 行。
- * 键盘可达（行即 button），是键盘用户进入城市数据的入口。
  */
 export default function HeroRanking({
   ranked,
@@ -33,6 +34,7 @@ export default function HeroRanking({
   const ml = METRIC_LABELS[metric];
   const top = ranked.slice(0, count);
   if (top.length === 0) return null;
+  const maxValue = top[0].value || 1;
 
   return (
     <nav
@@ -47,6 +49,7 @@ export default function HeroRanking({
         style={{ color: NIGHT.text }}
       >
         {ml.name}
+        {ml.unit && <span className="ml-1 font-sans text-[10px] font-normal" style={{ color: NIGHT.textDim }}>· {ml.unit}</span>}
         <span className="ml-1.5 text-[10px] font-normal" style={{ color: NIGHT.textDim }}>
           Top {top.length}
         </span>
@@ -57,6 +60,7 @@ export default function HeroRanking({
           const selected = selectedCity === r.city;
           const first = r.rank === 1;
           const highlighted = hovered || selected;
+          const barPct = Math.max(4, Math.round((r.value / maxValue) * 100));
           return (
             <li key={r.city}>
               <button
@@ -67,18 +71,27 @@ export default function HeroRanking({
                 onBlur={() => onHover(null)}
                 onClick={() => onSelect(r.city)}
                 aria-label={`第${r.rank}名 ${r.cityCn} ${formatMetricValue(r.raw, metric)}`}
-                className={`flex w-full cursor-pointer items-center gap-2 rounded-sm px-1.5 py-[5px] text-left text-[12px] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[#d0553f] ${
+                className={`relative flex w-full cursor-pointer items-center gap-2 rounded-sm px-1.5 py-[5px] text-left text-[12px] transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-[#d0553f] ${
                   highlighted ? 'bg-[#d0553f]/15' : 'hover:bg-[#16202e]/80'
                 }`}
               >
+                {/* 极弱比例条：row 底层，相对 Top1；不与文字争夺可读性 */}
                 <span
-                  className="w-4 shrink-0 text-right font-serif text-[11px] tabular-nums"
+                  aria-hidden
+                  className="absolute inset-y-[3px] left-0 rounded-sm"
+                  style={{
+                    width: `${barPct}%`,
+                    background: first ? 'rgba(208,85,63,0.12)' : 'rgba(139,148,163,0.09)',
+                  }}
+                />
+                <span
+                  className="relative z-10 w-4 shrink-0 text-right font-serif text-[11px] tabular-nums"
                   style={{ color: first ? NIGHT.accent : NIGHT.textDim }}
                 >
                   {r.rank}
                 </span>
                 <span
-                  className="min-w-0 flex-1 truncate"
+                  className="relative z-10 min-w-0 flex-1 truncate"
                   style={{
                     color: highlighted || first ? NIGHT.text : NIGHT.textDim,
                     fontWeight: highlighted || first ? 500 : 400,
@@ -86,14 +99,13 @@ export default function HeroRanking({
                 >
                   {r.cityCn}
                 </span>
-                {/* 非仅颜色：hover/selected 行加 ▸ 前导符 */}
                 {highlighted && (
-                  <span className="shrink-0 text-[9px]" style={{ color: NIGHT.accent }}>
+                  <span className="relative z-10 shrink-0 text-[9px]" style={{ color: NIGHT.accent }}>
                     ▸
                   </span>
                 )}
                 <span
-                  className="shrink-0 tabular-nums"
+                  className="relative z-10 shrink-0 tabular-nums"
                   style={{ color: first ? NIGHT.accent : NIGHT.text }}
                 >
                   {r.value.toFixed(ml.decimals)}

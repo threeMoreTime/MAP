@@ -14,13 +14,14 @@ const pillIdle = 'border-[#2b3a4e] bg-[#0b1016]/60 text-[#8a94a3] hover:text-[#e
 /**
  * Hero 主指标切换：沿用全站分段胶囊词汇（夜墨变体），
  * 与下方 FilterToolbar 共用同一 metric 状态（单一 source of truth 在页面层）。
+ * 对齐随容器：desktop 左锚（跟随 overlay），mobile 居中。
  */
 export default function HeroMetricSwitcher({ metric, onMetricChange }: Props) {
   return (
     <div
       role="group"
       aria-label="主指标切换"
-      className="mt-4 flex flex-wrap items-center justify-center gap-2"
+      className="mt-3 flex flex-wrap items-center justify-center gap-2 lg:justify-start"
     >
       {(Object.keys(METRIC_LABELS) as MetricKey[]).map((key) => {
         const active = metric === key;

@@ -63,6 +63,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   to { opacity: 0; }
 }
 
+/* Hero 真一屏：Header(52px) + Hero = 恰好一个 viewport。
+   svh 处理移动端动态视口；不支持 svh 的环境回退 vh。 */
+.hero-viewport {
+  height: calc(100vh - var(--app-header-height));
+  height: calc(100svh - var(--app-header-height));
+  min-height: 520px;
+}
+
 /* intro 后的 overlay 阶梯显影（延迟由内联 style 提供） */
 @utility hero-fade-in {
   animation: heroFadeIn 0.45s var(--ease-paper) both;
