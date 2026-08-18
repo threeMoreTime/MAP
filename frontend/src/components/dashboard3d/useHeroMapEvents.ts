@@ -198,11 +198,17 @@ export function useHeroMapEvents(refs: HeroEventBridgeRefs, phase: 'loading' | '
       stopRevalidate();
       domEl?.removeEventListener('mousedown', onDomDown, { capture: true } as EventListenerOptions);
       domEl?.removeEventListener('mouseup', onDomUp, { capture: true } as EventListenerOptions);
-      inst.off('click', onClick);
-      inst.off('mouseover', onMouseOver);
-      inst.getZr().off('mousemove', onZrMouseMove);
-      inst.off('mouseout', onLeaveDom);
-      inst.off('globalout', onLeaveDom);
+      // 实例可能已被 fallback 路径 dispose（webglcontextlost 先置空再切 phase），
+      // 对已释放实例解绑是无害操作，防御式吞掉以保证不阻断 unmount 链
+      try {
+        inst.off('click', onClick);
+        inst.off('mouseover', onMouseOver);
+        inst.getZr()?.off('mousemove', onZrMouseMove);
+        inst.off('mouseout', onLeaveDom);
+        inst.off('globalout', onLeaveDom);
+      } catch {
+        /* 已 dispose：无需解绑 */
+      }
     };
   }, [phase, instanceRef, containerRef, handlersRef, hoverRef, lastMouseRef, revalidateTimerRef]);
 
