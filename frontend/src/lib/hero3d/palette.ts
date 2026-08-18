@@ -17,7 +17,12 @@ export const NIGHT = {
   grid: 'rgba(232,228,216,0.06)',
 } as const;
 
-/** 各 quality 档的视觉预算（不触碰数据口径） */
+/**
+ * 各 quality 档的视觉预算（不触碰数据口径）。
+ * pulse 实测成本：每次 setOption 阻塞主线程 ~50ms（scatter3D 全量更新 + geo3D
+ * render 重放），900ms 间隔时每秒造成 2-3 帧长帧——high 降频至 1200ms，
+ * medium 直接关闭（长帧源消除，呼吸感由节点视觉静态层次承担）。
+ */
 export interface QualityProfile {
   /** 飞线数量（Top N-1 条，hub 除外） */
   flylineCount: number;
@@ -35,14 +40,14 @@ export const QUALITY_PROFILES: Record<HeroQuality, QualityProfile> = {
   high: {
     flylineCount: 9,
     labelCount: 8,
-    pulse: { enabled: true, topN: 5, intervalMs: 900 },
+    pulse: { enabled: true, topN: 5, intervalMs: 1200 },
     ambience: true,
     dprCap: null,
   },
   medium: {
     flylineCount: 5,
     labelCount: 5,
-    pulse: { enabled: true, topN: 2, intervalMs: 1200 },
+    pulse: { enabled: false, topN: 0, intervalMs: 0 },
     ambience: false,
     dprCap: 1.5,
   },

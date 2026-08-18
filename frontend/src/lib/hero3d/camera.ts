@@ -4,6 +4,7 @@ import type { RankedCity } from './types';
  * 相机数学（纯函数）：构图参数与聚焦目标计算。
  * 实际插值交给 echarts-gl 原生 animateTo（setOption viewControl +
  * animationDurationUpdate/cubicOut），不自写 RAF tween。
+ * 时序常量（时长/延迟）统一在 animation.ts。
  */
 
 export interface CameraPose {
@@ -40,12 +41,6 @@ export function cityFocusPose(project: ProjectLngLat, city: RankedCity): CameraP
   };
 }
 
-/** 镜头过渡时长；reducedMotion 时由调用方归零 */
-export const CAMERA_FOCUS_MS = 900;
-export const CAMERA_RESET_MS = 900;
-/** hover 离开后 autoRotate 恢复延迟 */
-export const AUTOROTATE_RESUME_MS = 900;
-
 /** 全国总览视角下 viewControl 的旋转参数 */
 export const AUTOROTATE = {
   speed: 0.55,
@@ -56,3 +51,6 @@ export const AUTOROTATE = {
    */
   afterStill: 0,
 } as const;
+
+// 时序常量已迁移至 animation.ts（唯一来源），此处 re-export 保持既有引用
+export { CAMERA_FOCUS_MS, CAMERA_RESET_MS, AUTOROTATE_RESUME_MS } from './animation';
