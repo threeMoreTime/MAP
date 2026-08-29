@@ -1698,7 +1698,9 @@ async function main() {
     }
 
     // Start preview server with --strictPort and port fallback
-    const ports = [4173, 4174, 4175, 4176, 4177];
+    // Windows 可能将 4173 段列入 Hyper-V/WinNAT 保留端口范围（EACCES），可用 PREVIEW_PORT 指定起点
+    const basePort = Number(process.env.PREVIEW_PORT) || 4173;
+    const ports = [basePort, basePort + 1, basePort + 2, basePort + 3, basePort + 4];
     for (const port of ports) {
       try {
         console.log(`  Trying port ${port} (--strictPort)...`);
@@ -1762,6 +1764,12 @@ async function main() {
   console.log('-'.repeat(55));
   console.log(`  Total: ${results.length}  PASS: ${passCount}  FAIL: ${failCount}  MANUAL: ${manualCount}  SKIP: ${skipCount}`);
   console.log('='.repeat(55));
+
+  if (results.length === 0) {
+    console.log('Result: FAIL');
+    console.error('[ERROR] 没有任何验收测试被执行（环境故障，如 preview 服务器无法启动），不得视为 PASS。');
+    process.exit(1);
+  }
 
   if (failCount > 0) {
     console.log('Result: FAIL');
