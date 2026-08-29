@@ -1,0 +1,7 @@
+# MAP 数据管线与工具脚本运行时依赖（canonical definition）
+# CI（data-check / data-update）与本地均从本文件安装，勿在 workflow 内散装 pip install。
+# 本地已验证组合（Python 3.11.9）：pillow 12.1.1 / matplotlib 3.10.9 / numpy 2.4.3 / fonttools 4.62.1
+Pillow>=10.0        # pipeline 图片优化（processors/image_optimizer.py，经 pipeline.cli 顶层 import 成为硬依赖）
+matplotlib>=3.8     # scrapers/generate_charts.py 年度趋势图生成
+numpy>=1.26         # generate_charts 数值处理
+fonttools>=4.50     # scripts/subset_font.py 标题字体子集化
