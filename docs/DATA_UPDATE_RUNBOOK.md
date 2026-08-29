@@ -16,11 +16,11 @@
 ## 2. 工作流入口
 
 更新管道基于 GitHub Actions 自动化工作流：
-- **配置文件**：[.github/workflows/data-update.yml](file:///c:/Users/Administrator/Desktop/FL/MAP/.github/workflows/data-update.yml)
-- **总控脚本**：[scripts/run_data_update.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/run_data_update.py)
-- **校验拦截器**：[pipeline validate (python -m pipeline.cli validate)](file:///c:/Users/Administrator/Desktop/FL/MAP/pipeline validate (python -m pipeline.cli validate))
-- **数据差分引擎**：[scripts/diff_data_snapshot.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scripts/diff_data_snapshot.py)
-- **客流采集爬虫**：[scrapers/scrape_metrodb.py](file:///c:/Users/Administrator/Desktop/FL/MAP/scrapers/scrape_metrodb.py)
+- **配置文件**：[.github/workflows/data-update.yml](../.github/workflows/data-update.yml)
+- **总控脚本**：[scripts/run_data_update.py](../scripts/run_data_update.py)
+- **校验拦截器**：`python -m pipeline.cli validate`（[pipeline/validators/schema_validator.py](../pipeline/validators/schema_validator.py)）
+- **数据差分引擎**：[scripts/diff_data_snapshot.py](../scripts/diff_data_snapshot.py)
+- **客流采集爬虫**：[scrapers/scrape_metrodb.py](../scrapers/scrape_metrodb.py)
 
 ---
 
@@ -50,9 +50,9 @@
 ## 5. 自动 PR 审查清单
 
 即使自动 PR 已经顺利由 Bot 创建，核心维护团队也**严禁直接盲目 Merge**。每次合并前必须根据以下清单进行严格的人工合规审查：
-- [ ] **CI 状态核验**：确保该 PR 上自动挂载的 `CI / Legacy Dashboard Baseline Check`、`CI / React Frontend Build Check` 和 `CI / React Frontend UI Test` 三项 Job 均呈现 **全绿通过**。
+- [ ] **CI 状态核验**：确保该 PR 上自动挂载的 `CI / Data Layer Validation`、`CI / React Frontend Build Check` 和 `CI / React Frontend UI Test` 三项 Job 均呈现 **全绿通过**（`Data Freshness Signal` 为业务信号 Job，数据 stale 不阻断）。
 - [ ] **差分合理度评估**：仔细研读 PR 主页中自动呈献的 Markdown 格式差分表，对照源站人工复核各项运营数字（运营线路、站点、客流量等）是否处于合理演进范围，排除大面积被篡改或爬取字段错位风险。
-- [ ] **向下兼容性检查**：检查双前端大屏数据一致性，确认旧版 `dashboard.html` 冷冻基线在 `legacy-check` 中 16/16 完美通过，未引入任何破坏性代码。
+- [ ] **快照自洽检查**：确认数据改动同时包含 `data/latest/` 的全部四个汇总文件（含派生产物 `quality_report.json`），staging 校验在 CI `Data Layer Validation` 中已通过。
 - [ ] **只允许数据改动**：确认 File Changed 标签页中只涉及 `cities/{city}/{city}_stats.json` 以及 `data/latest/` 汇总 JSON 文件。**严禁包含任何前端业务 JS/TS/CSS 组件、图片资产或 Workflow 配置的意外改动**。
 
 ---
@@ -93,18 +93,29 @@
 
 ## 9. 数据异常熔断说明
 
-为防御坏数据污染生产环境，管道内置了以下“数据突变安全阈值拦截规则”：
-1. **城市名额缩水**：新生成的 stats 城市数低于 `34` 个，或 assets 资源数低于 `50` 个。
-2. **客流断崖式暴跌**：原本大于 0 的日客流在更新后突降超过原值的 **50%**（防范爬取到空值或占位符）。
-3. **客流暴涨/单位错位**：日客流骤增超过原值的 **2.5倍**，或单城绝对值日客流超过 **2500 万/日**（防范万人次与人次单位错装）。
-4. **运营指标归零**：原本大于 0 的运营里程、站点数发生归零或负数。
-5. **历史断裂**：年均日客流趋势 `yearly_avg_ridership.years` 发生了已存年份的物理删减或历史值的非向下兼容订正。
+为防御坏数据污染生产环境，管道内置以下拦截规则（以当前代码实现为准）：
 
-凡有一项被触发，数据差分与校验器即刻阻断并以 20 退出，宣告本轮更新失败。
+1. **城市名额缩水熔断（exit 30）**：更新编排检测到新数据城市数不足原有的 **80%** 时立即阻断，疑似上游结构变更或大面积反爬，见 `scripts/run_data_update.py`。
+2. **城市数底线（exit 20）**：差分引擎要求新数据 stats 城市数不低于 `34`、assets 城市数不低于 `50`、quality_report 城市数不低于 `50`，见 `scripts/diff_data_snapshot.py`。
+3. **结构/类型校验（exit 20）**：`items` 缺失、重复城市记录、关键数值字段（客流/线路/站点/里程等）出现非 number 类型，由差分完整性校验与 schema 校验器拦截。
+4. **staging 快照自洽（exit 20）**：staging 必须携带 `metro_stats.json`、`city_assets_index.json`、`manifest.json`、`quality_report.json` 四件套；`stats_path` 相对 staging 资源根解析、图片资产相对仓库根解析，任何派生产物缺失或路径落空都会阻断（staging 校验不会偷读生产 `data/latest` 误 PASS）。
+
+凡有一项被触发，本轮更新即以非零码退出，宣告失败，不物理修改任何文件、不创建 PR。
 
 ---
 
-## 10. 回滚策略
+## 10. 数据鲜活度（freshness）信号语义
+
+CI 的 `Data Freshness Signal` Job 在每次 push/PR 时运行 `python scripts/check_freshness.py --max-age-days 45`：
+
+- 数据采集日距今超过 **45 天** → Job 输出 `::warning::` 告警与 step summary，并自动创建/更新 `data-stale-alert` Issue，**但不判定 Job 失败**。
+- 设计原因：数据过期是**业务状态**而非代码缺陷；若 stale 阻断 CI，代码健康时也会导致 Pages 部署停摆，"数据旧"会叠加成"部署停摆"。数据刷新应通过手动触发本 workflow（write 模式）完成。
+- `manifest.json` 缺失/损坏仍会被 `data-check` 的数据校验兜底阻断，数据层硬伤不会漏过。
+- 45 天阈值是产品决策，不得为让信号变绿而调宽。
+
+---
+
+## 11. 回滚策略
 
 一旦发生坏数据流意外合并或线上故障，维护团队应立刻启动回滚：
 1. **PR 阶段拦截**：若在 PR 阶段人工发现异常，**一键拒绝并 Close 该自动 PR**，master 分支 100% 保持纯净无害。
@@ -120,7 +131,7 @@
 
 ---
 
-## 11. 禁止事项
+## 12. 禁止事项
 
 > [!CAUTION]
 > 1. **严禁直接 push master**：数据更新管道及其所有子脚本在任何情况下均绝对不允许直接向 master 进行 commit 推送，必须通过 PR 并经人工差分研判审核后合并。

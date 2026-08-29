@@ -28,26 +28,17 @@
 
 ## 架构问题
 
-### 3. DATA 对象嵌入在 dashboard.html 中
+### 3. DATA 对象嵌入在 dashboard.html 中（已解决）
 
 - **严重程度**：中
 - **描述**：所有城市数据以 JavaScript 对象（`DATA`）的形式直接硬编码在 `dashboard.html` 文件内
-- **影响**：
-  - 数据更新需要修改 HTML 文件
-  - 文件体积较大
-  - 无法独立缓存数据和页面
-  - 多页面无法复用同一份数据
-- **计划**：Phase 4 将数据外置为独立 JSON 文件
+- **状态**：v2.0.0 全仓重构中 legacy dashboard 已退役删除，数据层统一外置为 `data/latest/*.json`，由 `pipeline/` 管线生成
 
-### 4. ECharts CDN 依赖
+### 4. ECharts CDN 依赖（已解决）
 
 - **严重程度**：低
 - **描述**：Dashboard 依赖 CDN 加载 ECharts 库（`https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js`）
-- **影响**：
-  - 离线环境无法使用
-  - CDN 服务不可用时页面无法渲染图表
-  - CDN 版本变更可能导致兼容性问题
-- **计划**：后续考虑将 ECharts 本地化，或使用 Subresource Integrity (SRI) 校验
+- **状态**：v2.0.0 重构改为 npm 依赖 + 按需引入（`src/lib/echarts.ts`），打包进构建产物，离线可用
 
 ---
 
@@ -101,6 +92,7 @@
 
 | 日期 | 更新内容 |
 |------|----------|
+| 2026-08-29 | 标记 #3/#4 已随 v2.0.0 重构解决；Release Infrastructure Recovery 修复 CI runtime/Python 依赖/staging 自洽/freshness 信号语义 |
 | 2026-05-20 | 解决无 CI/CD 与无 Pages 发布问题；自动部署与线上 Smoke Test 验证通过 |
 | 2026-05-08 | 更新路径引用，适配目录结构优化 |
 | 2026-05-05 | 初始版本，列出 8 个已知问题 |

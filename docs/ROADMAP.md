@@ -13,12 +13,9 @@
 - **v2.0.0 全仓重构（2026-08-14）**：legacy dashboard 退役删除；ESLint/Vitest/pytest 三层测试接入；ECharts 按需引入（-45%）+ 路由分包；Tailwind v4 纸墨·朱印视觉全量换装（DESIGN.md 契约）；pipeline/ 数据管线包重建（parity 验证后替换旧脚本）+ WebP 图片优化
 - 当前前端形态：`frontend/` React 18 + TS + Vite + Tailwind v4（唯一前端）
 - 当前数据管线：`pipeline/` Python 包（`python -m pipeline.cli`）
-- 验收基线：T01-T34 浏览器验收 33 PASS / 0 FAIL / 1 MANUAL；Vitest 单测；pytest 18/18；数据校验 PASS
+- 验收基线：T01-T34 浏览器验收 33 PASS / 0 FAIL / 1 MANUAL；Vitest 单测 70/70；pytest 30/30（含 staging 回归）；数据校验 PASS
 - 视觉契约：`frontend/DESIGN.md`（纸墨·朱印），token 唯一来源 `frontend/src/styles/tokens.css`
 - 当前阶段：Phase 5.1 部署配置、Phase 5.6 线上体验与数据可信度优化、Phase 5.6.1 数据覆盖口径文案统一已完成并验证通过
-- 当前前端形态：
-  - 旧版：`dashboard.html` 单文件稳定基线（frozen baseline / legacy fallback）
-  - 新版：`frontend/` React + Vite + TypeScript
 - React 路由表：
   - `/#/dashboard` — 数据总览大屏
   - `/#/cities` — 城市资源总览
@@ -28,9 +25,10 @@
 
 | 验收体系 | 范围 | 结果 |
 |----------|------|------|
-| React `test:ui` | T01-T28 | **27 PASS / 0 FAIL / 1 MANUAL** |
+| React `test:ui` | T01-T34 | **33 PASS / 0 FAIL / 1 MANUAL** |
 | `check:static` | T01-T09 | **全部通过** |
-| Legacy `run_acceptance.py` | 16 项浏览器测试 | **16/16 PASS** |
+| Vitest `test:unit` | hooks / 工具单测 | **70/70** |
+| pipeline pytest | 单元 + staging 回归 | **30/30** |
 
 - 数据覆盖（动态快照）：城市索引 50 城、有统计记录 34 城、有日客流展示值 23 城、暂无日客流展示值 27 城（其中 11 城有统计无客流，16 城完全无统计）、线路图覆盖 48 城、规划图覆盖 41 城、封面图覆盖 49/50
 - 资源同步：`scripts/sync-data.cjs` 自动将 `data/latest/`、`assets/china.json`、`assets/city-covers/`、`cities/` 图片同步到 `frontend/public/`

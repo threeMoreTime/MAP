@@ -76,14 +76,17 @@ python scripts/(已退役，见 T01-T34 浏览器验收)
 # 数据校验
 python -m pipeline.cli validate
 
-# JS 语法检查
-python scripts/(已退役)
+# pipeline 单元与 staging 回归测试
+npm run test:pipeline
 
-# 浏览器验收
-node scripts/acceptance_dashboard.js
+# 前端完整检查（frontend/ 目录）
+npm run typecheck && npm run lint && npm run test:unit && npm run build && npm run check:static
+
+# 浏览器验收（需本机 Chrome）
+npm run test:ui
 ```
 
-验收标准：**16/16 PASS**（详见 [TESTING_ACCEPTANCE.md](./TESTING_ACCEPTANCE.md)）
+验收标准：全部通过（当前基线：UI 验收 T01-T34 33 PASS / 0 FAIL / 1 MANUAL、Vitest 70/70、pytest 30/30，详见 [TESTING_ACCEPTANCE.md](./TESTING_ACCEPTANCE.md)）
 
 若任何测试失败，需修复后重新执行本步骤。
 

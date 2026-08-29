@@ -2,6 +2,27 @@
 
 本文件记录项目的所有重要变更。格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/)。
 
+## [v2.0.0-dev] - 2026-08-29（Release Infrastructure Recovery）
+
+### CI / 运行时
+- **Node 22 LTS 统一**：engines `>=22.22.2`（下限由 jsdom@30 engines 约束决定）、`.nvmrc`、全部 workflow 由 Node 20 升至 22。
+- **canonical Python 依赖定义**：新增 `requirements.txt`（Pillow/matplotlib/numpy/fonttools）与 `requirements-dev.txt`（+pytest）；CI `data-check` 在跑测试前安装依赖（修复干净环境 `ModuleNotFoundError: PIL`）；`data-update` 改从 `requirements.txt` 安装，移除未被任何代码 import 的散装 beautifulsoup4/lxml。
+- **修复 Octokit API 误用**：`issues.addComment` → `issues.createComment`（freshness-check 与 alert-on-failure 两处）。
+
+### 数据管线
+- **staging 快照自洽（2026-08-01 data-update exit 20 根因修复）**：staging 构建期生成 `quality_report.json` 派生产物；`pipeline.cli validate` 新增 `--stats-root`，staging 校验时 stats 路径相对 staging 资源根解析（图片资产仍相对仓库根），不再误打生产目录；新增 8 个 staging 回归测试（含 dry-run 端到端）。
+- **freshness 信号语义修正**：数据 stale 不再阻断代码 CI 与 Pages 部署；保留 45 天阈值、`data-stale-alert` Issue 自动更新与 step summary 可见告警；manifest 损坏仍由数据校验兜底阻断。
+
+### 治理
+- `data-update` 顶层权限收紧（移除 `issues: write`，alert job 保留 job 级声明）。
+- npm audit 非 breaking 修复（ws、ip-address 等，root 5→3 high、frontend 12→8；剩余需 major 升级，记入 follow-up）。
+
+### 测试基础设施
+- `acceptance-react.cjs`：preview 端口起点支持 `PREVIEW_PORT` 环境变量（Windows Hyper-V/WinNAT 将 4173-4203 列入保留端口范围导致本地 EACCES）；preview 启动失败导致 0 个测试执行时明确 FAIL，不再输出假绿 PASS。
+
+### 文档
+- README / ROADMAP / RUNBOOK / RELEASE_PROCESS / KNOWN_ISSUES 与 v2.0 实际架构、真实测试基线（UI 33 PASS、Vitest 70/70、pytest 30/30）对齐。
+
 ## [v2.0.0-dev] - 2026-08-14
 
 ### 全仓重构（P0-P5）

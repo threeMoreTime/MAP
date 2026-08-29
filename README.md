@@ -22,6 +22,15 @@
 | [MetroDB.org](https://metrodb.org/) | 各城市年度客流统计数据 |
 | [MetroMan.cn](https://www.metroman.cn/) | 城市地铁网络图与规划图 |
 
+## 运行时要求
+
+- **Node >= 22.22.2**（仓库 `.nvmrc` 固定主版本 22；下限由 jsdom@30 的 engines 约束决定）
+- **Python >= 3.10**，数据管线依赖以 `requirements.txt` 为唯一来源（测试依赖用 `requirements-dev.txt`）：
+
+```bash
+python -m pip install -r requirements-dev.txt
+```
+
 ## 快速开始
 
 ```bash
@@ -90,14 +99,15 @@ npm run test:pipeline # pipeline pytest
 | 检查项 | 结果 |
 | --- | --- |
 | React UI 验收（T01-T34） | 33 PASS / 0 FAIL / 1 MANUAL |
-| 前端单元测试（Vitest） | 全部通过 |
-| pipeline pytest | 18/18 |
+| 前端单元测试（Vitest） | 70/70 |
+| pipeline pytest | 30/30（含 8 个 staging 回归） |
 | 数据层校验 | PASS |
+| 数据更新 dry-run | PASS（staging 快照自洽） |
 | 城市目录覆盖 | 50/50 |
 
 ### CI/CD 与 Pages 部署
 
-- **CI**（`.github/workflows/ci.yml`）：push/PR 到 master 触发，三个 Job — `data-check`（数据校验 + pipeline pytest）、`react-check`（typecheck + lint + 单测 + 构建 + 静态检查）、`react-ui-test`（Headless Chrome 真浏览器验收）。
+- **CI**（`.github/workflows/ci.yml`）：push/PR 到 master 触发，四个 Job — `data-check`（数据校验 + pipeline pytest，从 `requirements-dev.txt` 安装 Python 依赖）、`react-check`（typecheck + lint + 单测 + 构建 + 静态检查）、`react-ui-test`（Headless Chrome 真浏览器验收）、`freshness-check`（数据鲜活度信号：stale 时更新 `data-stale-alert` Issue 并输出 step summary 告警，**不阻断**代码 CI 与 Pages 部署）。
 - **CD**（`.github/workflows/pages.yml`）：CI 通过后自动部署 GitHub Pages，附带线上 smoke test。
 - **自定义 404**（`frontend/public/404.html`）：非 Hash 子路径访问自动重定向回 SPA。
 
