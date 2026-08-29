@@ -45,12 +45,24 @@ def copy_cities_stats_only(src_cities, dest_cities):
 
 def copy_latest_files(src_latest, dest_staging):
     """
-    复制 data/latest/ 下的三个关键 json 汇总文件。
+    复制 data/latest/ 下的四个关键 json 汇总文件（quality_report 为派生产物，缺失时由调用方重建）。
     """
-    for f_name in ["metro_stats.json", "city_assets_index.json", "manifest.json"]:
+    for f_name in ["metro_stats.json", "city_assets_index.json", "manifest.json", "quality_report.json"]:
         src_path = os.path.join(src_latest, f_name)
         if os.path.exists(src_path):
             shutil.copy2(src_path, os.path.join(dest_staging, f_name))
+
+
+def build_staging_quality_report(staging_dir):
+    """
+    从 staging 快照自身的 stats/assets 现场生成 quality_report.json。
+    validator 与 diff 都依赖该派生产物，staging 快照必须自洽携带，不得引用生产目录。
+    """
+    from pipeline.processors import quality_auditor
+
+    quality_path = os.path.join(staging_dir, "quality_report.json")
+    quality_auditor.build_and_write(staging_dir, quality_path, root=ROOT)
+    return quality_path
 
 
 def apply_staging_to_source(staging_cities_dir, real_cities_dir):
@@ -112,6 +124,9 @@ def main():
     if args.use_current_data:
         log("[INFO] 正在拷贝当前物理数据模拟无变更场景...")
         copy_latest_files(DATA_LATEST_DIR, staging_dir)
+        # quality_report 为派生产物：生产缺失时从 staging 数据现场重建，保证快照自洽
+        if not os.path.exists(os.path.join(staging_dir, "quality_report.json")):
+            build_staging_quality_report(staging_dir)
     else:
         if not args.skip_scrape:
             log("[INFO] 启动外部爬虫写入沙盒隔离区...")
@@ -153,9 +168,15 @@ def main():
         with open(os.path.join(staging_dir, "manifest.json"), "w", encoding="utf-8") as f:
             json.dump(manifest, f, ensure_ascii=False, indent=2)
 
+        # 5.2 生成质量报告派生产物，保证 staging 快照自洽（validator 与 diff 均依赖）
+        build_staging_quality_report(staging_dir)
+
     # 6. 调用 pipeline 校验器进行 Staging 沙盒校验
+    # stats_root 指向 staging 本身：stats 数据相对 staging 解析；
+    # 图片资产仍相对仓库根解析（数据更新流程不产出图片，图片是仓库固有文件）。
     log("[INFO] 正在执行 Staging 目录格式与边界强校验...")
-    cmd_validate = [sys.executable, "-m", "pipeline.cli", "validate", "--data-dir", staging_dir]
+    cmd_validate = [sys.executable, "-m", "pipeline.cli", "validate", "--data-dir", staging_dir,
+                    "--stats-root", staging_dir]
     res_validate = subprocess.run(cmd_validate, cwd=ROOT)
     if res_validate.returncode != 0:
         log("[ERROR] Staging 数据校验失败！本次更新被强行阻断熔断。")

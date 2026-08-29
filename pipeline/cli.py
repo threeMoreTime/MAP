@@ -51,7 +51,7 @@ def cmd_validate(args) -> int:
     print(f" 校验目录: {data_dir}")
     print("=" * 50)
 
-    result = schema_validator.run(data_dir, root=ROOT)
+    result = schema_validator.run(data_dir, root=ROOT, stats_root=args.stats_root)
 
     print(f"\n  Errors:   {len(result.errors)}")
     print(f"  Warnings: {len(result.warnings)}")
@@ -125,6 +125,8 @@ def main(argv=None) -> int:
     p_validate = sub.add_parser("validate", help="校验 data/latest 数据层")
     p_validate.add_argument("--data-dir", default=DATA_LATEST_DIR,
                             help="要校验的数据目录，默认 data/latest")
+    p_validate.add_argument("--stats-root", default=None,
+                            help="stats 数据文件的资源根；staging 校验时指向 staging 目录，默认与仓库根相同")
 
     p_quality = sub.add_parser("quality-report", help="生成质量报告")
     p_quality.add_argument("--data-dir", default=DATA_LATEST_DIR)
@@ -140,6 +142,9 @@ def main(argv=None) -> int:
     sub.add_parser("all", help="build-index + validate")
 
     args = parser.parse_args(argv)
+    # "all" 等子命令没有 --stats-root 参数，补默认值以统一 cmd_validate 的调用契约
+    if not hasattr(args, "stats_root"):
+        args.stats_root = None
 
     handlers = {
         "build-index": cmd_build_index,

@@ -51,7 +51,8 @@ def validate_metro_stats(data, result: ValidationResult) -> None:
             result.warning(f"{city} ({item.get('city_cn', '?')}): 日客流为 {daily}，暂无日客流数据")
 
 
-def validate_city_assets_index(data, result: ValidationResult, root: str) -> None:
+def validate_city_assets_index(data, result: ValidationResult, root: str,
+                               stats_root: str | None = None) -> None:
     if data is None:
         return
     if "items" not in data:
@@ -63,12 +64,18 @@ def validate_city_assets_index(data, result: ValidationResult, root: str) -> Non
         result.error("city_assets_index.json items 不是数组")
         return
 
+    # stats_path 是数据更新流程的产出，相对数据快照的资源根解析（staging 模式下即 staging 目录）；
+    # 图片资产（线路图/规划图/趋势图）是仓库固有文件，数据更新不产出图片，相对仓库根解析。
+    if stats_root is None:
+        stats_root = root
+
     for item in items:
         city = item.get("city", "?")
         for key in ["network_map_path", "plan_map_path", "stats_path", "yearly_trend_path"]:
             path_val = item.get(key)
             if path_val:
-                full = os.path.join(root, path_val.replace("/", os.sep))
+                resolve_root = stats_root if key == "stats_path" else root
+                full = os.path.join(resolve_root, path_val.replace("/", os.sep))
                 if not os.path.exists(full):
                     result.error(f"{city}: 资源路径不存在: {path_val}")
 
@@ -154,8 +161,13 @@ def validate_quality_report(quality, assets, result: ValidationResult) -> None:
                 result.error(f"quality_report.json missing_groups.{group_name} 中包含未注册城市: {c}")
 
 
-def run(data_dir: str, root: str = DEFAULT_ROOT) -> ValidationResult:
-    """执行全部校验并返回结构化结果。"""
+def run(data_dir: str, root: str = DEFAULT_ROOT,
+        stats_root: str | None = None) -> ValidationResult:
+    """执行全部校验并返回结构化结果。
+
+    stats_root: stats 数据文件的资源根（staging 校验时指向 staging 快照目录），
+    默认 None 表示与 root 相同（生产 data/latest 校验行为不变）。
+    """
     result = ValidationResult()
 
     if not os.path.exists(data_dir) or not os.path.isdir(data_dir):
@@ -168,7 +180,7 @@ def run(data_dir: str, root: str = DEFAULT_ROOT) -> ValidationResult:
     quality = load_json(os.path.join(data_dir, "quality_report.json"), "quality_report.json", result)
 
     validate_metro_stats(stats, result)
-    validate_city_assets_index(assets, result, root)
+    validate_city_assets_index(assets, result, root, stats_root=stats_root)
     validate_manifest(manifest, stats, assets, data_dir, result, root)
     validate_quality_report(quality, assets, result)
 

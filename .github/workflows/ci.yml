@@ -108,7 +108,10 @@ jobs:
       run: npm run test:ui
 
   freshness-check:
-    name: Data Freshness Gate
+    # 数据鲜活度是业务信号而非代码故障：stale 不判定本 job 失败，
+    # 避免"数据过期"阻断代码 CI 与 Pages 部署（数据刷新走独立的 data-update PR 流程）。
+    # manifest 缺失/损坏仍会由 data-check 的数据校验兜底阻断。
+    name: Data Freshness Signal
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -124,10 +127,22 @@ jobs:
 
     - name: Check Data Freshness (45 days)
       id: freshness
+      continue-on-error: true
       run: python scripts/check_freshness.py --max-age-days 45
 
+    - name: Surface Stale-Data Status
+      if: always() && steps.freshness.outcome == 'failure'
+      run: |
+        echo "::warning::数据快照已过期（采集日 ${{ steps.freshness.outputs.scrape_date }}，距今 ${{ steps.freshness.outputs.days }} 天 > 45 天阈值）。此为业务信号，不阻断代码 CI 与 Pages 部署；请手动触发 data-update workflow（write 模式）刷新数据。"
+        echo "## ⚠️ 数据鲜活度告警" >> "$GITHUB_STEP_SUMMARY"
+        echo "" >> "$GITHUB_STEP_SUMMARY"
+        echo "- 数据采集日: ${{ steps.freshness.outputs.scrape_date }}" >> "$GITHUB_STEP_SUMMARY"
+        echo "- 距今: ${{ steps.freshness.outputs.days }} 天（阈值 45 天）" >> "$GITHUB_STEP_SUMMARY"
+        echo "- 处理: 手动触发 Scheduled Data Increment Update (write 模式) 并审查自动 PR" >> "$GITHUB_STEP_SUMMARY"
+      shell: bash
+
     - name: Open or Update Stale-Data Issue
-      if: failure() && steps.freshness.outcome == 'failure'
+      if: always() && steps.freshness.outcome == 'failure'
       uses: actions/github-script@v7
       with:
         script: |
