@@ -270,7 +270,6 @@ export default function CityAssetPreview({ city, initialTab, onTabChange }: Prop
     container.addEventListener('wheel', wheelHandler, { passive: false });
     container.addEventListener('mousedown', mouseDownHandler);
     window.addEventListener('mousemove', handleGlobalMouseMove);
-    window.addEventListener('mouseup', createMouseUpHandler(container));
 
     return () => {
       container.removeEventListener('wheel', wheelHandler);
@@ -307,11 +306,21 @@ export default function CityAssetPreview({ city, initialTab, onTabChange }: Prop
   // === ESC to close fullscreen ===
   useEffect(() => {
     if (!isFullscreen) return;
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const dialog = document.querySelector<HTMLElement>('.fullscreenOverlay');
+    const controls = () => Array.from(dialog?.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], [tabindex="0"]') || []);
+    controls()[0]?.focus();
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsFullscreen(false);
+      if (e.key === 'Tab') {
+        const nodes = controls();
+        const first = nodes[0], last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
     };
     document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    return () => { document.removeEventListener('keydown', handler); previousFocus?.focus(); };
   }, [isFullscreen]);
 
   // === Body scroll lock when fullscreen ===

@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './tokens.css';
+@import './research.css';
 
 /* 标题衬线字体：Noto Serif SC 子集（可变字重 200-900，OFL 许可，见 assets/fonts/OFL.txt） */
 @font-face {
@@ -10,7 +11,7 @@
   font-display: swap;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; }
 
 body {
   background: var(--color-paper-50);

@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "test:unit": "vitest run",
     "preview": "vite preview",
-    "test:ui": "node scripts/acceptance-react.cjs",
+    "test:ui": "node scripts/acceptance-workbench.cjs",
     "check:static": "node scripts/check-static-build.cjs",
     "test:pages": "node scripts/smoke-pages.cjs"
   },

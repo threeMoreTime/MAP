@@ -1,65 +1,59 @@
-import { NavLink, Link } from 'react-router-dom';
+import { Link, NavLink } from "react-router-dom";
+import { useBasket, useMotion } from "../../hooks/useResearch";
 
-const NAV_ITEMS = [
-  { to: '/', label: '数据大屏', end: true },
-  { to: '/cities', label: '城市总览', end: false },
-  { to: '/compare', label: '城市对比', end: false },
-  { to: '/data-quality', label: '数据质量', end: false },
-  { to: '/about', label: '数据说明', end: false },
+const items = [
+  { to: "/", label: "全国概览", end: true },
+  { to: "/cities", label: "城市档案", end: false },
+  { to: "/compare", label: "对标分析", end: false },
+  { to: "/maps", label: "线网图集", end: false },
 ];
-
 export default function Header() {
+  const { ids, href } = useBasket();
+  const motion = useMotion();
   return (
-    <nav className="sticky top-0 z-[100] border-b border-paper-300 bg-paper-50/95">
-      <div className="mx-auto flex h-[52px] w-full max-w-[1180px] items-center gap-6 px-4 sm:px-6">
-        <Link
-          to="/"
-          className="mr-auto flex items-center gap-2.5 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion-500"
-        >
-          {/* 朱印 · 站点签章 */}
-          <span className="flex size-5 items-center justify-center rounded-[3px] bg-vermilion-600 font-serif text-[12px] font-semibold leading-none text-paper-50">
-            铁
+    <header className="research-header">
+      <a className="skip-link" href="#main-content">
+        跳至主要内容
+      </a>
+      <div className="header-inner">
+        <Link to={href("/", { q: null, city: null })} className="brand">
+          <span className="brand-symbol" aria-hidden="true">
+            M<span />
           </span>
-          <span className="font-serif text-[15px] font-semibold text-ink-900">MetroViz</span>
+          <span>
+            MetroViz<small>城市地铁客流研究台</small>
+          </span>
         </Link>
-        <div className="hidden items-center gap-5 sm:flex">
-          {NAV_ITEMS.map(({ to, label, end }) => (
+        <nav aria-label="主导航">
+          {items.map((item) => (
             <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                `border-b-2 pb-0.5 pt-1 text-[13px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-vermilion-500 ${
-                  isActive
-                    ? 'border-vermilion-500 font-medium text-ink-900'
-                    : 'border-transparent text-ink-500 hover:text-ink-900'
-                }`
-              }
+              key={item.to}
+              to={href(item.to, { q: null, city: null, tab: null })}
+              end={item.end}
+              className={({ isActive }) => (isActive ? "is-active" : "")}
             >
-              {label}
+              {item.label}
+              {item.to === "/compare" && ids.length > 0 && (
+                <span className="nav-count">{ids.length}</span>
+              )}
             </NavLink>
           ))}
-        </div>
-        {/* 移动端导航：横向滚动 */}
-        <div className="flex items-center gap-4 overflow-x-auto sm:hidden">
-          {NAV_ITEMS.map(({ to, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                `whitespace-nowrap border-b-2 pb-0.5 pt-1 text-[13px] ${
-                  isActive
-                    ? 'border-vermilion-500 font-medium text-ink-900'
-                    : 'border-transparent text-ink-500'
-                }`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
+        </nav>
+        <div className="header-tools">
+          <button
+            className="motion-toggle"
+            aria-pressed={motion.reduced}
+            disabled={motion.system}
+            onClick={motion.toggle}
+            title={
+              motion.system ? "已遵循系统减少动态效果设置" : "切换减少动态效果"
+            }
+          >
+            {motion.reduced ? "动效已减弱" : "减少动态效果"}
+          </button>
+          <Link to="/about">数据说明 ↗</Link>
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

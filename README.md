@@ -1,19 +1,17 @@
-# 全国城市地铁客流数据可视化平台 · MetroViz
+# MetroViz · 城市地铁客流研究台
 
-基于 React + TypeScript + ECharts 的中国 50 城市地铁客流数据可视化平台。**纸墨 · 朱印**视觉方向：米白宣纸底、墨色排印、朱砂红唯一强调，宋体衬线标题，离线可用。
+面向城市轨道交通研究与资料查询的 React + TypeScript 应用。采用浅色交通研究风，以城市、指标、期间与来源组织信息，提供适度三维空间效果与可减弱的任务动画。
 
-> 当前版本：v2.0.0-dev（全仓重构：legacy 退役、ECharts 按需加载、Tailwind v4 纸墨换装、pipeline 包重建）| [在线演示 🌐](https://threemoretime.github.io/MAP/)
-
----
+当前业务视觉重构版本以 [PRD 文档体系](docs/prd/00-README.md) 为准。[实施与验收记录](docs/prd/07-implementation-report.md) 说明范围、测试与发布边界。[在线演示](https://threemoretime.github.io/MAP/) 仅在功能分支合入并部署后更新。
 
 ## 功能特性
 
-- **数据大屏** — 全国地铁城市地理散点（墨阶气泡 + 朱砂 Top10 涟漪）、指标排行、年度趋势、客流强度
-- **城市总览** — 50 城封面卡片目录，多口径筛选（客流/线路图/规划图/资源完整度）
-- **城市详情** — 线路图/规划图查看器（滚轮/拖拽/单击缩放、全屏）、资源完整度说明、来源署名
-- **城市对比** — 2-5 城横向对比（柱状/雷达/趋势）、完整度评分、明细大表
-- **数据质量中心** — 50 城收录完整度大纲、缺失组索引、可检索大表
-- **移动端适配** — 响应式布局，375px 无横向溢出
+- **全国概览**：年度、日快照、里程与站点上下文；二维 / 三维切换，选城、聚焦、复位与故障降级。
+- **城市档案**：可检索列表 / 等高卡片；趋势、原值、来源、运营资料与线网分层。
+- **对标分析**：最多五城跨页选择，同指标原值与趋势；未知口径阻止严格排名和同比结论。
+- **线网图集**：线路图 / 规划图筛选，缩放和全屏查看，明确版本未知状态。
+- **数据说明**：日期语义、指标定义、构建版本与逐城资料收录。
+- **可访问性**：窄屏适配、图表等价数据、全屏焦点管理、系统与站内减少动态效果。
 
 ## 数据来源
 
@@ -32,11 +30,12 @@ npm run dev        # 开发服务器（默认 http://localhost:5173）
 
 路由（Hash 模式）：
 
-- `/#/` 或 `/#/dashboard` — 数据大屏
-- `/#/cities` — 城市总览
-- `/#/city/:id` — 城市详情（如 `/#/city/xiamen`）
-- `/#/compare` — 城市对比
-- `/#/data-quality` — 数据质量中心
+- `/#/` 或 `/#/dashboard` — 全国概览
+- `/#/cities` — 城市档案目录
+- `/#/city/:id` — 城市档案（如 `/#/city/xiamen`）
+- `/#/compare` — 对标分析
+- `/#/data-quality` — 逐城资料收录
+- `/#/maps` — 线网图集
 - `/#/about` — 数据说明
 
 ## 数据管线（pipeline/）
@@ -80,39 +79,31 @@ npm run lint          # ESLint
 npm run typecheck     # TypeScript
 npm run test:unit     # Vitest + Testing Library 单元测试
 npm run check:static  # 静态构建检查（T01-T09）
-npm run test:ui       # 浏览器验收（T01-T34，需本机 Chrome）
+npm run test:ui       # PRD 浏览器验收（需本机 Chrome）
 
 # 数据层（根目录）
 npm run test:data     # pipeline 校验
 npm run test:pipeline # pipeline pytest
 ```
 
-| 检查项 | 结果 |
-| --- | --- |
-| React UI 验收（T01-T34） | 33 PASS / 0 FAIL / 1 MANUAL |
-| 前端单元测试（Vitest） | 全部通过 |
-| pipeline pytest | 18/18 |
-| 数据层校验 | PASS |
-| 城市目录覆盖 | 50/50 |
+最新测试结果和限制详见 [实施与验收记录](docs/prd/07-implementation-report.md)。原有 45 天数据新鲜度检查仍然生效，历史数据没有在界面改造时被改写。
 
 ### CI/CD 与 Pages 部署
 
-- **CI**（`.github/workflows/ci.yml`）：push/PR 到 master 触发，三个 Job — `data-check`（数据校验 + pipeline pytest）、`react-check`（typecheck + lint + 单测 + 构建 + 静态检查）、`react-ui-test`（Headless Chrome 真浏览器验收）。
+- **CI**（`.github/workflows/ci.yml`）：push/PR 到 master 触发，包含 `data-check`（数据校验 + pipeline pytest）、`react-check`（typecheck + lint + 单测 + 构建 + 静态检查）、`react-ui-test`（Headless Chrome 真浏览器验收）。
 - **CD**（`.github/workflows/pages.yml`）：CI 通过后自动部署 GitHub Pages，附带线上 smoke test。
 - **自定义 404**（`frontend/public/404.html`）：非 Hash 子路径访问自动重定向回 SPA。
 
 ## 视觉与设计契约
 
-视觉方向为**纸墨 · 朱印**（浅色纸墨编辑部风）。设计令牌唯一来源：`frontend/src/styles/tokens.css`（Tailwind v4 `@theme`）；完整视觉契约见 [frontend/DESIGN.md](frontend/DESIGN.md)。
-
-标题字体为子集化 Noto Serif SC（可变字重，299KB woff2，OFL 许可），再生成脚本：`python scripts/subset_font.py`。
+视觉规范见 [frontend/DESIGN.md](frontend/DESIGN.md)，完整产品约束见 [docs/prd](docs/prd/00-README.md)。研究台语义样式位于 research.css，tokens.css 为存量组件保留兼容令牌。三维按需加载，无自动旋转或无依据飞线。
 
 ## 文件结构
 
 ```
 MAP/
 ├── frontend/                   # 主力前端（React 18 + TS + Vite + Tailwind v4）
-│   ├── DESIGN.md               # 视觉契约（纸墨·朱印）
+│   ├── DESIGN.md               # 城市交通研究台视觉契约
 │   └── src/                    # pages / components / hooks / lib / styles
 ├── pipeline/                   # 数据管线 Python 包（CLI + pytest）
 │   ├── processors/             # index_builder / quality_auditor / image_optimizer

@@ -1,140 +1,235 @@
-import { useMemo, useCallback, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { useMetroData, type MergedCity } from '../hooks/useMetroData';
-import { useDashboardFilters, hasValidDailyRidership } from '../hooks/useDashboardFilters';
-import { METRIC_LABELS } from '../types/metro';
-import SectionTitle from '../components/common/SectionTitle';
-import StatCard from '../components/common/StatCard';
-import FilterToolbar from '../components/common/FilterToolbar';
-import ChartCard from '../components/common/ChartCard';
-import DashboardHero3D from '../components/dashboard3d/DashboardHero3D';
-import RankChart from '../components/charts/RankChart';
-import MileageChart from '../components/charts/MileageChart';
-import TrendChart from '../components/charts/TrendChart';
-import IntensityChart from '../components/charts/IntensityChart';
-import DataSnapshotCard from '../components/common/DataSnapshotCard';
-
-function StatsRow({ cities }: { cities: MergedCity[] }) {
-  const cards = useMemo(() => {
-    const withDaily = cities.filter(hasValidDailyRidership);
-    return [
-      { label: '覆盖城市', value: cities.length, unit: '座', icon: '🏙' },
-      { label: '运营线路', value: cities.reduce((s, d) => s + d.operating_lines, 0), unit: '条', icon: '🚇' },
-      { label: '运营站点', value: cities.reduce((s, d) => s + d.operating_stations, 0), unit: '座', icon: '📍' },
-      { label: '总里程', value: cities.reduce((s, d) => s + d.operating_mileage_km, 0).toFixed(0), unit: 'km', icon: '📏' },
-      { label: '日总客流', value: withDaily.reduce((s, d) => s + d.daily_ridership_wan, 0).toFixed(0), unit: '万', icon: '👥' },
-    ];
-  }, [cities]);
-
-  return (
-    <div className="grid grid-cols-2 gap-3 py-1 sm:grid-cols-3 lg:grid-cols-5">
-      {cards.map((c) => (
-        <StatCard key={c.label} {...c} />
-      ))}
-    </div>
-  );
-}
+import { useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { useMetroData } from "../hooks/useMetroData";
+import { useBasket } from "../hooks/useResearch";
+import {
+  filterCities,
+  formatValue,
+  observe,
+  parseResearchQuery,
+  RESEARCH_METRICS,
+} from "../lib/research";
+import ResearchMap from "../components/research/ResearchMap";
+import {
+  BasketButton,
+  CityTable,
+  ComparisonTray,
+  ContextBar,
+  DataState,
+  MetricControls,
+  PageHeading,
+  SourceInfo,
+  StrictNotice,
+} from "../components/research/WorkbenchUI";
 
 export default function DashboardPage() {
   const { merged, loading, error, manifest } = useMetroData();
-  const { keyword, setKeyword, metric, setMetric, topN, setTopN, filteredCities } = useDashboardFilters(merged);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedCityName = searchParams.get('city');
-
-  const handleCitySelect = useCallback((city: string | null) => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (city) {
-        next.set('city', city);
-      } else {
-        next.delete('city');
-      }
-      return next;
-    }, { replace: true });
-  }, [setSearchParams]);
-
-  const selectedCity = useMemo(() => {
-    if (!selectedCityName) return null;
-    return merged.find((c) => c.city === selectedCityName) ?? null;
-  }, [selectedCityName, merged]);
-
-  const overviewRef = useRef<HTMLDivElement>(null);
-  const scrollToOverview = useCallback(() => {
-    overviewRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
-
-  if (loading) return <div className="state-message state-message--loading">加载数据中...</div>;
-  if (error) return <div className="state-message state-message--error">加载失败：{error}</div>;
-
-  const statsCount = merged.filter((c) => c.has_stats).length;
-  const noDataCount = filteredCities.filter((d) => !hasValidDailyRidership(d)).length;
-  const ml = METRIC_LABELS[metric];
-  const trendCount = Math.min(8, filteredCities.filter(hasValidDailyRidership).length);
-
+  const [params, setParams] = useSearchParams();
+  const view = parseResearchQuery(params, merged);
+  const { href } = useBasket();
+  const sort = params.get("sort") || "name";
+  const setSort = (value: string) =>
+    setParams(
+      (prev) => {
+        const p = new URLSearchParams(prev);
+        p.set("sort", value);
+        return p;
+      },
+      { replace: true },
+    );
+  const [mapOpen, setMapOpen] = useState(false);
+  const cities = useMemo(
+    () =>
+      filterCities(merged, view.keyword).sort((a, b) =>
+        sort === "value"
+          ? (observe(b, view.metric, view.year).value ?? -1) -
+            (observe(a, view.metric, view.year).value ?? -1)
+          : a.city_cn.localeCompare(b.city_cn, "zh-CN"),
+      ),
+    [merged, view.keyword, view.metric, view.year, sort],
+  );
+  const selected =
+    cities.find((c) => c.city === params.get("city")) ||
+    cities.find((c) => c.city === "shanghai") ||
+    cities[0];
+  const select = (id: string) =>
+    setParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("city", id);
+        return next;
+      },
+      { replace: true },
+    );
+  if (loading || error)
+    return (
+      <div className="workbench">
+        <DataState loading={loading} error={error} />
+      </div>
+    );
   return (
-    <>
-      {/* 全屏夜墨 3D Hero（场景系统：状态机 / 镜头 / hover / 排行 / controls） */}
-      <DashboardHero3D
-        data={filteredCities}
-        metric={metric}
-        onMetricChange={setMetric}
-        selectedCity={selectedCityName}
-        onCitySelect={handleCitySelect}
-        cityDetail={selectedCity}
-        citiesCount={merged.length}
-        statsCount={statsCount}
-        dataDate={manifest?.stats_scrape_date ?? null}
-        onScrollToOverview={scrollToOverview}
+    <div className="workbench">
+      <PageHeading
+        eyebrow="METRO RESEARCH / 01"
+        title="从一座城，看见轨道交通"
+        description="查阅城市客流、理解历史变化，让每一次对照都有依据。"
+        action={
+          <Link
+            className="quiet-button"
+            to={href("/cities", { q: null, city: null })}
+          >
+            浏览城市档案 ↗
+          </Link>
+        }
       />
-
-      <div ref={overviewRef} className="mx-auto w-full max-w-[1180px] scroll-mt-2 px-4 pb-8 pt-10 sm:px-6">
-        <DataSnapshotCard cities={merged} />
-        <SectionTitle icon="◎" title="数据总览" />
-        <StatsRow cities={filteredCities} />
-        {noDataCount > 0 && (
-          <div className="px-8 pb-1.5 pt-2 text-center text-[11px] text-ink-400">
-            日客流统计已排除 {noDataCount} 个暂无数据城市
-          </div>
-        )}
-
-        <FilterToolbar
-          keyword={keyword}
-          onKeywordChange={setKeyword}
-          metric={metric}
-          onMetricChange={setMetric}
-          topN={topN}
-          onTopNChange={setTopN}
-          matchCount={filteredCities.length}
-        />
-
-        {/* Rank + Mileage */}
-        <div className="mb-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <ChartCard title={`${ml.name}排行榜（${ml.unit}）`}>
-            <div className="chart-container h-[340px] w-full">
-              <RankChart data={filteredCities} metric={metric} topN={topN} />
-            </div>
-          </ChartCard>
-          <ChartCard title="运营里程排行榜（km）">
-            <div className="chart-container h-[340px] w-full">
-              <MileageChart data={filteredCities} topN={topN} />
-            </div>
-          </ChartCard>
+      <div className="overview-stats">
+        <div>
+          <span>城市资源</span>
+          <strong>
+            {merged.length}
+            <small> 城</small>
+          </strong>
+          <p>全国城市资料索引</p>
         </div>
-
-        {/* Trend + Intensity */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <ChartCard title={`Top ${trendCount} 城市年度客流趋势`}>
-            <div className="chart-container h-[340px] w-full">
-              <TrendChart data={filteredCities} />
-            </div>
-          </ChartCard>
-          <ChartCard title="客流强度对比">
-            <div className="chart-container h-[340px] w-full">
-              <IntensityChart data={filteredCities} topN={topN} />
-            </div>
-          </ChartCard>
+        <div>
+          <span>年度序列</span>
+          <strong>
+            {
+              merged.filter((c) => c.stats?.yearly_avg_ridership.years.length)
+                .length
+            }
+            <small> 城</small>
+          </strong>
+          <p>按年份独立判断可用性</p>
+        </div>
+        <div>
+          <span>日客流快照</span>
+          <strong>
+            {
+              merged.filter(
+                (c) => observe(c, "daily_snapshot", view.year).value !== null,
+              ).length
+            }
+            <small> 城</small>
+          </strong>
+          <p>统计日期尚待核验</p>
+        </div>
+        <div className="overview-note">
+          <span className="status-dot" />
+          历史资料研究
+          <p>
+            按城市查阅，按口径对照。
+            <br />
+            当前数据不代表实时运营。
+          </p>
         </div>
       </div>
-    </>
+      <MetricControls cities={merged} />
+      <ContextBar
+        cities={cities}
+        metric={view.metric}
+        year={view.year}
+        collectedAt={manifest?.stats_scrape_date}
+      />
+      {view.strict ? (
+        <StrictNotice />
+      ) : (
+        <>
+          <button
+            className="mobile-map-toggle quiet-button"
+            aria-expanded={mapOpen}
+            onClick={() => setMapOpen(!mapOpen)}
+          >
+            {mapOpen ? "收起空间视图" : "展开空间视图 · 支持 3D"}
+          </button>
+          <div className="overview-grid">
+            <div
+              className={`spatial-column ${mapOpen ? "mobile-map-open" : ""}`}
+            >
+              <ResearchMap
+                cities={cities}
+                metric={view.metric}
+                year={view.year}
+                selected={selected?.city || ""}
+                onSelect={select}
+              />
+            </div>
+            <section className="research-panel city-list-panel">
+              <div className="panel-top">
+                <div>
+                  <span className="eyebrow">CITY INDEX</span>
+                  <h2>
+                    城市资料 <small>{cities.length}</small>
+                  </h2>
+                </div>
+                <label className="inline-select">
+                  <span className="sr-only">城市列表排序</span>
+                  <select
+                    aria-label="城市列表排序"
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value)}
+                  >
+                    <option value="name">按名称</option>
+                    <option value="value">按源数据值</option>
+                  </select>
+                </label>
+              </div>
+              <CityTable
+                cities={cities}
+                metric={view.metric}
+                year={view.year}
+                selected={selected?.city}
+                onSelect={select}
+                compact
+              />
+              <p className="panel-footnote">
+                源值排序用于资料浏览，不构成全国排名。
+              </p>
+            </section>
+          </div>
+          {selected && (
+            <section className="selected-city-panel" aria-label="选中城市摘要">
+              <div>
+                <span className="eyebrow">
+                  SELECTED CITY / {selected.city.toUpperCase()}
+                </span>
+                <h2>
+                  {selected.city_cn}
+                  <span className="pending-tag">资料待核验</span>
+                </h2>
+                <p>
+                  {RESEARCH_METRICS[view.metric].label} ·{" "}
+                  {observe(selected, view.metric, view.year).periodLabel}
+                </p>
+              </div>
+              <div className="selected-metric">
+                <strong>
+                  {formatValue(
+                    observe(selected, view.metric, view.year).value,
+                    view.metric,
+                  )}
+                </strong>
+                <span>{RESEARCH_METRICS[view.metric].unit}</span>
+              </div>
+              <div className="selected-actions">
+                <BasketButton city={selected} />
+                <Link
+                  className="action-button"
+                  to={href(`/city/${selected.city}`, { q: null, city: null })}
+                >
+                  进入城市档案 →
+                </Link>
+              </div>
+              <SourceInfo
+                city={selected}
+                metric={view.metric}
+                year={view.year}
+              />
+            </section>
+          )}
+        </>
+      )}
+      <ComparisonTray cities={merged} />
+    </div>
   );
 }
