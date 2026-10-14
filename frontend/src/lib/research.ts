@@ -208,13 +208,13 @@ export function citation(
 // ID-derived color remains stable when cities are sorted, removed, or re-added.
 export function cityColor(id: string): string {
   const palette = [
-    "#146a73",
-    "#4d69a2",
-    "#99601d",
-    "#815896",
-    "#3f7662",
-    "#92585f",
-    "#566b7d",
+    "#3478df",
+    "#169b95",
+    "#bc833a",
+    "#8570c0",
+    "#53926e",
+    "#bc6780",
+    "#617792",
   ];
   const hash = Array.from(id).reduce(
     (n, c) => (n * 31 + c.charCodeAt(0)) >>> 0,

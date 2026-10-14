@@ -33,7 +33,7 @@ export default function MapsPage() {
     <div className="workbench">
       <PageHeading
         eyebrow="NETWORK ATLAS / 04"
-        title="沿着线网，阅读城市"
+        title="轨道交通图集"
         description="独立查阅线路图与规划资料，保留图件类型和版本状态。"
       />
       <div className="research-controls">

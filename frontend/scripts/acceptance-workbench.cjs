@@ -1,4 +1,4 @@
-/** PRD v1.1 P0 browser checks. Runs against dist under /MAP/ or a supplied BASE_URL. */
+/** PRD v2.0 P0 browser checks. Runs against dist under /MAP/ or a supplied BASE_URL. */
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -135,7 +135,7 @@ async function run() {
     await waitFrame(page);
   };
   await step(
-    "AC-01/05 overview coverage, compact first viewport and lazy 3D",
+    "AC-01/05 overview coverage, map-first viewport and lazy 3D",
     async () => {
       await go("/?metric=annual&year=2025&cities=", ".overview-grid");
       await textIncludes("有效记录 34 / 50 城");
@@ -148,12 +148,12 @@ async function run() {
         ),
         "50 城,34 城,23 城",
       );
-      assert(
-        await page.$eval(
-          ".compact-table tbody tr:nth-child(5)",
-          (e) => e.getBoundingClientRect().bottom < innerHeight,
-        ),
-      );
+      assert(await page.$eval(".map-canvas", (e) => {
+        const box = e.getBoundingClientRect();
+        return box.width > 550 && box.height >= 380 && box.top < innerHeight / 2;
+      }), "the map should dominate the first viewport");
+      assert(await page.$eval(".inspector-value", e => e.getBoundingClientRect().bottom < innerHeight), "selected city metric should be visible beside the map");
+      assert.equal(await page.$$eval(".compact-table tbody tr", els => els.length), 50);
       assert(
         !requests.some((url) => /echarts-gl-/.test(url)),
         "GL bundle eagerly requested",
@@ -214,7 +214,7 @@ async function run() {
       );
       await page.click(".header-tools a");
       await page.waitForSelector(".reading-page");
-      await clickText(".header-inner nav a", "对标分析");
+      await clickText(".studio-sidebar nav a", "对标分析");
       await page.waitForSelector(".comparison-row");
       assert.equal(
         await page.$$eval(".comparison-row", (els) => els.length),
@@ -351,10 +351,15 @@ async function run() {
         "true",
         "WebGL not available in this environment",
       );
+      await page.click('button[aria-label="放大地图"]');
+      await page.click('button[aria-label="缩小地图"]');
+      await page.click('button[aria-label="显示城市名称"]');
+      assert.equal(await page.$eval('button[aria-label="显示城市名称"]', e => e.getAttribute("aria-pressed")), "false");
+      await page.click('button[aria-label="显示城市名称"]');
       await clickText(".map-tools button", "聚焦城市");
       await clickText(".map-tools button", "复位");
       await shot("overview-3d");
-      await clickText(".segmented button", "二维");
+      await clickText(".segmented button", "2D");
       await page.waitForFunction(() => !document.querySelector(".map-overlay"));
       await textIncludes("SELECTED CITY / SHANGHAI");
     },
@@ -415,6 +420,10 @@ async function run() {
       );
       await noOverflow();
       await shot("overview-mobile");
+      await page.click(".mobile-map-toggle");
+      await page.waitForFunction(() => getComputedStyle(document.querySelector(".spatial-column")).display !== "none");
+      await noOverflow();
+      await shot("overview-mobile-map");
       await page.emulateMediaFeatures([
         { name: "prefers-reduced-motion", value: "no-preference" },
       ]);

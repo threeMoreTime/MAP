@@ -45,7 +45,7 @@ export default function ComparePage() {
     <div className="workbench">
       <PageHeading
         eyebrow="CITY COMPARISON / 03"
-        title="让差异，有据可循"
+        title="城市对标分析"
         description="选择 2–5 座城市，在相同指标下浏览原值，并先检查可比条件。"
       />
       <MetricControls cities={merged} />

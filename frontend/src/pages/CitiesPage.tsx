@@ -56,7 +56,7 @@ export default function CitiesPage() {
     <div className="workbench">
       <PageHeading
         eyebrow="CITY ARCHIVE / 02"
-        title="每座城市，都有自己的轨迹"
+        title="城市档案"
         description="将客流记录与线网资料分开检索，缺失一个指标也不遗漏一座城市。"
       />
       <MetricControls cities={merged} showMode={false} />

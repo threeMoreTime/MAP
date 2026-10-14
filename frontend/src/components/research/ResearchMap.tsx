@@ -10,6 +10,7 @@ import {
   type ResearchMetric,
 } from "../../lib/research";
 import { withBaseUrl } from "../../utils/path";
+import StudioIcon from "./StudioIcon";
 
 interface Props {
   cities: MergedCity[];
@@ -18,7 +19,7 @@ interface Props {
   selected: string;
   onSelect: (id: string) => void;
 }
-const overview = { center: [0, 0, 0], distance: 105, alpha: 45, beta: -8 };
+const overview = { center: [0, 0, 0], distance: 100, alpha: 48, beta: -10 };
 
 export default function ResearchMap({
   cities,
@@ -38,6 +39,7 @@ export default function ResearchMap({
     "loading",
   );
   const [message, setMessage] = useState("");
+  const [showLabels, setShowLabels] = useState(true);
   const [retry, setRetry] = useState(0);
   const { reduced } = useMotion();
 
@@ -90,24 +92,24 @@ export default function ResearchMap({
                 backgroundColor: "transparent",
                 geo3D: {
                   map: "research-china",
-                  regionHeight: 1.8,
+                  regionHeight: 2.2,
                   boxWidth: 120,
-                  boxHeight: 5,
+                  boxHeight: 6,
                   shading: "lambert",
                   itemStyle: {
-                    color: "#9dbeb8",
-                    borderColor: "#f1f8f6",
+                    color: "#345d8b",
+                    borderColor: "#7198c4",
                     borderWidth: 0.7,
                   },
-                  emphasis: { itemStyle: { color: "#b3d0cf" } },
+                  emphasis: { itemStyle: { color: "#527ead" } },
                   light: {
                     main: {
-                      intensity: 0.45,
+                      intensity: 0.9,
                       alpha: 55,
                       beta: 20,
                       shadow: false,
                     },
-                    ambient: { intensity: 0.55 },
+                    ambient: { intensity: 0.4 },
                   },
                   viewControl: {
                     ...overview,
@@ -132,13 +134,17 @@ export default function ResearchMap({
                 backgroundColor: "transparent",
                 geo: {
                   map: "research-china",
-                  roam: false,
-                  layoutCenter: ["48%", "48%"],
-                  layoutSize: "102%",
+                  roam: true,
+                  scaleLimit: { min: 0.8, max: 4 },
+                  layoutCenter: ["47%", "49%"],
+                  layoutSize: "108%",
                   itemStyle: {
-                    areaColor: "#dae8e5",
-                    borderColor: "#ffffff",
-                    borderWidth: 1,
+                    areaColor: "#233f64",
+                    borderColor: "#44658b",
+                    borderWidth: 0.7,
+                    shadowColor: "#071223",
+                    shadowBlur: 15,
+                    shadowOffsetY: 6,
                   },
                   emphasis: { disabled: true },
                   silent: true,
@@ -204,30 +210,32 @@ export default function ResearchMap({
         return {
           name: city.city_cn,
           city: city.city,
-          value: [...CITY_COORDS[city.city], mode === "3d" ? 2 : o.value || 0],
+          value: [...CITY_COORDS[city.city], mode === "3d" ? 3 : o.value || 0],
           symbol: o.value === null && mode === "2d" ? "emptyCircle" : "circle",
           symbolSize:
             o.value === null
               ? 5
-              : Math.max(7, Math.sqrt(o.value / max) * 30) + (picked ? 5 : 0),
+              : Math.max(6, Math.sqrt(o.value / max) * 28) + (picked ? 4 : 0),
           itemStyle: {
             color: picked
-              ? "#bb7328"
+              ? "#71f2d1"
               : o.value === null
-                ? "#879b9d"
-                : "#146a73",
-            opacity: picked ? 1 : 0.72,
-            borderColor: "#ffffff",
+                ? "#748dab"
+                : "#75b5ff",
+            opacity: picked ? 1 : 0.76,
+            borderColor: picked ? "#c8fff0" : "#b7d7ff",
+            shadowColor: picked ? "#71f2d155" : "transparent",
+            shadowBlur: picked ? 14 : 0,
             borderWidth: picked ? 2 : 1,
           },
           label: {
-            show: picked,
+            show: showLabels && (picked || (mode === "2d" && (o.value || 0) > max * 0.5)),
             formatter: city.city_cn,
             position: "top",
-            color: "#183c42",
-            fontSize: 13,
+            color: "#d6e9ff",
+            fontSize: 11,
             fontWeight: 600,
-            textStyle: { color: "#183c42", fontSize: 13 },
+            textStyle: { color: "#d6e9ff", fontSize: 11 },
           },
           tooltip: {
             formatter: `${city.city_cn}<br/>${RESEARCH_METRICS[metric].label}：${formatValue(o.value, metric)} ${o.unit}<br/>${o.periodLabel} · ${o.reason}`,
@@ -255,7 +263,7 @@ export default function ResearchMap({
               },
             }
           : {}),
-        series: [{ id: "cities", data }],
+        series: [{ id: "cities", data, labelLayout: { hideOverlap: true } }],
       } as EChartsCoreOption);
     } catch {
       const frame = window.requestAnimationFrame(() =>
@@ -263,7 +271,7 @@ export default function ResearchMap({
       );
       return () => window.cancelAnimationFrame(frame);
     }
-  }, [cities, metric, year, selected, mode, status, reduced]);
+  }, [cities, metric, year, selected, mode, status, reduced, showLabels]);
 
   function focus(reset = false) {
     const instance = chart.current;
@@ -307,6 +315,19 @@ export default function ResearchMap({
     }
   }
 
+  function zoom(inward: boolean) {
+    const instance = chart.current;
+    if (!instance) return;
+    const options = instance.getOption() as { geo?: { zoom?: number }[]; geo3D?: { viewControl?: { distance?: number } }[] };
+    if (mode === "2d") {
+      const current = options.geo?.[0]?.zoom || 1;
+      instance.setOption({ geo: { zoom: Math.max(0.8, Math.min(4, current * (inward ? 1.25 : 0.8))) } });
+    } else {
+      const current = options.geo3D?.[0]?.viewControl?.distance || overview.distance;
+      instance.setOption({ geo3D: { viewControl: { distance: Math.max(55, Math.min(190, current * (inward ? 0.85 : 1.18))), animation: !reduced, animationDurationUpdate: reduced ? 0 : 300 } } } as EChartsCoreOption);
+    }
+  }
+
   function switchMode(next: "2d" | "3d") {
     if (next !== mode) {
       setStatus("loading");
@@ -318,12 +339,12 @@ export default function ResearchMap({
     <section className="research-map">
       <div className="panel-top">
         <div>
-          <span className="eyebrow">SPATIAL VIEW</span>
-          <h2>城市空间分布</h2>
+          <span className="eyebrow">NATIONAL TRANSIT ATLAS</span>
+          <h2><span className="map-title-icon"><StudioIcon name="layers" size={15}/></span>城市空间分布</h2>
         </div>
         <div className="segmented" aria-label="空间视图维度">
           <button aria-pressed={mode === "2d"} onClick={() => switchMode("2d")}>
-            二维
+            2D 平面
           </button>
           <button aria-pressed={mode === "3d"} onClick={() => switchMode("3d")}>
             三维 3D
@@ -356,20 +377,26 @@ export default function ResearchMap({
             </button>
           </div>
         )}
+        <div className="map-zoom" aria-label="地图缩放">
+          <button aria-label="放大地图" disabled={status !== "ready"} onClick={() => zoom(true)}><StudioIcon name="plus" size={16}/></button>
+          <button aria-label="缩小地图" disabled={status !== "ready"} onClick={() => zoom(false)}><StudioIcon name="minus" size={16}/></button>
+        </div>
+        <span className="map-coordinate" aria-hidden="true">METRO ATLAS<br/>CHINA · URBAN TRANSIT</span>
         <div className="map-tools">
+          <button className="quiet-button" aria-label="显示城市名称" aria-pressed={showLabels} onClick={() => setShowLabels(!showLabels)}><StudioIcon name="label" size={14}/>标签</button>
           <button
             className="quiet-button"
             disabled={!CITY_COORDS[selected] || status !== "ready"}
             onClick={() => focus()}
           >
-            聚焦城市
+            <StudioIcon name="focus" size={14}/>聚焦城市
           </button>
           <button
             className="quiet-button"
             disabled={status !== "ready"}
             onClick={() => focus(true)}
           >
-            复位
+            <StudioIcon name="reset" size={13}/>复位
           </button>
         </div>
         <span className="map-compass" aria-hidden="true">
@@ -378,7 +405,7 @@ export default function ResearchMap({
       </div>
       <div className="map-legend">
         <span>
-          <i /> 节点面积表示源数据值
+          <i /> 节点大小表示源数据值
         </span>
         <span>
           <i className="missing-dot" /> 当前指标缺失

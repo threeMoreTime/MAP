@@ -2,7 +2,7 @@
  * MetroViz 城市交通研究台设计令牌（旧令牌名兼容现有查看器）（Tailwind v4 CSS-first @theme）
  *
  * 浅色交通研究风，旧令牌名兼容存量组件。
- * 主界面语义变量与布局见 research.css；三维独立按需加载。
+ * 主界面语义变量与布局见 research.css 与 studio.css；三维独立按需加载。
  *
  * 本文件维护兼容组件使用的颜色、字体、圆角与阴影；
  * ECharts 侧调色板以普通 CSS 变量形式暴露（图表无法消费 utility class）。
@@ -10,26 +10,26 @@
 
 @theme {
   /* === 纸 · 表面 === */
-  --color-paper-50: #f4f6f5; /* 页面画布 */
+  --color-paper-50: #f5f7fb; /* 页面画布 */
   --color-paper-100: #ffffff; /* 卡片/抬升面 */
-  --color-paper-200: #edf3f0; /* 分割底/悬浮态 */
-  --color-paper-300: #d9e2e2; /* 边线 */
-  --color-paper-400: #baccc9; /* 强边线/禁用 */
+  --color-paper-200: #edf4ff; /* 分割底/悬浮态 */
+  --color-paper-300: #e3e9f2; /* 边线 */
+  --color-paper-400: #bdcbe0; /* 强边线/禁用 */
 
   /* === 墨 · 文字 === */
-  --color-ink-900: #182a2f; /* 主文字 */
-  --color-ink-700: #304c53; /* 次文字 */
-  --color-ink-500: #53676d; /* 弱文字/说明 */
-  --color-ink-400: #61787c; /* 标签/轴文字 */
-  --color-ink-300: #70888c; /* 占位/最弱 */
-  --color-ink-200: #ccdcd8; /* 极弱分割 */
+  --color-ink-900: #17253d; /* 主文字 */
+  --color-ink-700: #354762; /* 次文字 */
+  --color-ink-500: #62718a; /* 弱文字/说明 */
+  --color-ink-400: #71839d; /* 标签/轴文字 */
+  --color-ink-300: #8193ab; /* 占位/最弱 */
+  --color-ink-200: #d8e2f0; /* 极弱分割 */
 
   /* === 操作强调（保留 vermilion 旧类名） === */
-  --color-vermilion-700: #0c555d; /* 按压深 */
-  --color-vermilion-600: #115d65; /* 悬浮 */
-  --color-vermilion-500: #146a73; /* 蓝绿色主强调 */
-  --color-vermilion-100: #d8eae6; /* 淡朱底 */
-  --color-vermilion-50: #e7f2f1; /* 极淡朱底 */
+  --color-vermilion-700: #174fae; /* 按压深 */
+  --color-vermilion-600: #215ccc; /* 悬浮 */
+  --color-vermilion-500: #2867dc; /* 蓝色主强调 */
+  --color-vermilion-100: #dceaff; /* 淡朱底 */
+  --color-vermilion-50: #edf4ff; /* 极淡朱底 */
 
   /* === 语义色（收敛用量，仅状态语义） === */
   --color-jade-600: #37755a; /* 完备/正向 */
@@ -85,13 +85,13 @@
   --chart-ink-5: #aea48b;
   --chart-ink-6: #cdc4ab;
   /* 朱砂高亮：榜首/选中/当前指标 */
-  --chart-vermilion: #146a73;
+  --chart-vermilion: #2867dc;
   /* 轴与网格（浅底） */
-  --chart-axis-label: #61787c;
+  --chart-axis-label: #71839d;
   --chart-split-line: rgba(33, 29, 22, 0.08);
   --chart-axis-line: rgba(33, 29, 22, 0.18);
   /* 多城市对比序列：朱砂领衔 + 墨阶递进 */
-  --chart-series-1: #146a73;
+  --chart-series-1: #2867dc;
   --chart-series-2: #2b2620;
   --chart-series-3: #6b6354;
   --chart-series-4: #9a7325;
