@@ -56,3 +56,13 @@ periodEnded 只表示年份已经早于采集年份，可进入历史资料趋�
 screenshots 目录包含全国概览三维、五城对标、城市档案与移动端截图。查看代码时从 docs/prd/00-README.md 阅读范围与规则，再对照此文件的实现位置和测试脚本。
 
 本地运行：进入 frontend 后执行 npm ci、npm run dev。生产验证顺序为 npm run lint、npm run typecheck、npm run test:unit、npm run build、npm run check:static、npm run test:ui。浏览器验收需要设置 PUPPETEER_EXECUTABLE_PATH 指向 Chrome 或 Chromium；test:pages 使用 BASE_URL 验证已部署站点。
+
+## 6 PR 前补修与复验（2026-10-14）
+
+复查发现共享数据请求缺少超时和取消机制，连接挂起时会无限停留在加载态。现增加 12 秒截止时间：核心请求超时显示错误及重试入口；可选封面与质量报告超时降级为 null；卸载或核心请求提前失败时取消剩余请求并清理定时器。重新加载沿用 URL，保留对比城市、指标和年份。
+
+新增三项回归单测，已先验证旧实现失败，再确认补修后通过。新增浏览器用例模拟持续挂起的统计请求，验证超时提示、重试恢复和两城对比状态保留。
+
+CI 的数据任务原先只安装 npm 依赖，未安装 pytest 与 Pillow。新增 requirements-dev.txt 并由 CI 显式安装；README 同步本地安装方法。使用新的 Python 3.12 虚拟环境安装声明依赖后验证管线，远端 CI 仍沿用 Python 3.10。
+
+本日复验结果为前端单测 92 项、浏览器验收 18 组、管线测试 22 项全部通过；ESLint、TypeScript 生产构建和 T01–T09 静态检查通过。数据校验仍为 0 error、11 条日快照缺失 warning。采集日仍为 2026-05-08，距复验日 159 天，既有 45 天新鲜度门槛仍失败；此次补修没有更新业务数据或放宽该门槛。

@@ -51,7 +51,10 @@ export function DataState({
     return (
       <div className="research-empty" role="alert">
         <h2>数据加载失败</h2>
-        <p>请检查网络后重试，已选城市会保留在链接中。</p>
+        <p>
+          {error.includes("超时") ? "数据请求超时。" : ""}
+          请检查网络后重试，已选城市会保留在链接中。
+        </p>
         <button
           className="action-button"
           onClick={() => window.location.reload()}

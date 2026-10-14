@@ -482,6 +482,36 @@ async function run() {
     },
   );
   await step(
+    "AC-15 stalled core-data times out and retry retains comparison",
+    async () => {
+      const stalled = await browser.newPage();
+      let holdRequests = true;
+      await stalled.setRequestInterception(true);
+      stalled.on("request", (req) => {
+        if (holdRequests && req.url().includes("metro_stats.json")) return;
+        void req.continue();
+      });
+      const route = "#/compare?cities=hangzhou,xiamen&metric=annual&year=2025";
+      await stalled.goto(`${base}${route}`, { waitUntil: "domcontentloaded" });
+      await stalled.waitForFunction(
+        () => document.body.innerText.includes("数据请求超时"),
+        { timeout: 20000 },
+      );
+      assert.equal(await stalled.$(".research-loading"), null);
+      assert.equal(await stalled.$(".comparison-row"), null);
+      assert.equal(new URL(stalled.url()).hash, route);
+      holdRequests = false;
+      await Promise.all([
+        stalled.waitForNavigation({ waitUntil: "networkidle0" }),
+        stalled.click(".research-empty .action-button"),
+      ]);
+      await stalled.waitForSelector(".comparison-row");
+      assert.equal(await stalled.$$eval(".comparison-row", (els) => els.length), 2);
+      assert.equal(new URL(stalled.url()).hash, route);
+      await stalled.close();
+    },
+  );
+  await step(
     "AC-16 legacy routes, build identity and no runtime errors",
     async () => {
       await go("/dashboard?cities=", ".overview-grid");

@@ -82,6 +82,7 @@ npm run check:static  # 静态构建检查（T01-T09）
 npm run test:ui       # PRD 浏览器验收（需本机 Chrome）
 
 # 数据层（根目录）
+python -m pip install -r requirements-dev.txt # Python 3.10+，安装 Pillow 与 pytest
 npm run test:data     # pipeline 校验
 npm run test:pipeline # pipeline pytest
 ```

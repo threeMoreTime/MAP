@@ -94,8 +94,8 @@ function mergeData(
 
 import { withBaseUrl } from "../utils/path";
 
-async function fetchJSON<T>(url: string): Promise<T> {
-  const resp = await fetch(url);
+async function fetchJSON<T>(url: string, signal: AbortSignal): Promise<T> {
+  const resp = await fetch(url, { signal });
   if (!resp.ok) throw new Error(`Failed to fetch ${url}: ${resp.status}`);
   return resp.json() as Promise<T>;
 }
@@ -115,6 +115,12 @@ export function useMetroDataLoader(enabled = true): MetroDataState {
   useEffect(() => {
     if (!enabled) return;
     let cancelled = false;
+    let timedOut = false;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 12000);
 
     async function load() {
       try {
@@ -125,16 +131,25 @@ export function useMetroDataLoader(enabled = true): MetroDataState {
           coversManifestData,
           qualityReportData,
         ] = await Promise.all([
-          fetchJSON<MetroStats>(withBaseUrl("data/latest/metro_stats.json")),
+          fetchJSON<MetroStats>(
+            withBaseUrl("data/latest/metro_stats.json"),
+            controller.signal,
+          ),
           fetchJSON<CityAssetsIndex>(
             withBaseUrl("data/latest/city_assets_index.json"),
+            controller.signal,
           ),
-          fetchJSON<Manifest>(withBaseUrl("data/latest/manifest.json")),
+          fetchJSON<Manifest>(
+            withBaseUrl("data/latest/manifest.json"),
+            controller.signal,
+          ),
           fetchJSON<CoverManifest>(
             withBaseUrl("assets/city-covers/manifest.json"),
+            controller.signal,
           ).catch(() => null),
           fetchJSON<QualityReport>(
             withBaseUrl("data/latest/quality_report.json"),
+            controller.signal,
           ).catch(() => null),
         ]);
 
@@ -161,15 +176,23 @@ export function useMetroDataLoader(enabled = true): MetroDataState {
           setState((prev) => ({
             ...prev,
             loading: false,
-            error: e instanceof Error ? e.message : "Unknown error",
+            error: timedOut
+              ? "数据请求超时，请检查网络后重新加载。"
+              : e instanceof Error ? e.message : "Unknown error",
           }));
         }
+      } finally {
+        window.clearTimeout(timeout);
+        // Stop sibling downloads after an early core-data failure as well.
+        controller.abort();
       }
     }
 
     load();
     return () => {
       cancelled = true;
+      window.clearTimeout(timeout);
+      controller.abort();
     };
   }, [enabled]);
 
