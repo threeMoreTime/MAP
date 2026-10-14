@@ -85,11 +85,16 @@ export default function ResearchMap({
           devicePixelRatio: Math.min(window.devicePixelRatio || 1, 1.5),
         });
         chart.current = instance;
+        // Redraw canvas labels when the bundled CJK face has finished loading.
+        void document.fonts?.ready.then(() => {
+          if (!cancelled && !instance.isDisposed()) instance.resize();
+        });
         const base: EChartsCoreOption =
           mode === "3d"
             ? {
                 animation: false,
                 backgroundColor: "transparent",
+                textStyle: { fontFamily: "Metro Sans, sans-serif" },
                 geo3D: {
                   map: "research-china",
                   regionHeight: 2.2,
@@ -132,12 +137,13 @@ export default function ResearchMap({
               }
             : {
                 backgroundColor: "transparent",
+                textStyle: { fontFamily: "Metro Sans, sans-serif" },
                 geo: {
                   map: "research-china",
                   roam: true,
                   scaleLimit: { min: 0.8, max: 4 },
                   layoutCenter: ["47%", "49%"],
-                  layoutSize: "108%",
+                  layoutSize: "94%",
                   itemStyle: {
                     areaColor: "#233f64",
                     borderColor: "#44658b",
@@ -233,9 +239,10 @@ export default function ResearchMap({
             formatter: city.city_cn,
             position: "top",
             color: "#d6e9ff",
+            fontFamily: "Metro Sans, sans-serif",
             fontSize: 11,
             fontWeight: 600,
-            textStyle: { color: "#d6e9ff", fontSize: 11 },
+            textStyle: { color: "#d6e9ff", fontSize: 11, fontFamily: "Metro Sans, sans-serif" },
           },
           tooltip: {
             formatter: `${city.city_cn}<br/>${RESEARCH_METRICS[metric].label}：${formatValue(o.value, metric)} ${o.unit}<br/>${o.periodLabel} · ${o.reason}`,

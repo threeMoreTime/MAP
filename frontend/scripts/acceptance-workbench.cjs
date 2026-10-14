@@ -132,6 +132,7 @@ async function run() {
   const go = async (route, selector) => {
     await page.goto(`${base}#${route}`, { waitUntil: "networkidle0" });
     await page.waitForSelector(selector || ".workbench");
+    await page.evaluate(() => document.fonts.ready);
     await waitFrame(page);
   };
   await step(

@@ -1,3 +1,4 @@
+@font-face { font-family: "Metro Sans"; src: url("../assets/fonts/metro-sans-subset.woff2") format("woff2"); font-style: normal; font-weight: 100 900; font-display: swap; }
 /* MetroViz Studio v2 — map-first research workspace. */
 :root {
   --research-canvas: #f5f7fb;
@@ -10,7 +11,7 @@
   --research-warm: #986016;
   --studio-sidebar: 212px;
 }
-.research-app { padding-left: var(--studio-sidebar); font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; }
+.research-app { padding-left: var(--studio-sidebar); font-family: "Metro Sans", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 13px; }
 .studio-icon { display: inline-block; flex-shrink: 0; vertical-align: middle; }
 .research-app h1, .research-app h2, .research-app h3, .research-app strong { font-family: inherit; }
 .research-app h2 { font-size: 16px; font-weight: 650; }
@@ -55,15 +56,15 @@
 .history-chip > span { width: 5px; height: 5px; border-radius: 50%; background: #5a9b85; }
 .motion-toggle { display: flex; gap: 6px; align-items: center; color: #687894; border: 0 !important; font-size: 10px; padding: 7px 0 !important; }
 .topbar-help { border-left: 1px solid #e1e7f0; padding-left: 17px; color: #788ba8; }
-.workbench { max-width: 1640px; width: 100%; padding: 26px 28px 40px; }
-.research-heading { margin-bottom: 23px; gap: 20px; }
+.workbench { max-width: 1640px; width: 100%; padding: 22px 28px 40px; }
+.research-heading { margin-bottom: 18px; gap: 20px; }
 .research-heading .eyebrow { display: none; }
 .research-heading h1 { font-family: inherit; font-size: 26px; font-weight: 650; letter-spacing: -.8px; line-height: 1.35; margin: 0 0 8px; }
 .research-heading p { font-size: 12px; color: #718198; }
 .eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 1.4px; color: #8190a7; }
 .eyebrow > span:empty { display: none; }
-.overview-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 15px; background: transparent; border: 0; border-radius: 0; overflow: visible; margin-bottom: 22px; }
-.overview-stats > .stat-card { position: relative; background: #fff; border: 1px solid #e4eaf3; border-radius: 10px; padding: 15px 18px 13px; box-shadow: 0 2px 3px #23385d02; }
+.overview-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 15px; background: transparent; border: 0; border-radius: 0; overflow: visible; margin-bottom: 18px; }
+.overview-stats > .stat-card { position: relative; background: #fff; border: 1px solid #e4eaf3; border-radius: 10px; padding: 12px 18px; box-shadow: 0 2px 3px #23385d02; }
 .stat-label { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #66778f; }
 .stat-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 7px; background: #eef4ff; color: #467feb; position: absolute; top: 17px; right: 17px; }
 .stat-card-1 .stat-icon { color: #429b94; background: #ecf7f5; }
@@ -77,7 +78,9 @@
 .research-controls > label { gap: 6px; font-size: 11px; color: #647590; min-width: 115px; }
 .research-controls .search-control { flex: 1; max-width: 330px; }
 .search-control input { padding-left: 34px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2391a0b5' stroke-width='1.6'%3E%3Ccircle cx='6.5' cy='6.5' r='4.5'/%3E%3Cpath d='m10 10 4 4'/%3E%3C/svg%3E") no-repeat 11px center; }
-.dashboard-filter-panel { margin-bottom: 17px; }
+.dashboard-filter-panel { margin-bottom: 13px; }
+.dashboard-filter-panel .research-controls > label > span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+.dashboard-filter-panel .research-controls > label { gap: 0; }
 .metric-context { border: 0; padding: 0; margin: 0 0 18px; gap: 13px; color: #687b93; font-size: 10px; min-height: 25px; }
 .metric-context strong { color: #50647f; font-weight: 500; }
 .metric-context > span + span:before { content: ""; height: 8px; width: 1px; background: #d2dbe7; display: inline-block; margin-right: 12px; }
@@ -87,14 +90,14 @@
 .spatial-column { min-width: 0; }
 .research-panel { border-color: #e2e9f2; border-radius: 10px; background: #fff; overflow: hidden; }
 .research-map { position: relative; background: #101f35; border-color: #142841; border-radius: 11px; overflow: hidden; color: #d5e5fa; box-shadow: 0 6px 18px #0c213f10; }
-.research-map .panel-top { position: relative; z-index: 1; padding: 19px 22px 0; margin: 0; }
+.research-map .panel-top { position: relative; z-index: 1; padding: 16px 22px 0; margin: 0; }
 .research-map .panel-top h2 { color: #edf5ff; font-size: 15px; font-weight: 550; display: flex; gap: 9px; align-items: center; }
 .research-map .panel-top .eyebrow { color: #7e9cc3; font-size: 8px; letter-spacing: 1.7px; margin-bottom: 6px; }
 .map-title-icon { display: flex; align-items: center; justify-content: center; height: 27px; width: 27px; color: #93bffc; border: 1px solid #3a5477; border-radius: 6px; }
 .research-map .segmented { background: #0b1729; border: 1px solid #30445f; padding: 3px; border-radius: 7px; }
 .research-map .segmented button { color: #8fa6c6; font-size: 10px; padding: 6px 11px; min-height: 29px; }
 .research-map .segmented [aria-pressed="true"] { background: #294566; color: #e0eeff; border-radius: 4px; box-shadow: 0 1px 4px #0003; }
-.map-stage { height: 393px; position: relative; background: radial-gradient(ellipse at 52% 48%,#203e632b,transparent 67%); }
+.map-stage { height: 400px; position: relative; background: radial-gradient(ellipse at 52% 48%,#203e632b,transparent 67%); }
 .map-stage:before { content: ""; pointer-events: none; position: absolute; inset: 0; opacity: .4; background-image: linear-gradient(#637ca10b 1px,transparent 1px),linear-gradient(90deg,#637ca10b 1px,transparent 1px); background-size: 38px 38px; mask-image: radial-gradient(ellipse,#000,transparent 75%); }
 .map-canvas { height: 100%; width: 100%; position: relative; z-index: 1; }
 .map-compass { top: 29px; right: 23px; left: auto; color: #8da4c4; font-size: 10px; line-height: 1.7; z-index: 2; }
@@ -248,7 +251,7 @@
   .overview-stats p { font-size: 9px; }
   .research-controls { gap: 9px; }
   .research-controls > label { min-width: 105px; }
-  .map-stage { height: 393px; }
+  .map-stage { height: 400px; }
   .map-legend span:last-child { display: none; }
   .city-inspector.selected-city-panel { padding: 15px; }
   .city-inspector .selected-metric strong { font-size: 30px; }
