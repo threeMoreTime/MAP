@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { useMetroData } from './useMetroData';
 import type { MetroStats, CityAssetsIndex, Manifest } from '../types/metro';
 
@@ -108,8 +108,15 @@ function stubFetch(routes: Record<string, () => Response>, fallback?: () => Resp
 }
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
+
+function pendingRequest(signal: AbortSignal) {
+  return new Promise<Response>((_, reject) => {
+    signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+  });
+}
 
 describe('useMetroData', () => {
   it('成功加载并合并 stats/assets/covers', async () => {
@@ -185,5 +192,62 @@ describe('useMetroData', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toContain('metro_stats.json');
     expect(result.current.merged).toEqual([]);
+  });
+
+  it('挂起的核心请求在 12 秒后退出加载态并取消请求', async () => {
+    vi.useFakeTimers();
+    const signals: AbortSignal[] = [];
+    vi.stubGlobal('fetch', vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+      const signal = init?.signal as AbortSignal;
+      signals.push(signal);
+      return signal ? pendingRequest(signal) : new Promise<Response>(() => {});
+    }));
+    const { result } = renderHook(() => useMetroData());
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(12000); });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toContain('超时');
+    expect(result.current.merged).toEqual([]);
+    expect(signals.every((signal) => signal?.aborted)).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('可选资料请求挂起时超时降级，保留已加载的城市数据', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('fetch', vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.endsWith('/metro_stats.json')) return Promise.resolve(jsonResponse(makeStats()));
+      if (url.endsWith('/city_assets_index.json')) return Promise.resolve(jsonResponse(makeAssets()));
+      if (url === '/data/latest/manifest.json') return Promise.resolve(jsonResponse(makeManifest()));
+      return init?.signal ? pendingRequest(init.signal) : new Promise<Response>(() => {});
+    }));
+    const { result } = renderHook(() => useMetroData());
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(12000); });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(result.current.merged).toHaveLength(3);
+    expect(result.current.coversManifest).toBeNull();
+    expect(result.current.qualityReport).toBeNull();
+  });
+
+  it('卸载时立即取消未完成的请求并清理超时任务', async () => {
+    vi.useFakeTimers();
+    const signals: AbortSignal[] = [];
+    vi.stubGlobal('fetch', vi.fn((_input: RequestInfo | URL, init?: RequestInit) => {
+      const signal = init?.signal as AbortSignal;
+      signals.push(signal);
+      return signal ? pendingRequest(signal) : new Promise<Response>(() => {});
+    }));
+    const { unmount } = renderHook(() => useMetroData());
+
+    await act(async () => { unmount(); });
+
+    expect(signals).toHaveLength(5);
+    expect(signals.every((signal) => signal?.aborted)).toBe(true);
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

@@ -40,14 +40,14 @@ jobs:
     - name: Set up Node.js Runtime
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version-file: .nvmrc
         cache: 'npm'
         cache-dependency-path: package-lock.json
 
     - name: Install System and Project Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install beautifulsoup4 lxml
+        python -m pip install -r requirements-dev.txt beautifulsoup4 lxml
         npm ci
 
     - name: Run Data Update Orchestration
@@ -172,7 +172,7 @@ jobs:
             labels: label,
           });
           if (issues.data.length > 0) {
-            await github.rest.issues.addComment({
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issues.data[0].number,

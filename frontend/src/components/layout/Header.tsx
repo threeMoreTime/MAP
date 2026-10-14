@@ -1,65 +1,37 @@
-import { NavLink, Link } from 'react-router-dom';
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { useBasket, useMotion } from "../../hooks/useResearch";
+import StudioIcon, { type StudioIconName } from "../research/StudioIcon";
 
-const NAV_ITEMS = [
-  { to: '/', label: '数据大屏', end: true },
-  { to: '/cities', label: '城市总览', end: false },
-  { to: '/compare', label: '城市对比', end: false },
-  { to: '/data-quality', label: '数据质量', end: false },
-  { to: '/about', label: '数据说明', end: false },
+const items: { to: string; label: string; icon: StudioIconName; end: boolean }[] = [
+  { to: "/", label: "全国概览", icon: "overview", end: true },
+  { to: "/cities", label: "城市档案", icon: "city", end: false },
+  { to: "/compare", label: "对标分析", icon: "compare", end: false },
+  { to: "/maps", label: "线网图集", icon: "map", end: false },
 ];
-
 export default function Header() {
-  return (
-    <nav className="sticky top-0 z-[100] border-b border-paper-300 bg-paper-50/95">
-      <div className="mx-auto flex h-[52px] w-full max-w-[1180px] items-center gap-6 px-4 sm:px-6">
-        <Link
-          to="/"
-          className="mr-auto flex items-center gap-2.5 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vermilion-500"
-        >
-          {/* 朱印 · 站点签章 */}
-          <span className="flex size-5 items-center justify-center rounded-[3px] bg-vermilion-600 font-serif text-[12px] font-semibold leading-none text-paper-50">
-            铁
-          </span>
-          <span className="font-serif text-[15px] font-semibold text-ink-900">MetroViz</span>
-        </Link>
-        <div className="hidden items-center gap-5 sm:flex">
-          {NAV_ITEMS.map(({ to, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                `border-b-2 pb-0.5 pt-1 text-[13px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-vermilion-500 ${
-                  isActive
-                    ? 'border-vermilion-500 font-medium text-ink-900'
-                    : 'border-transparent text-ink-500 hover:text-ink-900'
-                }`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-        </div>
-        {/* 移动端导航：横向滚动 */}
-        <div className="flex items-center gap-4 overflow-x-auto sm:hidden">
-          {NAV_ITEMS.map(({ to, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                `whitespace-nowrap border-b-2 pb-0.5 pt-1 text-[13px] ${
-                  isActive
-                    ? 'border-vermilion-500 font-medium text-ink-900'
-                    : 'border-transparent text-ink-500'
-                }`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-        </div>
+  const { ids, href } = useBasket();
+  const motion = useMotion();
+  const { pathname } = useLocation();
+  const current = items.find(i => i.to === pathname)?.label || (pathname.startsWith("/city/") ? "城市档案" : "数据说明");
+  return <>
+    <aside className="studio-sidebar">
+      <a className="skip-link" href="#main-content">跳至主要内容</a>
+      <Link to={href("/", { q: null, city: null })} className="studio-brand">
+        <span className="studio-brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M7 23V9l9 9 9-9v14" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="7" cy="25" r="2" fill="currentColor"/><circle cx="25" cy="25" r="2" fill="currentColor"/></svg></span>
+        <span>MetroViz<small>城市轨道交通研究</small></span>
+      </Link>
+      <div className="workspace-badge"><span className="workspace-monogram">M</span><div>交通数据工作台<small>Research workspace</small></div><StudioIcon name="chevron" size={14}/></div>
+      <span className="sidebar-label">工作空间</span>
+      <nav aria-label="主导航">{items.map(item => <NavLink key={item.to} to={href(item.to, { q: null, city: null, tab: null })} end={item.end} className={({isActive}) => isActive ? "is-active" : ""}><StudioIcon name={item.icon}/><span>{item.label}</span>{item.to === "/compare" && ids.length > 0 && <span className="nav-count">{ids.length}</span>}</NavLink>)}</nav>
+      <div className="sidebar-bottom">
+        <div className="sidebar-note"><StudioIcon name="layers" size={23}/><strong>读懂城市的流动</strong><p>从空间分布，到历史轨迹。<br/>为每一次研究找到依据。</p><Link to="/about">了解数据与来源 <StudioIcon name="arrow" size={14}/></Link></div>
+        <Link className="sidebar-help" to="/about"><StudioIcon name="info"/>数据与指标说明</Link>
+        <div className="sidebar-edition"><span className="status-dot"/>MetroViz Research <span>V2</span></div>
       </div>
-    </nav>
-  );
+    </aside>
+    <header className="research-header studio-topbar">
+      <div className="studio-breadcrumb"><StudioIcon name="layers" size={17}/><span>工作空间</span><span>/</span><strong>{current}</strong></div>
+      <div className="header-tools"><span className="history-chip"><span/>历史资料研究</span><button className="motion-toggle" aria-pressed={motion.reduced} disabled={motion.system} onClick={motion.toggle} title={motion.system ? "已遵循系统减少动态效果设置" : "切换减少动态效果"}><StudioIcon name="motion" size={15}/>{motion.reduced ? "动效已减弱" : "减少动态效果"}</button><Link className="topbar-help" to="/about" aria-label="数据说明"><StudioIcon name="info"/></Link></div>
+    </header>
+  </>;
 }

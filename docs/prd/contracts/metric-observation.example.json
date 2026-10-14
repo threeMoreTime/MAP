@@ -1,0 +1,62 @@
+{
+  "description": "拟新增指标契约示例，源值取自852dbdd；verified字段没有自动背书",
+  "observations": [
+    {
+      "cityId": "hangzhou",
+      "metricId": "M-01",
+      "value": null,
+      "unit": "万人次",
+      "periodType": "snapshot",
+      "periodStart": null,
+      "periodEnd": null,
+      "asOfDate": null,
+      "periodCompleteness": "unknown",
+      "sourceUrl": "https://metrodb.org/index/hangzhou.html",
+      "sourceName": "MetroDB",
+      "collectedAt": "2026-05-08",
+      "generatedAt": "2026-08-17T03:21:22Z",
+      "systemScope": null,
+      "countingMethod": null,
+      "verificationStatus": "pending",
+      "verifiedBy": null,
+      "verifiedAt": null,
+      "availability": "missing",
+      "missingReason": "源字段为0，按既有来源约定视为缺失",
+      "provenance": "source",
+      "periodKey": null
+    },
+    {
+      "cityId": "hangzhou",
+      "metricId": "M-02",
+      "value": 423.52,
+      "unit": "万人次每日",
+      "periodKey": "2025",
+      "periodType": "annual",
+      "periodStart": null,
+      "periodEnd": null,
+      "asOfDate": null,
+      "periodCompleteness": "unknown",
+      "sourceUrl": "https://metrodb.org/index/hangzhou.html",
+      "sourceName": "MetroDB",
+      "collectedAt": "2026-05-08",
+      "generatedAt": "2026-08-17T03:21:22Z",
+      "systemScope": null,
+      "countingMethod": null,
+      "verificationStatus": "pending",
+      "verifiedBy": null,
+      "verifiedAt": null,
+      "availability": "available",
+      "missingReason": null,
+      "provenance": "source"
+    }
+  ],
+  "comparison": {
+    "mode": "reference",
+    "strictEligible": false,
+    "reasons": [
+      "统计起止未核验",
+      "系统范围未知",
+      "计数方式未知"
+    ]
+  }
+}

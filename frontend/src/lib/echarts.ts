@@ -20,6 +20,7 @@ import {
   TooltipComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
+import { LabelLayout } from 'echarts/features';
 import type {
   BarSeriesOption,
   EffectScatterSeriesOption,
@@ -52,6 +53,7 @@ echarts.use([
   TitleComponent,
   TooltipComponent,
   CanvasRenderer,
+  LabelLayout,
 ]);
 
 export type EChartsOption = ComposeOption<

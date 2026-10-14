@@ -1,5 +1,15 @@
-import { useState, useEffect } from 'react';
-import type { MetroStats, CityAssetsIndex, Manifest, MetroCity, CityAsset, CoverManifest, CoverManifestItem, QualityReport } from '../types/metro';
+import { useState, useEffect, useContext } from "react";
+import { MetroDataContext } from "../lib/metroDataContext";
+import type {
+  MetroStats,
+  CityAssetsIndex,
+  Manifest,
+  MetroCity,
+  CityAsset,
+  CoverManifest,
+  CoverManifestItem,
+  QualityReport,
+} from "../types/metro";
 
 export interface MergedCity extends CityAsset {
   stats: MetroCity | null;
@@ -13,7 +23,7 @@ export interface MergedCity extends CityAsset {
   peak_ridership_date: string;
   // 封面图元数据字段（从 city-covers manifest 中聚合而来）
   cover_file: string | null;
-  cover_status: 'downloaded' | 'fallback' | 'missing' | 'unknown';
+  cover_status: "downloaded" | "fallback" | "missing" | "unknown";
   cover_source_url?: string;
   cover_license?: string;
   cover_author?: string;
@@ -31,8 +41,11 @@ export interface MetroDataState {
   qualityReport: QualityReport | null;
 }
 
-
-function mergeData(assets: CityAsset[], stats: MetroCity[], covers: CoverManifest | null): MergedCity[] {
+function mergeData(
+  assets: CityAsset[],
+  stats: MetroCity[],
+  covers: CoverManifest | null,
+): MergedCity[] {
   const statsMap = new Map<string, MetroCity>();
   for (const s of stats) {
     statsMap.set(s.city, s);
@@ -50,8 +63,13 @@ function mergeData(assets: CityAsset[], stats: MetroCity[], covers: CoverManifes
     const coverItem = coverItemMap.get(a.city) || null;
 
     // 优雅降级兜底
-    const cover_status = coverItem?.status || (a.city === 'hohhot' ? 'fallback' : 'downloaded');
-    const cover_file = coverItem ? coverItem.file : (a.city === 'hohhot' ? null : `${a.city}.webp`);
+    const cover_status =
+      coverItem?.status || (a.city === "hohhot" ? "fallback" : "downloaded");
+    const cover_file = coverItem
+      ? coverItem.file
+      : a.city === "hohhot"
+        ? null
+        : `${a.city}.webp`;
 
     return {
       ...a,
@@ -63,7 +81,7 @@ function mergeData(assets: CityAsset[], stats: MetroCity[], covers: CoverManifes
       operating_mileage_km: s?.operating_mileage_km ?? 0,
       lines_under_construction: s?.lines_under_construction ?? 0,
       peak_ridership_wan: s?.peak_ridership_wan ?? 0,
-      peak_ridership_date: s?.peak_ridership_date ?? '',
+      peak_ridership_date: s?.peak_ridership_date ?? "",
       cover_file,
       cover_status,
       cover_source_url: coverItem?.source_url,
@@ -74,15 +92,15 @@ function mergeData(assets: CityAsset[], stats: MetroCity[], covers: CoverManifes
   });
 }
 
-import { withBaseUrl } from '../utils/path';
+import { withBaseUrl } from "../utils/path";
 
-async function fetchJSON<T>(url: string): Promise<T> {
-  const resp = await fetch(url);
+async function fetchJSON<T>(url: string, signal: AbortSignal): Promise<T> {
+  const resp = await fetch(url, { signal });
   if (!resp.ok) throw new Error(`Failed to fetch ${url}: ${resp.status}`);
   return resp.json() as Promise<T>;
 }
 
-export function useMetroData(): MetroDataState {
+export function useMetroDataLoader(enabled = true): MetroDataState {
   const [state, setState] = useState<MetroDataState>({
     loading: true,
     error: null,
@@ -95,21 +113,53 @@ export function useMetroData(): MetroDataState {
   });
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
+    let timedOut = false;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 12000);
 
     async function load() {
       try {
-        const [statsData, assetsData, manifestData, coversManifestData, qualityReportData] = await Promise.all([
-          fetchJSON<MetroStats>(withBaseUrl('data/latest/metro_stats.json')),
-          fetchJSON<CityAssetsIndex>(withBaseUrl('data/latest/city_assets_index.json')),
-          fetchJSON<Manifest>(withBaseUrl('data/latest/manifest.json')),
-          fetchJSON<CoverManifest>(withBaseUrl('assets/city-covers/manifest.json')).catch(() => null),
-          fetchJSON<QualityReport>(withBaseUrl('data/latest/quality_report.json')).catch(() => null),
+        const [
+          statsData,
+          assetsData,
+          manifestData,
+          coversManifestData,
+          qualityReportData,
+        ] = await Promise.all([
+          fetchJSON<MetroStats>(
+            withBaseUrl("data/latest/metro_stats.json"),
+            controller.signal,
+          ),
+          fetchJSON<CityAssetsIndex>(
+            withBaseUrl("data/latest/city_assets_index.json"),
+            controller.signal,
+          ),
+          fetchJSON<Manifest>(
+            withBaseUrl("data/latest/manifest.json"),
+            controller.signal,
+          ),
+          fetchJSON<CoverManifest>(
+            withBaseUrl("assets/city-covers/manifest.json"),
+            controller.signal,
+          ).catch(() => null),
+          fetchJSON<QualityReport>(
+            withBaseUrl("data/latest/quality_report.json"),
+            controller.signal,
+          ).catch(() => null),
         ]);
 
         if (cancelled) return;
 
-        const merged = mergeData(assetsData.items, statsData.items, coversManifestData);
+        const merged = mergeData(
+          assetsData.items,
+          statsData.items,
+          coversManifestData,
+        );
 
         setState({
           loading: false,
@@ -126,16 +176,31 @@ export function useMetroData(): MetroDataState {
           setState((prev) => ({
             ...prev,
             loading: false,
-            error: e instanceof Error ? e.message : 'Unknown error',
+            error: timedOut
+              ? "数据请求超时，请检查网络后重新加载。"
+              : e instanceof Error ? e.message : "Unknown error",
           }));
         }
+      } finally {
+        window.clearTimeout(timeout);
+        // Stop sibling downloads after an early core-data failure as well.
+        controller.abort();
       }
     }
 
     load();
-    return () => { cancelled = true; };
-  }, []);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [enabled]);
 
   return state;
 }
 
+export function useMetroData(): MetroDataState {
+  const shared = useContext(MetroDataContext);
+  const standalone = useMetroDataLoader(shared === null);
+  return shared ?? standalone;
+}
