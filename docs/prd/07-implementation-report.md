@@ -66,3 +66,9 @@ screenshots 目录包含全国概览三维、五城对标、城市档案与移�
 CI 的数据任务原先只安装 npm 依赖，未安装 pytest 与 Pillow。新增 requirements-dev.txt 并由 CI 显式安装；README 同步本地安装方法。使用新的 Python 3.12 虚拟环境安装声明依赖后验证管线，远端 CI 仍沿用 Python 3.10。
 
 本日复验结果为前端单测 92 项、浏览器验收 18 组、管线测试 22 项全部通过；ESLint、TypeScript 生产构建和 T01–T09 静态检查通过。数据校验仍为 0 error、11 条日快照缺失 warning。采集日仍为 2026-05-08，距复验日 159 天，既有 45 天新鲜度门槛仍失败；此次补修没有更新业务数据或放宽该门槛。
+
+PR #6 的首次远端 CI 发现，既有 Node 20 配置低于锁定依赖 jsdom 30 和 undici 8 的最低运行要求，导致测试进程无法启动。CI、Pages 与数据更新流程统一读取 .nvmrc 的 Node 24，并在两个 package.json 和对应锁文件声明 Node 24.15 以上的 24.x 版本要求。本地验证运行于 Node 24.19.0。
+
+同次 CI 还证实已有告警 issue 时会调用不存在的 github.rest.issues.addComment。现将新鲜度告警和数据更新告警统一修正为 createComment，保留原有告警对象和触发条件。
+
+数据更新工作流同步安装声明的 Python 依赖，确保管线入口导入图像处理模块时具备 Pillow；该工作流本轮未执行真实数据采集。

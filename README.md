@@ -22,6 +22,8 @@
 
 ## 快速开始
 
+使用 Node.js 24.x（至少 24.15.0）；已安装 nvm 时可在仓库根目录执行 `nvm install && nvm use`，与 CI 的 `.nvmrc` 保持一致。数据管线需要 Python 3.10+。
+
 ```bash
 cd frontend
 npm ci

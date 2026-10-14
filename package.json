@@ -13,5 +13,8 @@
   },
   "dependencies": {
     "puppeteer-core": "^24.42.0"
+  },
+  "engines": {
+    "node": "^24.15.0"
   }
 }
